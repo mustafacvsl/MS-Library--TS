@@ -1,5 +1,5 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import Author, { IAuthor } from '../User/Author';
+import Author, { IAuthor } from '../User/auth.entity';
 import Book, { IBook } from '../Book/Book';
 
 export interface ILoaned {

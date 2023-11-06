@@ -6,10 +6,10 @@ import BookService from '../Domain/Book/Book.service';
 import BookApplicationService from '../ApplicationService/BookApplicationService';
 import AuthRepository from '../Domain/User/Auth.repository';
 import BookRepository from '../Domain/Book/Book.repository';
-import ApplicationService from '../ApplicationService/UserApplicationService';
+import AuthApplicationService from '../ApplicationService/AuthApplicationService';
 
 const container = new Container();
-container.bind<ApplicationService>(ApplicationService).toSelf();
+container.bind<AuthApplicationService>(AuthApplicationService).toSelf();
 container.bind<AuthController>(AuthController).toSelf();
 container.bind<BookController>(BookController).toSelf();
 container.bind<AuthService>(AuthService).toSelf();

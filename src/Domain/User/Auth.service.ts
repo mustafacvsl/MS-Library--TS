@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify';
 import AuthRepository from './Auth.repository';
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-import Author, { IAuthorModel } from './Author';
+import Author, { IAuthorModel } from './auth.entity';
 import 'reflect-metadata';
 
 @injectable()

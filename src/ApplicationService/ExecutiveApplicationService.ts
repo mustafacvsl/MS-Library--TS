@@ -1,5 +1,5 @@
 import ExecutiveService from '../Domain/Executive/executive.service';
-import Author from '../Domain/User/Author';
+import Author from '../Domain/User/auth.entity';
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 import { injectable, inject } from 'inversify';

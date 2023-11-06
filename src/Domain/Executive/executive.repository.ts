@@ -1,4 +1,4 @@
-import Author from '../User/Author';
+import Author from '../User/auth.entity';
 
 class ExecutiveRepository {
     async findUserByEmail(email: string) {

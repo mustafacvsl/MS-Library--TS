@@ -1,6 +1,6 @@
 import Joi, { ObjectSchema } from 'joi';
 import { NextFunction, Request, Response } from 'express';
-import { IAuthor } from '../Domain/User/Author';
+import { IAuthor } from '../Domain/User/auth.entity';
 import { IBook } from '../Domain/Book/Book';
 import Logging from '../infrastructure/Logging';
 

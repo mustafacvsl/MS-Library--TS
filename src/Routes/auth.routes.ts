@@ -1,7 +1,7 @@
 import express from 'express';
 import { AuthController } from '../Controller/auth.controller';
 import { Schemas, ValidateJoi } from '../middleware/Joi';
-import ApplicationService from '../ApplicationService/UserApplicationService';
+import ApplicationService from '../ApplicationService/AuthApplicationService';
 import AuthService from '../Domain/User/Auth.service';
 import AuthRepository from '../Domain/User/Auth.repository';
 

@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import 'reflect-metadata';
 import { inject, injectable } from 'inversify';
 import BookApplicationService from '../ApplicationService/BookApplicationService';
-
+import { handleResponse } from '../infrastructure/response';
 @injectable()
 export class BookController {
     private bookApplicationservice: BookApplicationService;
@@ -10,68 +10,48 @@ export class BookController {
     constructor(@inject(BookApplicationService) bookApplicationservice: BookApplicationService) {
         this.bookApplicationservice = bookApplicationservice;
     }
-
     createBook = async (req: Request, res: Response, next: NextFunction) => {
         const { title, author, stock, location } = req.body;
 
         if (!title || !author || !stock || !location) {
-            return res.status(400).json({ error: 'Title, author, stock, and location are required.' });
+            return next(new Error('Title, author, stock, and location are required.'));
         }
 
-        try {
-            const newBook = await this.bookApplicationservice.createBook({
-                author,
-                title,
-                stock,
-                location
-            });
-            res.status(201).json({ book: newBook });
-        } catch (error: any) {
-            res.status(500).json({ error: error.message });
-        }
+        const newBook = await this.bookApplicationservice.createBook({
+            title,
+            author,
+            stock,
+            location
+        });
+        handleResponse(res, 201, { book: newBook }, 'Book created successfully');
     };
 
     readBook = async (req: Request, res: Response, next: NextFunction) => {
         const bookId = req.params.bookId;
 
-        try {
-            const book = await this.bookApplicationservice.getBook(bookId);
-            res.status(200).json({ book });
-        } catch (error: any) {
-            res.status(500).json({ error: error.message });
-        }
+        const book = await this.bookApplicationservice.getBook(bookId);
+        handleResponse(res, 200, { book }, 'Book retrieved successfully');
     };
 
     readAll = async (req: Request, res: Response, next: NextFunction) => {
-        try {
-            const books = await this.bookApplicationservice.getAllBooks();
-            res.status(200).json({ books });
-        } catch (error: any) {
-            res.status(500).json({ error: error.message });
-        }
+        const books = await this.bookApplicationservice.getAllBooks();
+        handleResponse(res, 200, { books }, 'All books retrieved successfully');
     };
 
     updateBook = async (req: Request, res: Response, next: NextFunction) => {
         const bookId = req.params.bookId;
         const updatedBookInfo = req.body;
 
-        try {
-            const updatedBook = await this.bookApplicationservice.updateBook(bookId, updatedBookInfo);
-            res.status(201).json({ book: updatedBook });
-        } catch (error: any) {
-            res.status(500).json({ error: error.message });
-        }
+        const updatedBook = await this.bookApplicationservice.updateBook(bookId, updatedBookInfo);
+        handleResponse(res, 201, { book: updatedBook }, 'Book updated successfully');
     };
 
     deleteBook = async (req: Request, res: Response, next: NextFunction) => {
         const bookId = req.params.bookId;
 
-        try {
-            const deletedBook = await this.bookApplicationservice.deleteBook(bookId);
-            res.status(201).json({ book: deletedBook, message: 'Silindi' });
-        } catch (error: any) {
-            res.status(500).json({ error: error.message });
-        }
+        const deletedBook = await this.bookApplicationservice.deleteBook(bookId);
+        handleResponse(res, 201, { book: deletedBook }, 'Book deleted successfully');
     };
 }
+
 export default BookController;

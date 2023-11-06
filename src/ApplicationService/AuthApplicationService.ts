@@ -1,12 +1,12 @@
 import AuthService from '../Domain/User/Auth.service';
-import Author from '../Domain/User/Author';
+import Author from '../Domain/User/auth.entity';
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 import { injectable, inject } from 'inversify';
 import 'reflect-metadata';
 
 @injectable()
-export class ApplicationService {
+export class AuthApplicationService {
     constructor(@inject(AuthService) private authService: AuthService) {}
 
     async registerUser(name: string, email: string, password: string) {
@@ -36,4 +36,4 @@ export class ApplicationService {
     }
 }
 
-export default ApplicationService;
+export default AuthApplicationService;

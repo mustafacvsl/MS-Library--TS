@@ -1,4 +1,4 @@
-import Author from './Author';
+import Author from './auth.entity';
 
 class AuthRepository {
     async findUserByEmail(email: string) {

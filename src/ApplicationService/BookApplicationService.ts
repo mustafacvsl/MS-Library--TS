@@ -2,6 +2,7 @@ import BookService from '../Domain/Book/Book.service';
 import { IBook } from '../Domain/Book/Book';
 import 'reflect-metadata';
 import { inject, injectable } from 'inversify';
+import { handleResponse } from '../infrastructure/response';
 
 @injectable()
 export class BookApplicationService {

@@ -3,6 +3,7 @@ import { IBook } from '../Domain/Book/Book';
 import 'reflect-metadata';
 import { inject, injectable } from 'inversify';
 import { handleResponse } from '../infrastructure/response';
+import { Response, response } from 'express';
 
 @injectable()
 export class BookApplicationService {
@@ -11,62 +12,52 @@ export class BookApplicationService {
     constructor(@inject(BookService) bookService: BookService) {
         this.bookService = bookService;
     }
-    async createBook(bookData: { title: string; author: string; stock: string; location: string }): Promise<IBook | null> {
-        try {
-            if (!bookData.author || !bookData.title) {
-                throw new Error('Author and title are required.');
-            }
 
-            const newBook = await this.bookService.createBook(bookData);
-            return newBook;
-        } catch (error) {
-            throw error;
+    async createBook(bookData: { title: string; author: string; stock: string; location: string }): Promise<IBook | null> {
+        if (!bookData.author || !bookData.title) {
+            handleResponse(response, 400, null, 'Author and title are required.');
+            return null;
         }
+
+        const newBook = await this.bookService.createBook(bookData);
+        handleResponse(response, 201, { book: newBook }, 'Book created successfully');
+        return newBook;
     }
 
     async getBook(bookId: string): Promise<IBook | null> {
-        try {
-            const book = await this.bookService.readBook(bookId);
-            if (!book) {
-                throw new Error('Book not found');
-            }
-            return book;
-        } catch (error) {
-            throw error;
+        const book = await this.bookService.readBook(bookId);
+        if (!book) {
+            handleResponse(response, 404, null, 'Book not found');
+            return null;
         }
+        handleResponse(response, 200, { book }, 'Book retrieved successfully');
+        return book;
     }
 
     async getAllBooks(): Promise<IBook[] | null> {
-        try {
-            const books = await this.bookService.readAllBooks();
-            return books;
-        } catch (error) {
-            throw error;
-        }
+        const books = await this.bookService.readAllBooks();
+        handleResponse(response, 200, { books }, 'All books retrieved successfully');
+        return books;
     }
 
     async updateBook(bookId: string, updatedBookInfo: any): Promise<IBook | null> {
-        try {
-            const updatedBook = await this.bookService.updateBook(bookId, updatedBookInfo);
-            if (!updatedBook) {
-                throw new Error(' Book not found');
-            }
-            return updatedBook;
-        } catch (error) {
-            throw error;
+        const updatedBook = await this.bookService.updateBook(bookId, updatedBookInfo);
+        if (!updatedBook) {
+            handleResponse(response, 404, null, 'Book not found');
+            return null;
         }
+        handleResponse(response, 200, { book: updatedBook }, 'Book updated successfully');
+        return updatedBook;
     }
 
     async deleteBook(bookId: string): Promise<IBook | null> {
-        try {
-            const deletedBook = await this.bookService.deleteBook(bookId);
-            if (!deletedBook) {
-                throw new Error('Book not found');
-            }
-            return deletedBook;
-        } catch (error) {
-            throw error;
+        const deletedBook = await this.bookService.deleteBook(bookId);
+        if (!deletedBook) {
+            handleResponse(response, 404, null, 'Book not found');
+            return null;
         }
+        handleResponse(response, 200, { book: deletedBook }, 'Book deleted successfully');
+        return deletedBook;
     }
 }
 

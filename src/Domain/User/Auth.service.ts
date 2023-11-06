@@ -2,7 +2,7 @@ import { inject, injectable } from 'inversify';
 import AuthRepository from './Auth.repository';
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-import Author, { IAuthorModel } from './auth.entity';
+import authEntity, { IAuthorModel } from './auth.entity';
 import 'reflect-metadata';
 
 @injectable()
@@ -15,7 +15,7 @@ class AuthService {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new Author({
+        const user = new authEntity({
             name,
             email,
             password: hashedPassword

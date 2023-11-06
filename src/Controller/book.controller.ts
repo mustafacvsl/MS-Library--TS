@@ -3,6 +3,7 @@ import 'reflect-metadata';
 import { inject, injectable } from 'inversify';
 import BookApplicationService from '../ApplicationService/BookApplicationService';
 import { handleResponse } from '../infrastructure/response';
+
 @injectable()
 export class BookController {
     private bookApplicationservice: BookApplicationService;

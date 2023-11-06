@@ -1,10 +1,10 @@
-import Book from './Book';
 import mongoose from 'mongoose';
 import 'reflect-metadata';
 import { inject, injectable } from 'inversify';
 import BookRepository from './Book.repository';
+import { Response } from 'express';
 import { handleResponse } from '../../infrastructure/response';
-import { Response, response } from 'express';
+import Book, { IBook } from './Book';
 
 @injectable()
 export class BookService {
@@ -14,59 +14,61 @@ export class BookService {
         this.bookRepository = bookRepository;
     }
 
-    async createBook(bookData: { author: string; title: string }): Promise<any> {
-        if (!bookData.author || !bookData.title) {
-            handleResponse(response, 400, null, 'Author and title are required.');
+    async createBook(bookData: { title: string; author: string; stock: string; location: string }, res: Response): Promise<IBook | null> {
+        if (!bookData.author || !bookData.title || !bookData.location || !bookData.stock) {
+            handleResponse(res, 400, null, 'Author, title, location, and stock are required.');
             return null;
         }
 
         const book = new Book({
             _id: new mongoose.Types.ObjectId(),
             author: bookData.author,
-            title: bookData.title
+            title: bookData.title,
+            location: bookData.location,
+            stock: bookData.stock
         });
 
         const savedBook = await book.save();
         if (!savedBook) {
-            handleResponse(response, 500, null, 'An error occurred while creating the book.');
+            handleResponse(res, 500, null, 'An error occurred while creating the book.');
             return null;
         }
 
-        handleResponse(response, 201, { book: savedBook }, 'Book created successfully');
+        handleResponse(res, 201, { book: savedBook }, 'Book created successfully');
         return savedBook;
     }
 
-    async readBook(bookId: string): Promise<any> {
+    async readBook(bookId: string, res: Response): Promise<any> {
         if (!bookId) {
-            handleResponse(response, 400, null, 'Book ID required.');
+            handleResponse(res, 400, null, 'Book ID required.');
             return null;
         }
 
         const book = await Book.findById(bookId).populate('author');
         if (!book) {
-            handleResponse(response, 404, null, 'Book not found');
+            handleResponse(res, 404, null, 'Book not found');
             return null;
         }
 
-        handleResponse(response, 200, { book }, 'Book retrieved successfully');
+        handleResponse(res, 200, { book }, 'Book retrieved successfully');
         return book;
     }
 
-    async readAllBooks(): Promise<any> {
+    async readAllBooks(res: Response): Promise<any> {
         const books = await Book.find();
-        handleResponse(response, 200, { books }, 'All books retrieved successfully');
+        handleResponse(res, 200, { books }, 'All books retrieved successfully');
         return books;
     }
 
-    async updateBook(bookId: string, updatedBookInfo: any): Promise<any> {
+    async updateBook(bookId: string, updatedBookInfo: any, res: Response): Promise<any> {
         if (!bookId) {
-            handleResponse(response, 400, null, 'Book ID required.');
+            handleResponse(res, 400, null, 'Book ID required.');
             return null;
         }
 
         const book = await Book.findById(bookId);
         if (!book) {
-            handleResponse(response, 404, null, 'Book not found');
+            handleResponse(res, 404, null, 'Book not found');
             return null;
         }
 
@@ -74,27 +76,27 @@ export class BookService {
         const updatedBook = await book.save();
 
         if (!updatedBook) {
-            handleResponse(response, 500, null, 'An error occurred while updating the book.');
+            handleResponse(res, 500, null, 'An error occurred while updating the book.');
             return null;
         }
 
-        handleResponse(response, 200, { book: updatedBook }, 'Book updated successfully');
+        handleResponse(res, 200, { book: updatedBook }, 'Book updated successfully');
         return updatedBook;
     }
 
-    async deleteBook(bookId: string): Promise<any> {
+    async deleteBook(bookId: string, res: Response): Promise<any> {
         if (!bookId) {
-            handleResponse(response, 400, null, 'Book ID required.');
+            handleResponse(res, 400, null, 'Book ID required.');
             return null;
         }
 
         const book = await Book.findByIdAndDelete(bookId);
         if (!book) {
-            handleResponse(response, 404, null, 'Book not found');
+            handleResponse(res, 404, null, 'Book not found');
             return null;
         }
 
-        handleResponse(response, 200, { book }, 'Book deleted successfully');
+        handleResponse(res, 200, { book }, 'Book deleted successfully');
         return book;
     }
 }

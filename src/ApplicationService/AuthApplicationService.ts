@@ -21,17 +21,8 @@ export class AuthApplicationService {
     }
 
     async loginUser(email: string, password: string) {
-        const author = await Author.findOne({ email });
-
-        if (!author) {
-            throw new Error('User not found');
-        }
-
-        if (!(await bcrypt.compare(password, author.password))) {
-            throw new Error('Authentication failed');
-        }
-
-        const token = this.generateJWTToken(author);
+        const user = await this.authService.login(email, password);
+        const token = this.generateJWTToken(user);
         return { token };
     }
 }

@@ -15,7 +15,6 @@ const MemberSchema: Schema = new Schema(
         userId: { type: Schema.Types.ObjectId, ref: 'Author', required: true },
         email: { type: String, required: true },
 
-        //bookId yi required yapmadım çünkü login ve register işlemlerinde gerek yok
         book_Id: { type: String, ref: 'Book' }
     },
     {

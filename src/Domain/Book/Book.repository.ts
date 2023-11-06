@@ -15,12 +15,13 @@ class BookRepository {
             title
         });
 
-        return newBook.save();
+        await newBook.save();
+        return newBook;
     }
 
     async readBook(bookId: string): Promise<any> {
         if (!bookId) {
-            throw new Error('Book ID is required.');//validation bak 
+            throw new Error('Book ID is required.'); //validation bak
         }
 
         const book = await Book.findById(bookId).populate('author');

@@ -3,7 +3,7 @@ import { IBook } from '../Domain/Book/Book';
 import 'reflect-metadata';
 import { inject, injectable } from 'inversify';
 import { handleResponse } from '../infrastructure/response';
-import { Response, response } from 'express';
+import { Response } from 'express';
 
 @injectable()
 export class BookApplicationService {
@@ -13,50 +13,50 @@ export class BookApplicationService {
         this.bookService = bookService;
     }
 
-    async createBook(bookData: { title: string; author: string; stock: string; location: string }): Promise<IBook | null> {
-        if (!bookData.author || !bookData.title) {
-            handleResponse(response, 400, null, 'Author and title are required.');
+    async createBook(bookData: { title: string; author: string; stock: string; location: string }, res: Response): Promise<IBook | null> {
+        if (!bookData.author || !bookData.title || !bookData.location || !bookData.stock) {
+            handleResponse(res, 400, null, 'Author, title, location, and stock are required.');
             return null;
         }
 
-        const newBook = await this.bookService.createBook(bookData);
-        handleResponse(response, 201, { book: newBook }, 'Book created successfully');
+        const newBook = await this.bookService.createBook(bookData, res);
+        handleResponse(res, 201, { book: newBook }, 'Book created successfully');
         return newBook;
     }
 
-    async getBook(bookId: string): Promise<IBook | null> {
-        const book = await this.bookService.readBook(bookId);
+    async getBook(bookId: string, res: Response): Promise<IBook | null> {
+        const book = await this.bookService.readBook(bookId, res);
         if (!book) {
-            handleResponse(response, 404, null, 'Book not found');
+            handleResponse(res, 404, null, 'Book not found');
             return null;
         }
-        handleResponse(response, 200, { book }, 'Book retrieved successfully');
+        handleResponse(res, 200, { book }, 'Book retrieved successfully');
         return book;
     }
 
-    async getAllBooks(): Promise<IBook[] | null> {
-        const books = await this.bookService.readAllBooks();
-        handleResponse(response, 200, { books }, 'All books retrieved successfully');
+    async getAllBooks(res: Response): Promise<IBook[] | null> {
+        const books = await this.bookService.readAllBooks(res);
+        handleResponse(res, 200, { books }, 'All books retrieved successfully');
         return books;
     }
 
-    async updateBook(bookId: string, updatedBookInfo: any): Promise<IBook | null> {
-        const updatedBook = await this.bookService.updateBook(bookId, updatedBookInfo);
+    async updateBook(bookId: string, updatedBookInfo: any, res: Response): Promise<IBook | null> {
+        const updatedBook = await this.bookService.updateBook(bookId, updatedBookInfo, res);
         if (!updatedBook) {
-            handleResponse(response, 404, null, 'Book not found');
+            handleResponse(res, 404, null, 'Book not found');
             return null;
         }
-        handleResponse(response, 200, { book: updatedBook }, 'Book updated successfully');
+        handleResponse(res, 200, { book: updatedBook }, 'Book updated successfully');
         return updatedBook;
     }
 
-    async deleteBook(bookId: string): Promise<IBook | null> {
-        const deletedBook = await this.bookService.deleteBook(bookId);
+    async deleteBook(bookId: string, res: Response): Promise<IBook | null> {
+        const deletedBook = await this.bookService.deleteBook(bookId, res);
         if (!deletedBook) {
-            handleResponse(response, 404, null, 'Book not found');
+            handleResponse(res, 404, null, 'Book not found');
             return null;
         }
-        handleResponse(response, 200, { book: deletedBook }, 'Book deleted successfully');
+        handleResponse(res, 200, { book: deletedBook }, 'Book deleted successfully');
         return deletedBook;
     }
 }

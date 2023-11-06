@@ -3,10 +3,10 @@ import http from 'http';
 import mongoose from 'mongoose';
 import { config } from './infrastructure/config';
 import Logging from './infrastructure/Logging';
-import authorRoutes from './Auth-Service/routes/auth.routes';
-import bookRoutes from './Book-Service/routes/book.routes';
-import executiveRoutes from './Executive/routes/executive.routes';
-import memberRoutes from './Members- Loaned/routes/member.routes';
+import authorRoutes from './Routes/auth.routes';
+import bookRoutes from './Routes/book.routes';
+import executiveRoutes from './Routes/executive.routes';
+import memberRoutes from './Routes/member.routes';
 
 const router = express();
 import errorHandlerMiddleware from './middleware/errorhandlerMiddleware';

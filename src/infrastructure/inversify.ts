@@ -1,12 +1,12 @@
 import { Container } from 'inversify';
-import { AuthController } from '../Auth-Service/controllers/auth.controller';
-import { BookController } from '../Book-Service/controllers/book.controller';
-import AuthService from '../Auth-Service/domain/User/Auth.service';
-import BookService from '../Book-Service/domain/Book/Book.service';
-import BookApplicationService from '../Book-Service/applicationService/BookApplicationService';
-import AuthRepository from '../Auth-Service/domain/User/Auth.repository';
-import BookRepository from '../Book-Service/domain/Book/Book.repository';
-import ApplicationService from '../Auth-Service/ApplicationService/UserApplicationService';
+import { AuthController } from '../Controller/auth.controller';
+import { BookController } from '../Controller/book.controller';
+import AuthService from '../Domain/User/Auth.service';
+import BookService from '../Domain/Book/Book.service';
+import BookApplicationService from '../ApplicationService/BookApplicationService';
+import AuthRepository from '../Domain/User/Auth.repository';
+import BookRepository from '../Domain/Book/Book.repository';
+import ApplicationService from '../ApplicationService/UserApplicationService';
 
 const container = new Container();
 container.bind<ApplicationService>(ApplicationService).toSelf();

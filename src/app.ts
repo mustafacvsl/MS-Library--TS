@@ -6,7 +6,7 @@ import Logging from './infrastructure/Logging';
 import authorRoutes from './Routes/auth.routes';
 import bookRoutes from './Routes/book.routes';
 import executiveRoutes from './Routes/executive.routes';
-import memberRoutes from './Routes/member.routes';
+// import memberRoutes from './Routes/member.routes';
 
 const router = express();
 import errorHandlerMiddleware from './middleware/errorhandlerMiddleware';
@@ -52,7 +52,7 @@ const StartServer = () => {
     router.use('/authors', authorRoutes);
     router.use('/books', bookRoutes);
     router.use('/executive', executiveRoutes);
-    router.use('member', memberRoutes);
+    // router.use('member', memberRoutes);
 
     router.use((req, res, next) => {
         const error = new Error('Not found');

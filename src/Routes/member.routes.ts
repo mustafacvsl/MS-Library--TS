@@ -1,17 +1,25 @@
 import express from 'express';
+import mongoose from 'mongoose';
 import { MemberController } from '../Controller/Member.controller';
-import { Schemas, ValidateJoi } from '../middleware/Joi';
-import MemberApplicationService from '../ApplicationService/MemberApplicationService';
-import MemberService from '../Domain/Member/member.service';
-import MemberRepository from '../Domain/Member/member.repository';
+import { MemberApplicationService } from '../ApplicationService/MemberApplicationService';
+import { MemberService } from '../Domain/Member/member.service';
+import { MemberRepository } from '../Domain/Member/member.repository';
+import { Model } from 'mongoose';
+import authEntity, { IAuthorModel } from '../Domain/User/auth.entity';
+import memberEntity, { IMemberModel } from '../Domain/Member/member.entity';
 
 const router = express.Router();
-const memberrepository = new MemberRepository();
-const memberservice = new MemberService(memberrepository);
-const memberapplicationservice = new MemberApplicationService(memberservice);
-const membercontroller = new MemberController(memberapplicationservice);
 
-router.post('/register', membercontroller.register.bind(membercontroller));
-router.post('/login', membercontroller.login.bind(membercontroller));
+const memberModel = mongoose.model<IMemberModel>('Member');
+const authorModel = mongoose.model<IAuthorModel>('Author');
 
-export = router;
+const memberRepository = new MemberRepository(memberModel);
+const memberService = new MemberService(authorModel, memberModel);
+const memberApplicationService = new MemberApplicationService(memberService, memberModel);
+const memberController = new MemberController(memberApplicationService);
+
+router.post('/createmember', async (req, res, next) => {
+    await memberController.createMemberFromAuthor(req, res, next);
+});
+
+export default router;

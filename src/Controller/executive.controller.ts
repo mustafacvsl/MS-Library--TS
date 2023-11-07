@@ -33,4 +33,24 @@ export class ExecutiveController {
 
         res.status(201).json({ author, message: 'Deleted' });
     }
+
+    async borrowBook(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { memberId, bookId } = req.body;
+            const loaned = await this.executiveapplicationservice.borrowBook(memberId, bookId);
+            res.status(201).json(loaned);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    async returnBook(req: Request, res: Response, next: NextFunction) {
+        try {
+            const loanedId = req.params.loanedId;
+            await this.executiveapplicationservice.returnBook(loanedId);
+            res.status(200).json({ message: 'Book returned successfully' });
+        } catch (err) {
+            next(err);
+        }
+    }
 }

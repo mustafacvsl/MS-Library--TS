@@ -3,21 +3,17 @@ import memberEntity, { IMember } from '../../Member/member.entity';
 import Book, { IBook } from '../../Book/Book';
 
 export interface ILoaned {
-    memberId: IMember;
-    bookId: IBook;
+    memberId: string;
+    bookId: string;
+    borrowedDate: Date;
 }
 
 export interface ILoanedModel extends ILoaned, Document {}
 
-const LoanedSchema: Schema = new Schema(
-    {
-        memberId: { type: String, required: true, ref: 'Author' },
-        bookId: { type: String, required: true, ref: 'Book' }
-    },
-    {
-        timestamps: true,
-        versionKey: false
-    }
-);
+const LoanedSchema = new Schema({
+    memberId: { type: mongoose.Schema.Types.ObjectId, ref: 'Author', required: true },
+    bookId: { type: mongoose.Schema.Types.ObjectId, ref: 'Book', required: true },
+    borrowedDate: { type: Date, default: Date.now }
+});
 
 export default mongoose.model<ILoanedModel>('Loaned', LoanedSchema);

@@ -19,7 +19,16 @@ export class BookApplicationService {
             return null;
         }
 
-        const newBook = await this.bookService.createBook(bookData, res);
+        const locationObject = JSON.parse(bookData.location);
+        const newBook = await this.bookService.createBook(
+            {
+                title: bookData.title,
+                author: bookData.author,
+                stock: bookData.stock,
+                location: locationObject
+            },
+            res
+        );
         handleResponse(res, 201, { book: newBook }, 'Book created successfully');
         return newBook;
     }

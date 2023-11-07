@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import Stock, { IStock } from './Stock.entity';
 import BookLocation, { IBookLocation } from './BookLocation';
+import { string } from 'joi';
 
 export interface IBook {
     title: string;
@@ -15,8 +16,12 @@ const BookSchema: Schema = new Schema(
     {
         title: { type: String, required: true },
         author: { type: String, required: true },
-        stock: { type: Number, ref: 'Stock', required: true },
-        location: { type: String, required: true, ref: 'BookLocation' }
+        stock: { type: String, ref: 'Stock', required: true },
+        location: {
+            corridor: { type: String, required: true },
+            shelf: { type: String, required: true },
+            cupboard: { type: String, required: true }
+        }
     },
     {
         timestamps: true,

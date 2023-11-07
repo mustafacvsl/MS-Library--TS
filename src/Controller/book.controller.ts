@@ -19,12 +19,14 @@ export class BookController {
             return next(new Error('Title, author, stock, and location are required.'));
         }
 
+        const locationString = JSON.stringify(location);
+
         const newBook = await this.bookApplicationservice.createBook(
             {
                 title,
                 author,
                 stock,
-                location
+                location: locationString
             },
             res
         );
@@ -33,7 +35,6 @@ export class BookController {
 
     readBook = async (req: Request, res: Response, next: NextFunction) => {
         const bookId = req.params.bookId;
-
         const book = await this.bookApplicationservice.getBook(bookId, res);
         handleResponse(res, 200, { book }, 'Book retrieved successfully');
     };

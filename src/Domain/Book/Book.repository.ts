@@ -4,7 +4,7 @@ import { injectable } from 'inversify';
 
 @injectable()
 class BookRepository {
-    async createBook(author: string, title: string): Promise<any> {
+    async createBook(author: string, title: string, stock: number, location: string): Promise<any> {
         if (!author || !title) {
             throw new Error('Author and title are required.');
         }
@@ -12,7 +12,9 @@ class BookRepository {
         const newBook = new Book({
             _id: new mongoose.Types.ObjectId(),
             author,
-            title
+            title,
+            stock,
+            location
         });
 
         await newBook.save();

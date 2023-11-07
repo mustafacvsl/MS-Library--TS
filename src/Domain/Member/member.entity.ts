@@ -15,7 +15,7 @@ const MemberSchema: Schema = new Schema(
         userId: { type: Schema.Types.ObjectId, ref: 'Author', required: true },
         email: { type: String, required: true },
 
-        book_Id: { type: String, ref: 'Book' }
+        book_Id: { type: String, ref: 'Book', required: true }
     },
     {
         timestamps: true,

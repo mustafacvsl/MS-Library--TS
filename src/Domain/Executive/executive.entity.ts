@@ -1,13 +1,14 @@
 import mongoose, { Document, Schema } from 'mongoose';
+import memberEntity, { IMember } from '../Member/member.entity';
 
-export interface IAdmin {
-    memberId: string;
-    member_email: string;
+export interface IExecutive {
+    memberId: IMember;
+    member_email: IMember;
 }
 
-export interface IAdminModel extends IAdmin, Document {}
+export interface IExecutiveModel extends IExecutive, Document {}
 
-const AdminSchema: Schema = new Schema(
+const ExecutiveSchema: Schema = new Schema(
     {
         memberId: { type: String, required: true, unique: true, ref: 'Member' },
         member_email: { type: String, required: true, unique: true, ref: 'Member' }
@@ -18,4 +19,4 @@ const AdminSchema: Schema = new Schema(
     }
 );
 
-export default mongoose.model<IAdminModel>('Executive', AdminSchema);
+export default mongoose.model<IExecutiveModel>('Executive', ExecutiveSchema);

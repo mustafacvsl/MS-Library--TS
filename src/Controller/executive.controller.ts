@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response, Router } from 'express';
-import container from '../infrastructure/inversify';
-import Author from '../Domain/User/auth.entity';
+import authEntity from '../Domain/User/auth.entity';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 const jwt = require('jsonwebtoken');

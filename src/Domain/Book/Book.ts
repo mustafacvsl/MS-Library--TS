@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import Stock, { IStock } from './Stock.entity';
-import BookLocation, { IBookLocation } from './BookLocation';
+import Stock, { IStock } from '../BookStock/Stock.entity';
+import BookLocation, { IBookLocation } from '../BookLocation/BookLocation';
 import { string } from 'joi';
 
 export interface IBook {

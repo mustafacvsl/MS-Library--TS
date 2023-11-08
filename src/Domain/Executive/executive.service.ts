@@ -2,8 +2,9 @@ import { inject, injectable } from 'inversify';
 import ExecutiveRepository from './executive.repository';
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-import Author, { IAuthorModel } from '../User/auth.entity';
+import authEntity, { IAuthorModel } from '../User/auth.entity';
 import 'reflect-metadata';
+import { ILoanedModel } from '../Loaned/loaned.entity';
 
 @injectable()
 class ExecutiveService {

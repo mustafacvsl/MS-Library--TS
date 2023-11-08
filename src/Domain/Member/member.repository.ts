@@ -1,12 +1,23 @@
-import memberEntity from './member.entity';
+import Member from './member.entity';
+import memberEntity, { IMemberModel } from './member.entity';
 
 class MemberRepository {
-    async findUserByEmail(email: string) {
-        return memberEntity.findOne({ email });
+    async findMemberByEmail(email: string) {
+        return Member.findOne({ email });
     }
 
-    async findUserById(userId: string) {
-        return memberEntity.findById(userId);
+    async findMemberById(memberId: string) {
+        return Member.findById(memberId);
+    }
+
+    async createMember(userId: string, email: string): Promise<IMemberModel> {
+        const newMember = new Member({
+            userId,
+            email
+        });
+
+        await newMember.save();
+        return newMember;
     }
 }
 

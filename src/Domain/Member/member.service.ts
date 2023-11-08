@@ -1,40 +1,29 @@
 import { inject, injectable } from 'inversify';
 import MemberRepository from './member.repository';
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
+import authEntity from '../User/auth.entity';
 import memberEntity, { IMemberModel } from './member.entity';
-import 'reflect-metadata';
 
 @injectable()
 class MemberService {
-    constructor(@inject(MemberRepository) private memberrepository: MemberRepository) {}
+    constructor(@inject(MemberRepository) private memberRepository: MemberRepository) {}
 
-    async register(userId: string, email: string): Promise<IMemberModel> {
-        if (typeof userId !== 'string') {
-            throw new Error('Password must be a string');
+    async createUserAsMember(userId: string, email: string): Promise<IMemberModel | null> {
+        const existingMember = await this.memberRepository.findMemberByEmail(email);
+        if (existingMember) {
+            return null;
         }
 
-        const user = new memberEntity({
+        const newMemberAsMember = new memberEntity({
             userId,
             email
         });
 
         try {
-            const savedUser = await user.save();
-            return savedUser;
+            const savedUserAsMember = await newMemberAsMember.save();
+            return savedUserAsMember;
         } catch (error) {
             throw error;
         }
-    }
-
-    async login(userId: string, email: string): Promise<string> {
-        const user = await this.memberrepository.findUserByEmail(email);
-        if (!user) {
-            throw new Error('User not found');
-        }
-
-        const token = jwt.sign({ userId: user._id, email: user.email }, 'your-secret-key', { expiresIn: '1h' });
-        return token;
     }
 }
 

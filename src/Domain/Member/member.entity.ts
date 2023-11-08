@@ -1,24 +1,19 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import Author, { IAuthor } from '../User/auth.entity';
-import Book, { IBook } from '../Book/Book';
+import authEntity, { IAuthor } from '../User/auth.entity';
 
-export interface ILoaned {
-    userId: IAuthor;
+export interface IMember {
+    userId: string;
     email: string;
-    bookId: IBook;
 }
 
-export interface IMemberModel extends ILoaned, Document {}
+export interface IMemberModel extends IMember, Document {}
 
 const MemberSchema: Schema = new Schema(
     {
-        userId: { type: Schema.Types.ObjectId, ref: 'Author', required: true },
-        email: { type: String, required: true },
-
-        book_Id: { type: String, ref: 'Book', required: true }
+        userId: { type: String, required: true, ref: 'Author' },
+        email: { type: String, required: true, unique: true, ref: 'Author' }
     },
     {
-        timestamps: true,
         versionKey: false
     }
 );

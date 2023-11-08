@@ -1,19 +1,23 @@
-import mongoose, { Document, Schema } from 'mongoose';
-import memberEntity, { IMember } from '../../Member/member.entity';
-import Book, { IBook } from '../../Book/Book';
-
-export interface ILoaned {
+export interface ILoanedModel {
+    id: string;
     memberId: string;
     bookId: string;
     borrowedDate: Date;
+    returnedDate?: Date;
 }
 
-export interface ILoanedModel extends ILoaned, Document {}
+export class LoanedModel implements ILoanedModel {
+    id: string;
+    memberId: string;
+    bookId: string;
+    borrowedDate: Date;
+    returnedDate?: Date;
 
-const LoanedSchema = new Schema({
-    memberId: { type: mongoose.Schema.Types.ObjectId, ref: 'Author', required: true },
-    bookId: { type: mongoose.Schema.Types.ObjectId, ref: 'Book', required: true },
-    borrowedDate: { type: Date, default: Date.now }
-});
-
-export default mongoose.model<ILoanedModel>('Loaned', LoanedSchema);
+    constructor(id: string, memberId: string, bookId: string, borrowedDate: Date, returnedDate?: Date) {
+        this.id = id;
+        this.memberId = memberId;
+        this.bookId = bookId;
+        this.borrowedDate = borrowedDate;
+        this.returnedDate = returnedDate;
+    }
+}

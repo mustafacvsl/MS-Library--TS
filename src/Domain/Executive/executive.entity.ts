@@ -1,16 +1,16 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IAdmin {
-    book_id: string;
-    member_id: string;
+    memberId: string;
+    member_email: string;
 }
 
 export interface IAdminModel extends IAdmin, Document {}
 
 const AdminSchema: Schema = new Schema(
     {
-        book_id: { type: String, required: true, ref: 'Author' },
-        member_id: { type: String, required: true, unique: true, ref: 'Books' }
+        memberId: { type: String, required: true, unique: true, ref: 'Member' },
+        member_email: { type: String, required: true, unique: true, ref: 'Member' }
     },
     {
         timestamps: true,

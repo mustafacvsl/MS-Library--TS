@@ -4,7 +4,8 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 import authEntity, { IAuthorModel } from '../User/auth.entity';
 import 'reflect-metadata';
-import { ILoanedModel } from '../Loaned/loaned.entity';
+import loanedEntity, { ILoanedModel } from '../Loaned/loaned.entity';
+import Book, { IBook, IBookModel } from '../Book/Book';
 
 @injectable()
 class ExecutiveService {
@@ -43,6 +44,16 @@ class ExecutiveService {
         } catch (error) {
             throw error;
         }
+    }
+
+    async borrowBook(memberId: string, bookId: string): Promise<ILoanedModel | null> {
+        const loanedBook = await this.executiverepository.borrowBook(memberId, bookId);
+        return loanedBook;
+    }
+
+    async returnBook(loanId: string): Promise<ILoanedModel | null> {
+        const returnedBook = await this.executiverepository.returnBook(loanId);
+        return returnedBook;
     }
 }
 

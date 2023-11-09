@@ -12,11 +12,9 @@ const executiveapplicationservice = new ExecutiveApplicationService(executiveser
 const executivecontroller = new ExecutiveController(executiveapplicationservice);
 
 router.get('/list', executivecontroller.listUsers.bind(executivecontroller));
-
 router.patch('/update/:authorId', ValidateJoi(Schemas.author.update), executivecontroller.updateAuthor.bind(executivecontroller));
 router.delete('/delete/:authorId', executivecontroller.deleteAuthor.bind(executivecontroller));
-
-router.post('/borrow', (req, res) => executivecontroller.borrowBook(req, res));
-router.put('/return/:loanedId', (req, res) => executivecontroller.returnBook(req, res));
+router.post('/borrow-book', executivecontroller.borrowBook.bind(executivecontroller));
+router.post('/return-book', executivecontroller.returnBook.bind(executivecontroller));
 
 export = router;

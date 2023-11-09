@@ -5,6 +5,7 @@ import 'reflect-metadata';
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 import ExecutiveApplicationService from '../ApplicationService/ExecutiveApplicationService';
+import ExecutiveRepository from '../Domain/Executive/executive.repository';
 
 @injectable()
 export class ExecutiveController {
@@ -31,5 +32,27 @@ export class ExecutiveController {
         const author = await this.executiveapplicationservice.deleteAuthor(authorId);
 
         res.status(201).json({ author, message: 'Deleted' });
+    }
+
+    async borrowBook(req: Request, res: Response, next: NextFunction) {
+        const { memberId, bookId } = req.body;
+
+        try {
+            const loanedBook = await this.executiveapplicationservice.borrowBook(memberId, bookId);
+            res.status(201).json({ loanedBook });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    async returnBook(req: Request, res: Response, next: NextFunction) {
+        const loanId = req.params.loanId;
+
+        try {
+            const returnedBook = await this.executiveapplicationservice.returnBook(loanId);
+            res.status(201).json({ returnedBook });
+        } catch (error) {
+            next(error);
+        }
     }
 }

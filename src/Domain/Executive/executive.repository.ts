@@ -1,12 +1,12 @@
 import authEntity from '../User/auth.entity';
 import mongoose from 'mongoose';
 import { MongoClient, ObjectId } from 'mongodb';
-import { ILoanedModel } from '../Loaned/loaned.entity';
+import Book from '../Book/Book';
+import loanedEntity, { ILoanedModel } from '../Loaned/loaned.entity';
 
 class ExecutiveRepository {
     private client: MongoClient;
     private databaseName: string;
-
     constructor() {
         this.client = new MongoClient(process.env.MONGO_URL || '');
         this.databaseName = 'library';
@@ -32,6 +32,51 @@ class ExecutiveRepository {
     }
 
     //! KİTAP İŞLEMLERİ
+
+    async borrowBook(memberId: string, bookId: string): Promise<ILoanedModel | null> {
+        const book = await Book.findById(bookId);
+
+        if (!book) {
+            throw new Error('Book not found');
+        }
+
+        if (book.stock <= 0) {
+            throw new Error('Book out of stock');
+        }
+
+        book.stock -= 1;
+        await book.save();
+
+        const loanedBook = new loanedEntity({
+            memberId,
+            bookId,
+            borrowedDate: new Date(),
+            returnedDate: null
+        });
+
+        // Save the loaned entity
+        const savedLoan = await loanedBook.save();
+
+        return savedLoan;
+    }
+
+    async returnBook(loanId: string): Promise<ILoanedModel | null> {
+        const loanedBook = await loanedEntity.findById(loanId);
+
+        if (!loanedBook) {
+            throw new Error('Loan not found');
+        }
+
+        if (loanedBook.returnedDate) {
+            throw new Error('Book already returned');
+        }
+
+        loanedBook.returnedDate = new Date();
+
+        const updatedLoan = await loanedBook.save();
+
+        return updatedLoan;
+    }
 }
 
 export default ExecutiveRepository;

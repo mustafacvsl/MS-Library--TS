@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import memberEntity, { IMember } from '../Member/member.entity';
 import Book, { IBook } from '../Book/Book';
+
 export interface ILoaned {
     memberId: IMember;
     bookId: IBook;

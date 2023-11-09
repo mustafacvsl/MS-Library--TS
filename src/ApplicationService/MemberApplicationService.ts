@@ -1,14 +1,15 @@
+import { injectable, inject } from 'inversify';
 import MemberService from '../Domain/Member/member.service';
 import { IMemberModel } from '../Domain/Member/member.entity';
-import { inject, injectable } from 'inversify';
+import 'reflect-metadata';
 
 @injectable()
 export class MemberApplicationService {
     constructor(@inject(MemberService) private memberService: MemberService) {}
 
-    async createUserAsMember(userId: string, email: string): Promise<IMemberModel | null> {
-        const userAsMember = await this.memberService.createUserAsMember(userId, email);
-        return userAsMember;
+    async registerMember(authorname: string, email: string) {
+        const member = await this.memberService.register(authorname, email);
+        return { member };
     }
 }
 

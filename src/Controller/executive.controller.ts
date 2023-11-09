@@ -6,32 +6,42 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 import ExecutiveApplicationService from '../ApplicationService/ExecutiveApplicationService';
 import ExecutiveRepository from '../Domain/Executive/executive.repository';
+import { handleResponse } from '../infrastructure/response';
 
 @injectable()
 export class ExecutiveController {
     constructor(@inject('ExecutiveApplicationService') private executiveapplicationservice: ExecutiveApplicationService) {}
 
     async listUsers(req: Request, res: Response) {
-        const users = await this.executiveapplicationservice.listUsers();
-
-        res.status(200).json({ users });
+        try {
+            const users = await this.executiveapplicationservice.listUsers();
+            handleResponse(res, 200, { users });
+        } catch (error) {
+            handleResponse(res, 500, null, 'Internal Server Error');
+        }
     }
 
     async updateAuthor(req: Request, res: Response, next: NextFunction) {
         const authorId = req.params.authorId;
         const updateData = req.body;
 
-        const author = await this.executiveapplicationservice.updateAuthor(authorId, updateData);
-
-        res.status(201).json({ author });
+        try {
+            const author = await this.executiveapplicationservice.updateAuthor(authorId, updateData);
+            handleResponse(res, 201, { author });
+        } catch (error) {
+            handleResponse(res, 500, null, 'Internal Server Error');
+        }
     }
 
     async deleteAuthor(req: Request, res: Response, next: NextFunction) {
         const authorId = req.params.authorId;
 
-        const author = await this.executiveapplicationservice.deleteAuthor(authorId);
-
-        res.status(201).json({ author, message: 'Deleted' });
+        try {
+            const author = await this.executiveapplicationservice.deleteAuthor(authorId);
+            handleResponse(res, 201, { author, message: 'Deleted' });
+        } catch (error) {
+            handleResponse(res, 500, null, 'Internal Server Error');
+        }
     }
 
     async borrowBook(req: Request, res: Response, next: NextFunction) {
@@ -39,9 +49,9 @@ export class ExecutiveController {
 
         try {
             const loanedBook = await this.executiveapplicationservice.borrowBook(memberId, bookId);
-            res.status(201).json({ loanedBook });
+            handleResponse(res, 201, { loanedBook });
         } catch (error) {
-            next(error);
+            handleResponse(res, 500, null, 'Internal Server Error');
         }
     }
 
@@ -50,9 +60,9 @@ export class ExecutiveController {
 
         try {
             const returnedBook = await this.executiveapplicationservice.returnBook(loanId);
-            res.status(201).json({ returnedBook });
+            handleResponse(res, 201, { returnedBook });
         } catch (error) {
-            next(error);
+            handleResponse(res, 500, null, 'Internal Server Error');
         }
     }
 }

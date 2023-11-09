@@ -6,6 +6,7 @@ import authEntity, { IAuthorModel } from '../User/auth.entity';
 import 'reflect-metadata';
 import loanedEntity, { ILoanedModel } from '../Loaned/loaned.entity';
 import Book, { IBook, IBookModel } from '../Book/Book';
+import { handleResponse } from '../../infrastructure/response';
 
 @injectable()
 class ExecutiveService {

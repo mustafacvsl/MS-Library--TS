@@ -54,7 +54,6 @@ class ExecutiveRepository {
             returnedDate: null
         });
 
-        // Save the loaned entity
         const savedLoan = await loanedBook.save();
 
         return savedLoan;

@@ -1,49 +1,54 @@
-import ExecutiveRepository from '../Domain/Executive/executive.repository';
-import ExecutiveService from '../Domain/Executive/executive.service';
-import authEntity from '../Domain/User/auth.entity';
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 import { injectable, inject } from 'inversify';
 import 'reflect-metadata';
-import loanedEntity, { ILoaned, ILoanedModel } from '../Domain/Loaned/loaned.entity';
+import authEntity from '../Domain/User/auth.entity';
+import { ILoanedModel } from '../Domain/Loaned/loaned.entity';
+import ExecutiveService from '../Domain/Executive/executive.service';
+import { errorHandler } from '../middleware/errorhandlerMiddleware';
+import { handleResponse } from '../infrastructure/response';
+import { Response } from 'express';
 
 @injectable()
 export class ExecutiveApplicationService {
     constructor(@inject(ExecutiveService) private executiveservice: ExecutiveService) {}
 
-    async listUsers() {
+    @errorHandler()
+    async listUsers(res: Response) {
         const users = await authEntity.find({}, 'name email');
-        return { users };
+        handleResponse(res, 200, { users }, 'Users listed successfully');
     }
 
-    async updateAuthor(authorId: string, updateData: any) {
+    @errorHandler()
+    async updateAuthor(authorId: string, updateData: any, res: Response) {
         const author = await authEntity.findByIdAndUpdate(authorId, updateData, { new: true });
 
         if (!author) {
-            throw new Error('Author not found');
+            handleResponse(res, 404, null, 'Author not found');
+        } else {
+            handleResponse(res, 200, { author }, 'Author updated successfully');
         }
-
-        return { author };
     }
 
-    async deleteAuthor(authorId: string) {
+    @errorHandler()
+    async deleteAuthor(authorId: string, res: Response) {
         const author = await authEntity.findByIdAndDelete(authorId);
 
         if (!author) {
-            throw new Error('Author not found');
+            handleResponse(res, 404, null, 'Author not found');
+        } else {
+            handleResponse(res, 200, { author, message: 'Deleted' }, 'Author deleted successfully');
         }
-
-        return { author, message: 'Deleted' };
     }
 
-    async borrowBook(memberId: string, bookId: string): Promise<ILoanedModel | null> {
-        const loanedBook = await this.executiveservice.borrowBook(memberId, bookId);
-        return loanedBook;
-    }
+    // @errorHandler()
+    // async borrowBook(memberId: string, bookId: string, res: Response) {
+    //     const loanedBook = await this.executiveservice.borrowBook(memberId, bookId);
+    //     handleResponse(res, 200, { loanedBook }, 'Book borrowed successfully');
+    // }
 
-    async returnBook(loanId: string): Promise<ILoanedModel | null> {
+    @errorHandler()
+    async returnBook(loanId: string, res: Response) {
         const returnedBook = await this.executiveservice.returnBook(loanId);
-        return returnedBook;
+        handleResponse(res, 200, { returnedBook }, 'Book returned successfully');
     }
 }
 

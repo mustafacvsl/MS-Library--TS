@@ -7,16 +7,19 @@ import 'reflect-metadata';
 import loanedEntity, { ILoanedModel } from '../Loaned/loaned.entity';
 import Book, { IBook, IBookModel } from '../Book/Book';
 import { handleResponse } from '../../infrastructure/response';
+import { errorHandler } from '../../middleware/errorhandlerMiddleware';
 
 @injectable()
 class ExecutiveService {
     constructor(@inject(ExecutiveRepository) private executiverepository: ExecutiveRepository) {}
 
+    @errorHandler()
     async listUsers(): Promise<IAuthorModel[]> {
         const users = await this.executiverepository.getAllUsers();
         return users;
     }
 
+    @errorHandler()
     async updateUser(authorId: string, updatedAuthorInfo: any): Promise<IAuthorModel> {
         const author = await this.executiverepository.findUserById(authorId);
         if (!author) {
@@ -33,6 +36,7 @@ class ExecutiveService {
         }
     }
 
+    @errorHandler()
     async deleteAuthor(authorId: string): Promise<IAuthorModel | null> {
         const author = await this.executiverepository.findUserById(authorId);
         if (!author) {
@@ -46,12 +50,13 @@ class ExecutiveService {
             throw error;
         }
     }
+    // @errorHandler()
+    // async borrowBook(memberId: string, bookId: string): Promise<ILoanedModel | null> {
+    //     const loanedBook = await this.executiverepository.borrowBook(memberId, bookId);
+    //     return loanedBook;
+    // }
 
-    async borrowBook(memberId: string, bookId: string): Promise<ILoanedModel | null> {
-        const loanedBook = await this.executiverepository.borrowBook(memberId, bookId);
-        return loanedBook;
-    }
-
+    @errorHandler()
     async returnBook(loanId: string): Promise<ILoanedModel | null> {
         const returnedBook = await this.executiverepository.returnBook(loanId);
         return returnedBook;

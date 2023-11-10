@@ -6,7 +6,7 @@ import { number, string } from 'joi';
 export interface IBook {
     title: string;
     author: string;
-    stock: number;
+    stock: IStock;
     location: IBookLocation;
 }
 
@@ -16,7 +16,7 @@ const BookSchema: Schema = new Schema(
     {
         title: { type: String, required: true },
         author: { type: String, required: true },
-        stock: { type: number, ref: 'Stock', required: true },
+        stock: { type: String, ref: 'Stock', required: true },
         location: {
             corridor: { type: String, required: true },
             shelf: { type: String, required: true },

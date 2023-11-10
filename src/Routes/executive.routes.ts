@@ -14,7 +14,7 @@ const executivecontroller = new ExecutiveController(executiveapplicationservice)
 router.get('/list', executivecontroller.listUsers.bind(executivecontroller));
 router.patch('/update/:authorId', ValidateJoi(Schemas.author.update), executivecontroller.updateAuthor.bind(executivecontroller));
 router.delete('/delete/:authorId', executivecontroller.deleteAuthor.bind(executivecontroller));
-router.post('/borrow-book', executivecontroller.borrowBook.bind(executivecontroller));
+// router.post('/borrow-book', executivecontroller.borrowBook.bind(executivecontroller));
 router.post('/return-book', executivecontroller.returnBook.bind(executivecontroller));
 
 export = router;

@@ -1,67 +1,41 @@
 import Book from './Book';
 import mongoose from 'mongoose';
 import { injectable } from 'inversify';
+import { errorHandler } from '../../middleware/errorhandlerMiddleware';
 
 @injectable()
 class BookRepository {
+    @errorHandler()
     async createBook(author: string, title: string, stock: number, location: string): Promise<any> {
-        if (!author || !title) {
-            throw new Error('Author and title are required.');
-        }
+        if (!author || !title) throw new Error('Author and title are required.');
 
-        const newBook = new Book({
-            _id: new mongoose.Types.ObjectId(),
-            author,
-            title,
-            stock,
-            location
-        });
-
-        await newBook.save();
+        const newBook = await Book.create({ author, title, stock, location });
         return newBook;
     }
 
+    @errorHandler()
     async readBook(bookId: string): Promise<any> {
-        if (!bookId) {
-            throw new Error('Book ID is required.'); //validation bak
-        }
+        if (!bookId) throw new Error('Book ID is required.');
 
-        const book = await Book.findById(bookId).populate('author');
-        if (!book) {
-            throw new Error('Book not found');
-        }
-
-        return book;
+        return Book.findById(bookId).populate('author').orFail(new Error('Book not found'));
     }
 
+    @errorHandler()
     async readAllBooks(): Promise<any> {
         return Book.find();
     }
 
+    @errorHandler()
     async updateBook(bookId: string, updatedBookInfo: any): Promise<any> {
-        if (!bookId) {
-            throw new Error('Book ID is required.');
-        }
+        if (!bookId) throw new Error('Book ID is required.');
 
-        const updatedBook = await Book.findByIdAndUpdate(bookId, updatedBookInfo, { new: true });
-        if (!updatedBook) {
-            throw new Error('Book not found');
-        }
-
-        return updatedBook;
+        return Book.findByIdAndUpdate(bookId, updatedBookInfo, { new: true }).orFail(new Error('Book not found'));
     }
-
+    @errorHandler()
     async deleteBook(bookId: string): Promise<any> {
-        if (!bookId) {
-            throw new Error('Book ID required.');
-        }
+        if (!bookId) throw new Error('Book ID required.');
 
-        const deletedBook = await Book.findByIdAndDelete(bookId);
-        if (!deletedBook) {
-            throw new Error('Book not found');
-        }
-
-        return deletedBook;
+        return Book.findByIdAndDelete(bookId).orFail(new Error('Book not found'));
     }
 }
 

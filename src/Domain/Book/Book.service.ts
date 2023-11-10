@@ -5,6 +5,7 @@ import BookRepository from './Book.repository';
 import { Response } from 'express';
 import { handleResponse } from '../../infrastructure/response';
 import Book, { IBook } from './Book';
+import { errorHandler } from '../../middleware/errorhandlerMiddleware';
 
 @injectable()
 export class BookService {
@@ -14,6 +15,7 @@ export class BookService {
         this.bookRepository = bookRepository;
     }
 
+    @errorHandler()
     async createBook(bookData: { title: string; author: string; stock: string; location: string }, res: Response): Promise<IBook | null> {
         if (!bookData.author || !bookData.title || !bookData.location || !bookData.stock) {
             handleResponse(res, 400, null, 'Author, title, location, and stock are required.');
@@ -38,6 +40,7 @@ export class BookService {
         return savedBook;
     }
 
+    @errorHandler()
     async readBook(bookId: string, res: Response): Promise<any> {
         if (!bookId) {
             handleResponse(res, 400, null, 'Book ID required.');
@@ -60,6 +63,7 @@ export class BookService {
         return books;
     }
 
+    @errorHandler()
     async updateBook(bookId: string, updatedBookInfo: any, res: Response): Promise<any> {
         if (!bookId) {
             handleResponse(res, 400, null, 'Book ID required.');
@@ -84,6 +88,7 @@ export class BookService {
         return updatedBook;
     }
 
+    @errorHandler()
     async deleteBook(bookId: string, res: Response): Promise<any> {
         if (!bookId) {
             handleResponse(res, 400, null, 'Book ID required.');

@@ -1,17 +1,22 @@
 import { inject, injectable } from 'inversify';
+import 'reflect-metadata';
+import authEntity from './auth.entity';
 import AuthRepository from './Auth.repository';
+import { Response } from 'express';
+import { errorHandler } from '../../middleware/errorhandlerMiddleware';
+import { handleResponse } from '../../infrastructure/response';
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-import authEntity, { IAuthorModel } from './auth.entity';
-import 'reflect-metadata';
 
 @injectable()
 class AuthService {
     constructor(@inject(AuthRepository) private authrepository: AuthRepository) {}
 
-    async register(name: string, email: string, password: string): Promise<IAuthorModel> {
+    @errorHandler()
+    async register(name: string, email: string, password: string, res: Response): Promise<any> {
         if (typeof password !== 'string') {
-            throw new Error('Password must be a string');
+            handleResponse(res, 400, null, 'Password must be a string');
+            return;
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -21,27 +26,22 @@ class AuthService {
             password: hashedPassword
         });
 
-        try {
-            const savedUser = await user.save();
-            return savedUser;
-        } catch (error) {
-            throw error;
-        }
+        const savedUser = await user.save();
+        return savedUser;
     }
 
-    async login(email: string, password: string): Promise<string> {
+    @errorHandler()
+    async login(email: string, password: string, res: Response): Promise<any> {
         const user = await this.authrepository.findUserByEmail(email);
         if (!user) {
-            throw new Error('User not found');
+            handleResponse(res, 404, null, 'User not found');
+            return;
         }
 
-        try {
-            const passwordMatch = await bcrypt.compare(password, user.password);
-            if (!passwordMatch) {
-                throw new Error('Authentication failed');
-            }
-        } catch (error) {
-            throw error;
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (!passwordMatch) {
+            handleResponse(res, 401, null, 'Authentication failed');
+            return;
         }
 
         const token = jwt.sign({ email: user.email, userId: user._id }, 'your-secret-key', { expiresIn: '1h' });

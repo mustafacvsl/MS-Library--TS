@@ -4,6 +4,7 @@ import 'reflect-metadata';
 import { inject, injectable } from 'inversify';
 import { handleResponse } from '../infrastructure/response';
 import { Response } from 'express';
+import { errorHandler } from '../middleware/errorhandlerMiddleware';
 
 @injectable()
 export class BookApplicationService {
@@ -13,6 +14,7 @@ export class BookApplicationService {
         this.bookService = bookService;
     }
 
+    @errorHandler()
     async createBook(bookData: { title: string; author: string; stock: string; location: string }, res: Response): Promise<IBook | null> {
         if (!bookData.author || !bookData.title || !bookData.location || !bookData.stock) {
             handleResponse(res, 400, null, 'Author, title, location, and stock are required.');
@@ -33,6 +35,7 @@ export class BookApplicationService {
         return newBook;
     }
 
+    @errorHandler()
     async getBook(bookId: string, res: Response): Promise<IBook | null> {
         const book = await this.bookService.readBook(bookId, res);
         if (!book) {
@@ -43,12 +46,14 @@ export class BookApplicationService {
         return book;
     }
 
+    @errorHandler()
     async getAllBooks(res: Response): Promise<IBook[] | null> {
         const books = await this.bookService.readAllBooks(res);
         handleResponse(res, 200, { books }, 'All books retrieved successfully');
         return books;
     }
 
+    @errorHandler()
     async updateBook(bookId: string, updatedBookInfo: any, res: Response): Promise<IBook | null> {
         const updatedBook = await this.bookService.updateBook(bookId, updatedBookInfo, res);
         if (!updatedBook) {
@@ -59,6 +64,7 @@ export class BookApplicationService {
         return updatedBook;
     }
 
+    @errorHandler()
     async deleteBook(bookId: string, res: Response): Promise<IBook | null> {
         const deletedBook = await this.bookService.deleteBook(bookId, res);
         if (!deletedBook) {

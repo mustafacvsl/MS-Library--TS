@@ -7,62 +7,48 @@ const bcrypt = require('bcrypt');
 import ExecutiveApplicationService from '../ApplicationService/ExecutiveApplicationService';
 import ExecutiveRepository from '../Domain/Executive/executive.repository';
 import { handleResponse } from '../infrastructure/response';
+import { errorHandler } from '../middleware/errorhandlerMiddleware';
 
 @injectable()
 export class ExecutiveController {
     constructor(@inject('ExecutiveApplicationService') private executiveapplicationservice: ExecutiveApplicationService) {}
 
+    @errorHandler()
     async listUsers(req: Request, res: Response) {
-        try {
-            const users = await this.executiveapplicationservice.listUsers();
-            handleResponse(res, 200, { users });
-        } catch (error) {
-            handleResponse(res, 500, null, 'Internal Server Error');
-        }
+        const users = await this.executiveapplicationservice.listUsers(res);
+        handleResponse(res, 200, { users });
     }
 
+    @errorHandler()
     async updateAuthor(req: Request, res: Response, next: NextFunction) {
         const authorId = req.params.authorId;
         const updateData = req.body;
 
-        try {
-            const author = await this.executiveapplicationservice.updateAuthor(authorId, updateData);
-            handleResponse(res, 201, { author });
-        } catch (error) {
-            handleResponse(res, 500, null, 'Internal Server Error');
-        }
+        const author = await this.executiveapplicationservice.updateAuthor(authorId, updateData, res);
+        handleResponse(res, 201, { author });
     }
 
+    @errorHandler()
     async deleteAuthor(req: Request, res: Response, next: NextFunction) {
         const authorId = req.params.authorId;
 
-        try {
-            const author = await this.executiveapplicationservice.deleteAuthor(authorId);
-            handleResponse(res, 201, { author, message: 'Deleted' });
-        } catch (error) {
-            handleResponse(res, 500, null, 'Internal Server Error');
-        }
+        const author = await this.executiveapplicationservice.deleteAuthor(authorId, res);
+        handleResponse(res, 201, { author, message: 'Deleted' });
     }
 
-    async borrowBook(req: Request, res: Response, next: NextFunction) {
-        const { memberId, bookId } = req.body;
+    // @errorHandler()
+    // async borrowBook(req: Request, res: Response, next: NextFunction) {
+    //     const { memberId, bookId } = req.body;
 
-        try {
-            const loanedBook = await this.executiveapplicationservice.borrowBook(memberId, bookId);
-            handleResponse(res, 201, { loanedBook });
-        } catch (error) {
-            handleResponse(res, 500, null, 'Internal Server Error');
-        }
-    }
+    //     const loanedBook = await this.executiveapplicationservice.borrowBook(memberId, bookId, res);
+    //     handleResponse(res, 201, { loanedBook });
+    // }
 
+    @errorHandler()
     async returnBook(req: Request, res: Response, next: NextFunction) {
         const loanId = req.params.loanId;
 
-        try {
-            const returnedBook = await this.executiveapplicationservice.returnBook(loanId);
-            handleResponse(res, 201, { returnedBook });
-        } catch (error) {
-            handleResponse(res, 500, null, 'Internal Server Error');
-        }
+        const returnedBook = await this.executiveapplicationservice.returnBook(loanId, res);
+        handleResponse(res, 201, { returnedBook });
     }
 }

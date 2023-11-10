@@ -7,9 +7,9 @@ import authorRoutes from './Routes/auth.routes';
 import bookRoutes from './Routes/book.routes';
 import executiveRoutes from './Routes/executive.routes';
 import memberRoutes from './Routes/member.routes';
+import { errorHandler } from './middleware/errorhandlerMiddleware';
 
 const router = express();
-import errorHandlerMiddleware from './middleware/errorhandlerMiddleware';
 
 mongoose
     .connect(config.mongo.url, { retryWrites: true, w: 'majority' })
@@ -48,7 +48,7 @@ const StartServer = () => {
         next();
     });
 
-    router.use(errorHandlerMiddleware);
+    router.use(errorHandler);
     router.use('/authors', authorRoutes);
     router.use('/books', bookRoutes);
     router.use('/executive', executiveRoutes);

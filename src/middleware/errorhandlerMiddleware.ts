@@ -1,8 +1,18 @@
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 
-export const errorHandlerMiddleware = (err: Error, req: Request, res: Response, next: NextFunction) => {
-    console.error(err);
+export function errorHandler(): MethodDecorator {
+    return (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor): PropertyDescriptor => {
+        const originalMethod = descriptor.value;
 
-    res.status(500).json({ error: err.message });
-};
-export default errorHandlerMiddleware;
+        descriptor.value = async function (req: Request, res: Response, next: NextFunction): Promise<void> {
+            try {
+                await originalMethod.call(this, req, res, next);
+            } catch (error) {
+                console.error('Error:', error);
+                res.status(500).send('Internal Server Error');
+            }
+        };
+
+        return descriptor;
+    };
+}

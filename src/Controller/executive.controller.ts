@@ -36,13 +36,13 @@ export class ExecutiveController {
         handleResponse(res, 201, { author, message: 'Deleted' });
     }
 
-    // @errorHandler()
-    // async borrowBook(req: Request, res: Response, next: NextFunction) {
-    //     const { memberId, bookId } = req.body;
+    @errorHandler()
+    async borrowBook(req: Request, res: Response, next: NextFunction) {
+        const { memberId, bookId } = req.body;
 
-    //     const loanedBook = await this.executiveapplicationservice.borrowBook(memberId, bookId, res);
-    //     handleResponse(res, 201, { loanedBook });
-    // }
+        const loanedBook = await this.executiveapplicationservice.borrowBook(memberId, bookId, res);
+        handleResponse(res, 201, { loanedBook });
+    }
 
     @errorHandler()
     async returnBook(req: Request, res: Response, next: NextFunction) {

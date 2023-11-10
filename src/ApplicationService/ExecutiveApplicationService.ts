@@ -39,11 +39,11 @@ export class ExecutiveApplicationService {
         }
     }
 
-    // @errorHandler()
-    // async borrowBook(memberId: string, bookId: string, res: Response) {
-    //     const loanedBook = await this.executiveservice.borrowBook(memberId, bookId);
-    //     handleResponse(res, 200, { loanedBook }, 'Book borrowed successfully');
-    // }
+    @errorHandler()
+    async borrowBook(memberId: string, bookId: string, res: Response) {
+        const loanedBook = await this.executiveservice.borrowBook(memberId, bookId);
+        handleResponse(res, 200, { loanedBook }, 'Book borrowed successfully');
+    }
 
     @errorHandler()
     async returnBook(loanId: string, res: Response) {

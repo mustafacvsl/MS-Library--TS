@@ -50,11 +50,11 @@ class ExecutiveService {
             throw error;
         }
     }
-    // @errorHandler()
-    // async borrowBook(memberId: string, bookId: string): Promise<ILoanedModel | null> {
-    //     const loanedBook = await this.executiverepository.borrowBook(memberId, bookId);
-    //     return loanedBook;
-    // }
+    @errorHandler()
+    async borrowBook(memberId: string, bookId: string): Promise<ILoanedModel | null> {
+        const loanedBook = await this.executiverepository.borrowBook(memberId, bookId);
+        return loanedBook;
+    }
 
     @errorHandler()
     async returnBook(loanId: string): Promise<ILoanedModel | null> {

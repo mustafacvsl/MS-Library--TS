@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { MongoClient, ObjectId } from 'mongodb';
 import Book from '../Book/Book';
 import loanedEntity, { ILoanedModel } from '../Loaned/loaned.entity';
+import StockEntity, { IStock } from '../BookStock/Stock.entity';
 
 class ExecutiveRepository {
     private client: MongoClient;
@@ -33,31 +34,31 @@ class ExecutiveRepository {
 
     //! KİTAP İŞLEMLERİ
 
-    // async borrowBook(memberId: string, bookId: string): Promise<ILoanedModel | null> {
-    //     const book = await Book.findById(bookId);
+    async borrowBook(memberId: string, bookId: string): Promise<ILoanedModel | null> {
+        const book = await Book.findById(bookId);
 
-    //     if (!book) {
-    //         throw new Error('Book not found');
-    //     }
+        if (!book) {
+            throw new Error('Book not found');
+        }
 
-    //     if (book.stock <= 0) {
-    //         throw new Error('Book out of stock');
-    //     }
+        // if (book.stock <= 0) {
+        //     throw new Error('Book out of stock');
+        // }
 
-    //     book.stock -= 1;
-    //     await book.save();
+        // book.stock -= 1;
+        await book.save();
 
-    //     const loanedBook = new loanedEntity({
-    //         memberId,
-    //         bookId,
-    //         borrowedDate: new Date(),
-    //         returnedDate: null
-    //     });
+        const loanedBook = new loanedEntity({
+            memberId,
+            bookId,
+            borrowedDate: new Date(),
+            returnedDate: null
+        });
 
-    //     const savedLoan = await loanedBook.save();
+        const savedLoan = await loanedBook.save();
 
-    //     return savedLoan;
-    // }
+        return savedLoan;
+    }
 
     async returnBook(loanId: string): Promise<ILoanedModel | null> {
         const loanedBook = await loanedEntity.findById(loanId);

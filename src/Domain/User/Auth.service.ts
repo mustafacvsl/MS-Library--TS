@@ -7,6 +7,7 @@ import { errorHandler } from '../../middleware/errorhandlerMiddleware';
 import { handleResponse } from '../../infrastructure/response';
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+import * as crypto from 'crypto';
 
 @injectable()
 class AuthService {
@@ -19,7 +20,7 @@ class AuthService {
             return;
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
         const user = new authEntity({
             name,
             email,

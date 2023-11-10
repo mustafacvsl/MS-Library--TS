@@ -7,13 +7,15 @@ import 'reflect-metadata';
 import { handleResponse } from '../infrastructure/response';
 import { errorHandler } from '../middleware/errorhandlerMiddleware';
 import { Request, Response } from 'express';
+import * as crypto from 'crypto';
+
 @injectable()
 export class AuthApplicationService {
     constructor(@inject(AuthService) private authService: AuthService) {}
 
     @errorHandler()
     async registerUser(name: string, email: string, password: string, res: Response): Promise<void> {
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
         const user = new Author({ name, email, password: hashedPassword });
         const savedUser = await user.save();
         handleResponse(res, 201, { user: savedUser }, 'User registered successfully');

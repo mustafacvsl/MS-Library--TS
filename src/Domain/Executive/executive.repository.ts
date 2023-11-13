@@ -1,7 +1,7 @@
 import authEntity from '../User/auth.entity';
 import mongoose from 'mongoose';
 import { MongoClient, ObjectId } from 'mongodb';
-import Book from '../Book/Book';
+import Book, { IBook } from '../Book/Book';
 import loanedEntity, { ILoanedModel } from '../Loaned/loaned.entity';
 import StockEntity, { IStock } from '../BookStock/Stock.entity';
 
@@ -41,11 +41,11 @@ class ExecutiveRepository {
             throw new Error('Book not found');
         }
 
-        // if (book.stock <= 0) {
-        //     throw new Error('Book out of stock');
-        // }
+        if (book.stock.count <= 0) {
+            throw new Error('Book out of stock');
+        }
 
-        // book.stock -= 1;
+        book.stock.count = Number(book.stock.count) - 1;
         await book.save();
 
         const loanedBook = new loanedEntity({

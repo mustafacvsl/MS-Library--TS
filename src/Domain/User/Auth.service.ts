@@ -20,6 +20,12 @@ class AuthService {
             return;
         }
 
+        const existingUser = await this.authrepository.findUserByEmail(email);
+        if (existingUser) {
+            handleResponse(res, 400, null, 'User with this email already exists');
+            return;
+        }
+
         const hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
         const user = new authEntity({
             name,
@@ -35,7 +41,7 @@ class AuthService {
     async login(email: string, password: string, res: Response): Promise<any> {
         const user = await this.authrepository.findUserByEmail(email);
         if (!user) {
-            handleResponse(res, 404, null, 'User not found');
+            handleResponse(res, 401, null, 'Invalid credentials');
             return;
         }
 

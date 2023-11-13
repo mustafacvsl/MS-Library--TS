@@ -2,6 +2,7 @@ import Joi, { ObjectSchema } from 'joi';
 import { NextFunction, Request, Response } from 'express';
 import { IAuthor } from '../Domain/User/auth.entity';
 import { IBook } from '../Domain/Book/Book';
+import memberEntity, { IMember } from '../Domain/Member/member.entity';
 import Logging from '../infrastructure/Logging';
 
 export const ValidateJoi = (schema: ObjectSchema) => {
@@ -37,4 +38,5 @@ export const Schemas = {
             title: Joi.string().required()
         })
     }
+    //BURAYA MEMBER VE EXECUTİVE JOİ EKLE
 };

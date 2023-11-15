@@ -1,11 +1,11 @@
 import Book from './Book';
 import mongoose from 'mongoose';
 import { injectable } from 'inversify';
-import { errorHandler } from '../../middleware/errorhandlerMiddleware';
+import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
 
 @injectable()
 class BookRepository {
-    @errorHandler()
+    @errorHandlerMiddleware
     async createBook(author: string, title: string, stock: number, location: string): Promise<any> {
         if (!author || !title) throw new Error('Author and title are required.');
 
@@ -13,25 +13,25 @@ class BookRepository {
         return newBook;
     }
 
-    @errorHandler()
-    async readBook(bookId: string): Promise<any> {
+    @errorHandlerMiddleware
+    async showBook(bookId: string): Promise<any> {
         if (!bookId) throw new Error('Book ID is required.');
 
         return Book.findById(bookId).populate('author').orFail(new Error('Book not found'));
     }
 
-    @errorHandler()
-    async readAllBooks(): Promise<any> {
+    @errorHandlerMiddleware
+    async showAllBooks(): Promise<any> {
         return Book.find();
     }
 
-    @errorHandler()
+    @errorHandlerMiddleware
     async updateBook(bookId: string, updatedBookInfo: any): Promise<any> {
         if (!bookId) throw new Error('Book ID is required.');
 
         return Book.findByIdAndUpdate(bookId, updatedBookInfo, { new: true }).orFail(new Error('Book not found'));
     }
-    @errorHandler()
+    @errorHandlerMiddleware
     async deleteBook(bookId: string): Promise<any> {
         if (!bookId) throw new Error('Book ID required.');
 

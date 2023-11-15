@@ -1,54 +1,69 @@
 import { injectable, inject } from 'inversify';
 import 'reflect-metadata';
 import authEntity from '../Domain/User/auth.entity';
-import { ILoanedModel } from '../Domain/Loaned/loaned.entity';
 import ExecutiveService from '../Domain/Executive/executive.service';
-import { errorHandler } from '../middleware/errorhandlerMiddleware';
-import { handleResponse } from '../infrastructure/response';
+import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
 import { Response } from 'express';
+const winston = require('winston');
+import Joi from 'joi';
+
+const logger = winston.createLogger({
+    transports: [new winston.transports.Console(), new winston.transports.File({ filename: 'logs/error.log', level: 'error' }), new winston.transports.File({ filename: 'logs/combined.log' })]
+});
 
 @injectable()
 export class ExecutiveApplicationService {
     constructor(@inject(ExecutiveService) private executiveservice: ExecutiveService) {}
 
-    @errorHandler()
+    @errorHandlerMiddleware
     async listUsers(res: Response) {
         const users = await authEntity.find({}, 'name email');
-        handleResponse(res, 200, { users }, 'Users listed successfully');
+        res.status(200).json({ users, message: 'Users listed successfully' });
     }
 
-    @errorHandler()
     async updateAuthor(authorId: string, updateData: any, res: Response) {
+        const schema = Joi.object({
+            name: Joi.string(),
+            email: Joi.string().email()
+        });
+
+        const { error } = schema.validate(updateData);
+
+        if (error) {
+            res.status(400).json({ message: 'Validation error', details: error.details });
+            return;
+        }
+
         const author = await authEntity.findByIdAndUpdate(authorId, updateData, { new: true });
 
         if (!author) {
-            handleResponse(res, 404, null, 'Author not found');
+            res.status(404).json({ author, message: 'Author not found' });
         } else {
-            handleResponse(res, 200, { author }, 'Author updated successfully');
+            res.status(200).json({ author, message: 'Author updated successfully' });
         }
     }
 
-    @errorHandler()
+    @errorHandlerMiddleware
     async deleteAuthor(authorId: string, res: Response) {
         const author = await authEntity.findByIdAndDelete(authorId);
 
         if (!author) {
-            handleResponse(res, 404, null, 'Author not found');
+            res.status(404).json({ author, message: 'Author not found' });
         } else {
-            handleResponse(res, 200, { author, message: 'Deleted' }, 'Author deleted successfully');
+            res.status(200).json({ author, message: 'Author deleted successfully' });
         }
     }
 
-    @errorHandler()
+    @errorHandlerMiddleware
     async borrowBook(memberId: string, bookId: string, res: Response) {
         const loanedBook = await this.executiveservice.borrowBook(memberId, bookId);
-        handleResponse(res, 200, { loanedBook }, 'Book borrowed successfully');
+        res.status(200).json({ loanedBook, message: 'Book borrowed successfully' });
     }
 
-    @errorHandler()
+    @errorHandlerMiddleware
     async returnBook(loanId: string, res: Response) {
         const returnedBook = await this.executiveservice.returnBook(loanId);
-        handleResponse(res, 200, { returnedBook }, 'Book returned successfully');
+        res.status(200).json({ returnedBook, message: 'Book returned successfully' });
     }
 }
 

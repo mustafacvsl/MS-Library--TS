@@ -3,7 +3,7 @@ import 'reflect-metadata';
 import { inject, injectable } from 'inversify';
 import BookApplicationService from '../ApplicationService/BookApplicationService';
 import { handleResponse } from '../infrastructure/response';
-import { errorHandler } from '../middleware/errorhandlerMiddleware';
+import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
 
 @injectable()
 export class BookController {
@@ -34,13 +34,13 @@ export class BookController {
         handleResponse(res, 201, { book: newBook }, 'Book created successfully');
     };
 
-    readBook = async (req: Request, res: Response, next: NextFunction) => {
+    showBook = async (req: Request, res: Response, next: NextFunction) => {
         const bookId = req.params.bookId;
         const book = await this.bookApplicationservice.getBook(bookId, res);
         handleResponse(res, 200, { book }, 'Book retrieved successfully');
     };
 
-    readAll = async (req: Request, res: Response, next: NextFunction) => {
+    ShowAllBooks = async (req: Request, res: Response, next: NextFunction) => {
         const books = await this.bookApplicationservice.getAllBooks(res);
         handleResponse(res, 200, { books }, 'All books retrieved successfully');
     };

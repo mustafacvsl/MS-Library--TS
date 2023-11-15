@@ -2,13 +2,13 @@ import { Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 import MemberApplicationService from '../ApplicationService/MemberApplicationService';
 import { handleResponse } from '../infrastructure/response';
-import { errorHandler } from '../middleware/errorhandlerMiddleware';
+import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
 
 @injectable()
 export class MemberController {
     constructor(@inject('MemberApplicationService') private memberApplicationService: MemberApplicationService) {}
 
-    @errorHandler()
+    @errorHandlerMiddleware
     async register(req: Request, res: Response): Promise<void> {
         try {
             const { authorname, email } = req.body;

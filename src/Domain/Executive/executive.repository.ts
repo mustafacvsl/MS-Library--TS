@@ -35,29 +35,42 @@ class ExecutiveRepository {
     //! KİTAP İŞLEMLERİ
 
     async borrowBook(memberId: string, bookId: string): Promise<ILoanedModel | null> {
-        const book = await Book.findById(bookId);
+        const session = await mongoose.startSession();
+        session.startTransaction();
 
-        if (!book) {
-            throw new Error('Book not found');
+        try {
+            const options = { session };
+            const book = await Book.findById(bookId, null, options);
+
+            if (!book) {
+                throw new Error('Book not found');
+            }
+
+            if (book.stock.count <= 0) {
+                throw new Error('Book out of stock');
+            }
+
+            book.stock.count = Number(book.stock.count) - 1;
+            await book.save(options);
+
+            const loanedBook = new loanedEntity({
+                memberId,
+                bookId,
+                borrowedDate: new Date(),
+                returnedDate: null
+            });
+
+            const savedLoan = await loanedBook.save(options);
+
+            await session.commitTransaction();
+            session.endSession();
+
+            return savedLoan;
+        } catch (error) {
+            await session.abortTransaction();
+            session.endSession();
+            throw error;
         }
-
-        if (book.stock.count <= 0) {
-            throw new Error('Book out of stock');
-        }
-
-        book.stock.count = Number(book.stock.count) - 1;
-        await book.save();
-
-        const loanedBook = new loanedEntity({
-            memberId,
-            bookId,
-            borrowedDate: new Date(),
-            returnedDate: null
-        });
-
-        const savedLoan = await loanedBook.save();
-
-        return savedLoan;
     }
 
     async returnBook(loanId: string): Promise<ILoanedModel | null> {

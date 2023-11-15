@@ -1,10 +1,9 @@
 import BookService from '../Domain/Book/Book.service';
 import { IBook } from '../Domain/Book/Book';
-import 'reflect-metadata';
 import { inject, injectable } from 'inversify';
-import { handleResponse } from '../infrastructure/response';
+import 'reflect-metadata';
 import { Response } from 'express';
-import { errorHandler } from '../middleware/errorhandlerMiddleware';
+import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
 
 @injectable()
 export class BookApplicationService {
@@ -14,15 +13,14 @@ export class BookApplicationService {
         this.bookService = bookService;
     }
 
-    @errorHandler()
+    @errorHandlerMiddleware
     async createBook(bookData: { title: string; author: string; stock: string; location: string }, res: Response): Promise<IBook | null> {
-        if (!bookData.author || !bookData.title || !bookData.location || !bookData.stock) {
-            handleResponse(res, 400, null, 'Author, title, location, and stock are required.');
-            return null;
+        if (!bookData.title && !bookData.author && !bookData.stock && !bookData.location) {
+            throw new Error('At least one of the fields (title, author, stock, location) is required.');
         }
 
         const locationObject = JSON.parse(bookData.location);
-        const newBook = await this.bookService.createBook(
+        return this.bookService.createBook(
             {
                 title: bookData.title,
                 author: bookData.author,
@@ -31,47 +29,38 @@ export class BookApplicationService {
             },
             res
         );
-        handleResponse(res, 201, { book: newBook }, 'Book created successfully');
-        return newBook;
     }
 
-    @errorHandler()
+    @errorHandlerMiddleware
     async getBook(bookId: string, res: Response): Promise<IBook | null> {
-        const book = await this.bookService.readBook(bookId, res);
+        const book = await this.bookService.showBook(bookId, res);
         if (!book) {
-            handleResponse(res, 404, null, 'Book not found');
-            return null;
+            throw new Error('Book not found');
         }
-        handleResponse(res, 200, { book }, 'Book retrieved successfully');
         return book;
     }
 
-    @errorHandler()
+    @errorHandlerMiddleware
     async getAllBooks(res: Response): Promise<IBook[] | null> {
-        const books = await this.bookService.readAllBooks(res);
-        handleResponse(res, 200, { books }, 'All books retrieved successfully');
+        const books = await this.bookService.showAllBooks(res);
         return books;
     }
 
-    @errorHandler()
+    @errorHandlerMiddleware
     async updateBook(bookId: string, updatedBookInfo: any, res: Response): Promise<IBook | null> {
         const updatedBook = await this.bookService.updateBook(bookId, updatedBookInfo, res);
         if (!updatedBook) {
-            handleResponse(res, 404, null, 'Book not found');
-            return null;
+            throw new Error('Book not found');
         }
-        handleResponse(res, 200, { book: updatedBook }, 'Book updated successfully');
         return updatedBook;
     }
 
-    @errorHandler()
+    @errorHandlerMiddleware
     async deleteBook(bookId: string, res: Response): Promise<IBook | null> {
         const deletedBook = await this.bookService.deleteBook(bookId, res);
         if (!deletedBook) {
-            handleResponse(res, 404, null, 'Book not found');
-            return null;
+            throw new Error('Book not found');
         }
-        handleResponse(res, 200, { book: deletedBook }, 'Book deleted successfully');
         return deletedBook;
     }
 }

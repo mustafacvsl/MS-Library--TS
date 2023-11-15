@@ -3,9 +3,8 @@ import 'reflect-metadata';
 import { inject, injectable } from 'inversify';
 import BookRepository from './Book.repository';
 import { Response } from 'express';
-import { handleResponse } from '../../infrastructure/response';
 import Book, { IBook } from './Book';
-import { errorHandler } from '../../middleware/errorhandlerMiddleware';
+import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
 
 @injectable()
 export class BookService {
@@ -15,13 +14,8 @@ export class BookService {
         this.bookRepository = bookRepository;
     }
 
-    @errorHandler()
+    @errorHandlerMiddleware
     async createBook(bookData: { title: string; author: string; stock: string; location: string }, res: Response): Promise<IBook | null> {
-        if (!bookData.author || !bookData.title || !bookData.location || !bookData.stock) {
-            handleResponse(res, 400, null, 'Author, title, location, and stock are required.');
-            return null;
-        }
-
         const book = new Book({
             _id: new mongoose.Types.ObjectId(),
             author: bookData.author,
@@ -32,76 +26,64 @@ export class BookService {
 
         const savedBook = await book.save();
         if (!savedBook) {
-            handleResponse(res, 500, null, 'An error occurred while creating the book.');
-            return null;
+            throw new Error('An error occurred while creating the book.');
         }
 
-        handleResponse(res, 201, { book: savedBook }, 'Book created successfully');
         return savedBook;
     }
 
-    @errorHandler()
-    async readBook(bookId: string, res: Response): Promise<any> {
+    @errorHandlerMiddleware
+    async showBook(bookId: string, res: Response): Promise<IBook | null> {
         if (!bookId) {
-            handleResponse(res, 400, null, 'Book ID required.');
-            return null;
+            throw new Error('Book ID required.');
         }
 
         const book = await Book.findById(bookId).populate('author');
         if (!book) {
-            handleResponse(res, 404, null, 'Book not found');
-            return null;
+            throw new Error('Book not found');
         }
 
-        handleResponse(res, 200, { book }, 'Book retrieved successfully');
         return book;
     }
 
-    async readAllBooks(res: Response): Promise<any> {
+    @errorHandlerMiddleware
+    async showAllBooks(res: Response): Promise<IBook[] | null> {
         const books = await Book.find();
-        handleResponse(res, 200, { books }, 'All books retrieved successfully');
         return books;
     }
 
-    @errorHandler()
-    async updateBook(bookId: string, updatedBookInfo: any, res: Response): Promise<any> {
+    @errorHandlerMiddleware
+    async updateBook(bookId: string, updatedBookInfo: any, res: Response): Promise<IBook | null> {
         if (!bookId) {
-            handleResponse(res, 400, null, 'Book ID required.');
-            return null;
+            throw new Error('Book ID required.');
         }
 
         const book = await Book.findById(bookId);
         if (!book) {
-            handleResponse(res, 404, null, 'Book not found');
-            return null;
+            throw new Error('Book not found');
         }
 
         book.set(updatedBookInfo);
         const updatedBook = await book.save();
 
         if (!updatedBook) {
-            handleResponse(res, 500, null, 'An error occurred while updating the book.');
-            return null;
+            throw new Error('An error occurred while updating the book.');
         }
 
-        handleResponse(res, 200, { book: updatedBook }, 'Book updated successfully');
         return updatedBook;
     }
 
-    @errorHandler()
-    async deleteBook(bookId: string, res: Response): Promise<any> {
+    @errorHandlerMiddleware
+    async deleteBook(bookId: string, res: Response): Promise<IBook | null> {
         if (!bookId) {
-            handleResponse(res, 400, null, 'Book ID required.');
-            return null;
+            throw new Error('Book ID required.');
         }
 
         const book = await Book.findByIdAndDelete(bookId);
         if (!book) {
-            handleResponse(res, 404, null, 'Book not found');
-            return null;
+            throw new Error('Book not found');
         }
 
-        handleResponse(res, 200, { book }, 'Book deleted successfully');
         return book;
     }
 }

@@ -7,7 +7,7 @@ import authorRoutes from './Routes/auth.routes';
 import bookRoutes from './Routes/book.routes';
 import executiveRoutes from './Routes/executive.routes';
 import memberRoutes from './Routes/member.routes';
-import { errorHandler } from './middleware/errorhandlerMiddleware';
+import { errorHandlerMiddleware } from './middleware/errorhandlerMiddleware';
 
 const router = express();
 
@@ -48,7 +48,7 @@ const StartServer = () => {
         next();
     });
 
-    router.use(errorHandler);
+    // router.use(errorHandlerMiddleware);
     router.use('/authors', authorRoutes);
     router.use('/books', bookRoutes);
     router.use('/executive', executiveRoutes);

@@ -2,33 +2,46 @@ import { NextFunction, Request, Response, Router } from 'express';
 import authEntity from '../Domain/User/auth.entity';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
+import Joi from 'joi';
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 import ExecutiveApplicationService from '../ApplicationService/ExecutiveApplicationService';
 import ExecutiveRepository from '../Domain/Executive/executive.repository';
 import { handleResponse } from '../infrastructure/response';
-import { errorHandler } from '../middleware/errorhandlerMiddleware';
+import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
 
 @injectable()
 export class ExecutiveController {
     constructor(@inject('ExecutiveApplicationService') private executiveapplicationservice: ExecutiveApplicationService) {}
 
-    @errorHandler()
+    @errorHandlerMiddleware
     async listUsers(req: Request, res: Response) {
         const users = await this.executiveapplicationservice.listUsers(res);
         handleResponse(res, 200, { users });
     }
 
-    @errorHandler()
+    @errorHandlerMiddleware
     async updateAuthor(req: Request, res: Response, next: NextFunction) {
         const authorId = req.params.authorId;
         const updateData = req.body;
+
+        const schema = Joi.object({
+            name: Joi.string(),
+            email: Joi.string().email()
+        });
+
+        const { error } = schema.validate(updateData);
+
+        if (error) {
+            handleResponse(res, 400, { message: 'Validation error', details: error.details });
+            return;
+        }
 
         const author = await this.executiveapplicationservice.updateAuthor(authorId, updateData, res);
         handleResponse(res, 201, { author });
     }
 
-    @errorHandler()
+    @errorHandlerMiddleware
     async deleteAuthor(req: Request, res: Response, next: NextFunction) {
         const authorId = req.params.authorId;
 
@@ -36,7 +49,7 @@ export class ExecutiveController {
         handleResponse(res, 201, { author, message: 'Deleted' });
     }
 
-    @errorHandler()
+    @errorHandlerMiddleware
     async borrowBook(req: Request, res: Response, next: NextFunction) {
         const { memberId, bookId } = req.body;
 
@@ -44,7 +57,7 @@ export class ExecutiveController {
         handleResponse(res, 201, { loanedBook });
     }
 
-    @errorHandler()
+    @errorHandlerMiddleware
     async returnBook(req: Request, res: Response, next: NextFunction) {
         const loanId = req.params.loanId;
 

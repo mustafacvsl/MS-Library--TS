@@ -1,7 +1,6 @@
 import { inject, injectable } from 'inversify';
 import MemberRepository from './member.repository';
-import memberEntity, { IMemberModel } from './member.entity';
-import 'reflect-metadata';
+import { IMemberModel } from './member.entity';
 import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
 
 @injectable()

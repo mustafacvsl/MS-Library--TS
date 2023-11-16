@@ -8,7 +8,11 @@ export function errorHandlerMiddleware(target: any, propertyKey: string | symbol
             await originalMethod.call(this, req, res, next);
         } catch (error) {
             console.error('Error:', error);
-            res.status(500).send('Internal Server Error');
+            if (res && res.status) {
+                res.status(500).send('Internal Server Error');
+            } else {
+                console.error('Response object does not have a status function.');
+            }
         }
     };
 

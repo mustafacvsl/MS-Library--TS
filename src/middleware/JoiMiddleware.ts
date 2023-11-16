@@ -22,10 +22,14 @@ export const JoiMiddleware = (schema: ObjectSchema) => {
 export const Schemas = {
     author: {
         create: Joi.object<IAuthor>({
-            name: Joi.string().required()
+            name: Joi.string().required(),
+            email: Joi.string().email().required(),
+            password: Joi.string().required()
         }),
         update: Joi.object<IAuthor>({
-            name: Joi.string().required()
+            name: Joi.string().required(),
+            email: Joi.string().email().required(),
+            password: Joi.string().required()
         })
     },
     book: {

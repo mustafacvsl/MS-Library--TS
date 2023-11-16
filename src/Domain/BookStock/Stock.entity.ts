@@ -1,4 +1,3 @@
-import { number } from 'joi';
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IStock {
@@ -8,7 +7,7 @@ export interface IStock {
 export interface IStockModel extends IStock, Document {}
 
 const StockSchema: Schema = new Schema({
-    count: { type: number, required: true, default: 0 }
+    count: { type: Number, required: true, default: 0 }
 });
 
 export default mongoose.model<IStockModel>('Stock', StockSchema);

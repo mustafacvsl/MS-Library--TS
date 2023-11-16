@@ -1,8 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import authEntity, { IAuthor } from '../User/auth.entity';
 
 export interface IMember {
-    authorname: IAuthor;
+    authorname: string;
     email: string;
 }
 

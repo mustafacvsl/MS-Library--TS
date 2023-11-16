@@ -8,6 +8,7 @@ export interface IBook {
     author: string;
     stock: IStock;
     location: IBookLocation;
+    status: string;
 }
 
 export interface IBookModel extends IBook, Document {}
@@ -21,7 +22,8 @@ const BookSchema: Schema = new Schema(
             corridor: { type: String, required: true },
             shelf: { type: String, required: true },
             cupboard: { type: String, required: true }
-        }
+        },
+        status: { type: String, enum: ['Available', 'Borrowed'], default: 'Available' }
     },
     {
         timestamps: true,

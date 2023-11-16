@@ -3,6 +3,7 @@ import mongoose, { ClientSession } from 'mongoose';
 import Book, { IBook } from '../Book/Book';
 import loanedEntity, { ILoanedModel } from '../Loaned/loaned.entity';
 import StockEntity, { IStock } from '../BookStock/Stock.entity';
+const winston = require('winston');
 
 class ExecutiveRepository {
     private client: mongoose.Mongoose;

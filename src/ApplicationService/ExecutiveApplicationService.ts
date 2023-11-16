@@ -7,10 +7,6 @@ import { Response } from 'express';
 const winston = require('winston');
 import Joi from 'joi';
 
-const logger = winston.createLogger({
-    transports: [new winston.transports.Console(), new winston.transports.File({ filename: 'logs/error.log', level: 'error' }), new winston.transports.File({ filename: 'logs/combined.log' })]
-});
-
 @injectable()
 export class ExecutiveApplicationService {
     constructor(@inject(ExecutiveService) private executiveservice: ExecutiveService) {}

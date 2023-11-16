@@ -5,7 +5,7 @@ import { IBook } from '../Domain/Book/Book';
 import memberEntity, { IMember } from '../Domain/Member/member.entity';
 import Logging from '../infrastructure/Logging';
 
-export const ValidateJoi = (schema: ObjectSchema) => {
+export const JoiMiddleware = (schema: ObjectSchema) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
             await schema.validateAsync(req.body);
@@ -38,5 +38,4 @@ export const Schemas = {
             title: Joi.string().required()
         })
     }
-    //BURAYA MEMBER VE EXECUTİVE JOİ EKLE
 };

@@ -32,20 +32,23 @@ export class BookApplicationService {
     }
 
     @errorHandlerMiddleware
-    async getBook(bookId: string, res: Response): Promise<IBook | null> {
+    async showBook(bookId: string, res: Response): Promise<IBook | null> {
+        if (!bookId) {
+            throw new Error('Book ID required.');
+        }
+
         const book = await this.bookService.showBook(bookId, res);
         if (!book) {
             throw new Error('Book not found');
         }
+
         return book;
     }
 
     @errorHandlerMiddleware
-    async getAllBooks(res: Response): Promise<IBook[] | null> {
-        const books = await this.bookService.showAllBooks(res);
-        return books;
+    async showAllBooks(res: Response): Promise<IBook[] | null> {
+        return this.bookService.showAllBooks(res);
     }
-
     @errorHandlerMiddleware
     async updateBook(bookId: string, updatedBookInfo: any, res: Response): Promise<IBook | null> {
         const updatedBook = await this.bookService.updateBook(bookId, updatedBookInfo, res);

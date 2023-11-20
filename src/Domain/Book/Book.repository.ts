@@ -13,11 +13,10 @@ class BookRepository {
         return newBook;
     }
 
-    @errorHandlerMiddleware
     async showBook(bookId: string): Promise<any> {
-        if (!bookId) throw new Error('Book ID is required.');
+        if (!bookId) throw new Error('Book ID required.');
 
-        return Book.findById(bookId).populate('author').orFail(new Error('Book not found'));
+        return Book.findById(bookId).orFail(new Error('Book not found'));
     }
 
     @errorHandlerMiddleware

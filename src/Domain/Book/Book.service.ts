@@ -38,18 +38,12 @@ export class BookService {
             throw new Error('Book ID required.');
         }
 
-        const book = await Book.findById(bookId).populate('author');
-        if (!book) {
-            throw new Error('Book not found');
-        }
-
-        return book;
+        return Book.findById(bookId);
     }
 
     @errorHandlerMiddleware
     async showAllBooks(res: Response): Promise<IBook[] | null> {
-        const books = await Book.find();
-        return books;
+        return Book.find();
     }
 
     @errorHandlerMiddleware

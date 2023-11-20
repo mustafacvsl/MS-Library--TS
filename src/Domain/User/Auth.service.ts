@@ -26,7 +26,8 @@ class AuthService {
             throw new Error('User with this email already exists');
         }
 
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
+
         const user = new authEntity({
             name,
             email,

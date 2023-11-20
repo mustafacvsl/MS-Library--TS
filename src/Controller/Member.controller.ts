@@ -1,22 +1,18 @@
-import { Request, Response } from 'express';
-import { inject, injectable } from 'inversify';
-import MemberApplicationService from '../ApplicationService/MemberApplicationService';
-import { handleResponse } from '../infrastructure/response';
 import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
+import { Request, Response } from 'express';
+import { MemberApplicationService } from '../ApplicationService/MemberApplicationService';
+import { handleResponse } from '../infrastructure/response';
+import { inject, injectable } from 'inversify';
+import 'reflect-metadata';
 
 @injectable()
 export class MemberController {
     constructor(@inject('MemberApplicationService') private memberApplicationService: MemberApplicationService) {}
 
     @errorHandlerMiddleware
-    async register(req: Request, res: Response): Promise<void> {
-        try {
-            const { authorname, email } = req.body;
-            const { member } = await this.memberApplicationService.registerMember(authorname, email);
-
-            handleResponse(res, 201, { member });
-        } catch (error) {
-            handleResponse(res, 500, null, 'Internal Server Error');
-        }
+    async makeMember(req: Request, res: Response): Promise<void> {
+        const { authorName, email } = req.body;
+        await this.memberApplicationService.makeMember(authorName, email);
+        handleResponse(res, 200, {}, 'User successfully made a member');
     }
 }

@@ -12,9 +12,9 @@ const bookController = new BookController(bookApplicationservice);
 const router = express.Router();
 
 router.post('/create', bookController.createBook.bind(bookController));
-router.get('/get/:bookId', bookController.showBook.bind(bookController));
-router.get('/get/', bookController.ShowAllBooks.bind(bookController));
 router.patch('/update/:bookId', bookController.updateBook.bind(bookController));
 router.delete('/delete/:bookId', bookController.deleteBook.bind(bookController));
+router.get('/show/:bookId', bookController.showBook.bind(bookController));
+router.get('/showAll', bookController.showAllBooks.bind(bookController));
 
 export = router;

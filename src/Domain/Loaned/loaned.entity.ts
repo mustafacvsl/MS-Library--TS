@@ -1,27 +1,21 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import memberEntity, { IMember } from '../Member/member.entity';
-import Book, { IBook } from '../Book/Book';
 
-export interface ILoaned {
-    memberId: IMember;
-    bookId: IBook;
+export interface ILoanedModel extends Document {
+    memberId: string;
+    bookId: string;
     borrowedDate: Date;
-    returnedDate?: Date;
+    returnedDate: Date | null;
+    penalty: number;
 }
 
-export interface ILoanedModel extends ILoaned, Document {}
+const LoanedSchema = new Schema({
+    memberId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    bookId: { type: Schema.Types.ObjectId, ref: 'Book', required: true },
+    borrowedDate: { type: Date, required: true },
+    returnedDate: { type: Date, default: null },
+    penalty: { type: Number, default: 0 }
+});
 
-const LoanedSchema: Schema = new Schema(
-    {
-        memberId: { type: String, required: true, unique: true, ref: 'Member' },
-        bookId: { type: String, required: true, unique: true, ref: 'Book' },
-        borrowedDate: { type: Date, required: true },
-        returnedDate: { type: Date, required: true }
-    },
-    {
-        timestamps: true,
-        versionKey: false
-    }
-);
+const LoanedEntity = mongoose.model<ILoanedModel>('Loaned', LoanedSchema);
 
-export default mongoose.model<ILoanedModel>('Loaned', LoanedSchema);
+export default LoanedEntity;

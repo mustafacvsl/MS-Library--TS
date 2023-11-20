@@ -6,6 +6,7 @@ import loanedEntity, { ILoanedModel } from '../Loaned/loaned.entity';
 import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
 import Book, { IBookModel } from '../Book/Book';
 import { handleResponse } from '../../infrastructure/response';
+import { addDays } from 'date-fns';
 
 @injectable()
 class ExecutiveService {
@@ -45,6 +46,16 @@ class ExecutiveService {
 
         if (!member || !book) {
             throw new Error('Member or book not found');
+        }
+
+        const overdueLoans = await loanedEntity.find({
+            memberId,
+            returnedDate: null,
+            borrowedDate: { $lt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) }
+        });
+
+        if (overdueLoans.length > 0) {
+            throw new Error('Member has overdue loans. Cannot borrow a new book until overdue books are returned.');
         }
 
         const loanedBook = await this.executiverepository.borrowBook(memberId, bookId);

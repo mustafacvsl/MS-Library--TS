@@ -36,15 +36,15 @@ export class BookController {
 
     showBook = async (req: Request, res: Response, next: NextFunction) => {
         const bookId = req.params.bookId;
-        const book = await this.bookApplicationservice.getBook(bookId, res);
+
+        const book = await this.bookApplicationservice.showBook(bookId, res);
         handleResponse(res, 200, { book }, 'Book retrieved successfully');
     };
 
-    ShowAllBooks = async (req: Request, res: Response, next: NextFunction) => {
-        const books = await this.bookApplicationservice.getAllBooks(res);
+    showAllBooks = async (req: Request, res: Response, next: NextFunction) => {
+        const books = await this.bookApplicationservice.showAllBooks(res);
         handleResponse(res, 200, { books }, 'All books retrieved successfully');
     };
-
     updateBook = async (req: Request, res: Response, next: NextFunction) => {
         const bookId = req.params.bookId;
         const updatedBookInfo = req.body;

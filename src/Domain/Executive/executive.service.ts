@@ -7,6 +7,7 @@ import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware'
 import Book, { IBookModel } from '../Book/Book';
 import { handleResponse } from '../../infrastructure/response';
 import { addDays } from 'date-fns';
+import { ClientSession } from 'mongoose';
 
 @injectable()
 class ExecutiveService {
@@ -40,7 +41,7 @@ class ExecutiveService {
     }
 
     @errorHandlerMiddleware
-    async borrowBook(memberId: string, bookId: string): Promise<ILoanedModel | null> {
+    async borrowBook(memberId: string, bookId: string, session: ClientSession): Promise<ILoanedModel | null> {
         const member = await authEntity.findById(memberId);
         const book = await Book.findById(bookId);
 
@@ -58,7 +59,7 @@ class ExecutiveService {
             throw new Error('Member has overdue loans. Cannot borrow a new book until overdue books are returned.');
         }
 
-        const loanedBook = await this.executiverepository.borrowBook(memberId, bookId);
+        const loanedBook = await this.executiverepository.borrowBook(memberId, bookId, session);
 
         if (!loanedBook) {
             throw new Error('Unable to borrow book');
@@ -71,14 +72,14 @@ class ExecutiveService {
     }
 
     @errorHandlerMiddleware
-    async returnBook(loanId: string): Promise<ILoanedModel | null> {
+    async returnBook(loanId: string, session: ClientSession): Promise<ILoanedModel | null> {
         const loanedBook = await loanedEntity.findById(loanId);
 
         if (!loanedBook) {
             throw new Error('Loaned book not found');
         }
 
-        const returnedBook = await this.executiverepository.returnBook(loanId);
+        const returnedBook = await this.executiverepository.returnBook(loanId, session);
 
         if (!returnedBook) {
             throw new Error('Unable to return book');

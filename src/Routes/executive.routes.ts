@@ -4,11 +4,13 @@ import { Schemas, JoiMiddleware } from '../middleware/JoiMiddleware';
 import ExecutiveApplicationService from '../ApplicationService/ExecutiveApplicationService';
 import ExecutiveService from '../Domain/Executive/executive.service';
 import ExecutiveRepository from '../Domain/Executive/executive.repository';
+import TransactionHandler from '../Domain/Transaction/TransactionManager';
 
 const router = express.Router();
 const executiverepository = new ExecutiveRepository();
 const executiveservice = new ExecutiveService(executiverepository);
-const executiveapplicationservice = new ExecutiveApplicationService(executiveservice);
+const transactionhandler = new TransactionHandler();
+const executiveapplicationservice = new ExecutiveApplicationService(executiveservice, transactionhandler);
 const executivecontroller = new ExecutiveController(executiveapplicationservice);
 
 router.get('/list', executivecontroller.listUsers.bind(executivecontroller));

@@ -14,12 +14,6 @@ class ExecutiveRepository {
         this.databaseName = 'library';
     }
 
-    private async startSessionAndTransaction(): Promise<ClientSession> {
-        const session = await this.client.startSession();
-        session.startTransaction();
-        return session;
-    }
-
     async findUserByEmail(email: string) {
         return authEntity.findOne({ email });
     }
@@ -41,12 +35,10 @@ class ExecutiveRepository {
     }
 
     //! KİTAP İŞLEMLERİ
-
-    async borrowBook(memberId: string, bookId: string): Promise<ILoanedModel | null> {
-        const session = await this.startSessionAndTransaction();
+    async borrowBook(memberId: string, bookId: string, session: ClientSession): Promise<ILoanedModel | null> {
+        const options = { session };
 
         try {
-            const options = { session };
             const book = await Book.findById(bookId, null, options);
 
             if (!book) {
@@ -56,6 +48,7 @@ class ExecutiveRepository {
             if (book.stock.count <= 0) {
                 throw new Error('Book out of stock');
             }
+
             const stockEntry = new StockEntity({
                 bookId,
                 transactionType: 'entry',
@@ -77,22 +70,16 @@ class ExecutiveRepository {
 
             const savedLoan = await loanedBook.save(options);
 
-            await session.commitTransaction();
-
             return savedLoan;
         } catch (error) {
-            await session.abortTransaction();
             throw error;
-        } finally {
-            session.endSession();
         }
     }
 
-    async returnBook(loanId: string): Promise<ILoanedModel | null> {
-        const session = await this.startSessionAndTransaction();
+    async returnBook(loanId: string, session: ClientSession): Promise<ILoanedModel | null> {
+        const options = { session };
 
         try {
-            const options = { session };
             const loanedBook = await loanedEntity.findById(loanId, options);
 
             if (!loanedBook) {
@@ -113,14 +100,12 @@ class ExecutiveRepository {
             });
 
             await stockEntry.save(options);
+
             const updatedLoan = await loanedBook.save(options);
-            await session.commitTransaction();
+
             return updatedLoan;
         } catch (error) {
-            await session.abortTransaction();
             throw error;
-        } finally {
-            session.endSession();
         }
     }
 }

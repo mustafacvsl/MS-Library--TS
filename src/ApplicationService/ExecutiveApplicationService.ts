@@ -6,7 +6,7 @@ import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
 import { Response } from 'express';
 const winston = require('winston');
 import Joi from 'joi';
-import TransactionHandler from '../Domain/Transaction/TransactionManager';
+import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
 
 @injectable()
 export class ExecutiveApplicationService {

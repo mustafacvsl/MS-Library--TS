@@ -2,6 +2,7 @@ import Book from './Book';
 import mongoose from 'mongoose';
 import { injectable } from 'inversify';
 import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
+import { ClientSession } from 'mongoose';
 
 @injectable()
 class BookRepository {
@@ -25,16 +26,27 @@ class BookRepository {
     }
 
     @errorHandlerMiddleware
-    async updateBook(bookId: string, updatedBookInfo: any): Promise<any> {
-        if (!bookId) throw new Error('Book ID is required.');
+    async updateBook(bookId: string, updatedBookInfo: any, session: ClientSession): Promise<any> {
+        if (!bookId) {
+            throw new Error('Book ID is required.');
+        }
 
-        return Book.findByIdAndUpdate(bookId, updatedBookInfo, { new: true }).orFail(new Error('Book not found'));
+        return Book.findByIdAndUpdate(bookId, updatedBookInfo, { new: true, session }).orFail(new Error('Book not found'));
     }
-    @errorHandlerMiddleware
-    async deleteBook(bookId: string): Promise<any> {
-        if (!bookId) throw new Error('Book ID required.');
 
-        return Book.findByIdAndDelete(bookId).orFail(new Error('Book not found'));
+    @errorHandlerMiddleware
+    async deleteBook(bookId: string, session: ClientSession): Promise<any> {
+        if (!bookId) {
+            throw new Error('Book ID required.');
+        }
+
+        const book = await Book.findById(bookId).session(session);
+
+        if (!book) {
+            throw new Error('Book not found');
+        }
+
+        await book.deleteOne({ session });
     }
 }
 

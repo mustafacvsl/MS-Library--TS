@@ -5,6 +5,7 @@ import BookRepository from './Book.repository';
 import { Response } from 'express';
 import Book, { IBook } from './Book';
 import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
+import { ClientSession } from 'mongoose';
 
 @injectable()
 export class BookService {
@@ -15,7 +16,7 @@ export class BookService {
     }
 
     @errorHandlerMiddleware
-    async createBook(bookData: { title: string; author: string; stock: string; location: string }, res: Response): Promise<IBook | null> {
+    async createBook(bookData: { title: string; author: string; stock: string; location: string }, res: Response, session?: ClientSession): Promise<IBook | null> {
         const book = new Book({
             _id: new mongoose.Types.ObjectId(),
             author: bookData.author,
@@ -24,7 +25,7 @@ export class BookService {
             stock: bookData.stock
         });
 
-        const savedBook = await book.save();
+        const savedBook = await book.save({ session });
         if (!savedBook) {
             throw new Error('An error occurred while creating the book.');
         }
@@ -47,18 +48,19 @@ export class BookService {
     }
 
     @errorHandlerMiddleware
-    async updateBook(bookId: string, updatedBookInfo: any, res: Response): Promise<IBook | null> {
+    async updateBook(bookId: string, updatedBookInfo: any, res: Response, session: ClientSession | null = null): Promise<IBook | null> {
         if (!bookId) {
             throw new Error('Book ID required.');
         }
 
-        const book = await Book.findById(bookId);
+        const book = await Book.findById(bookId).session(session);
+
         if (!book) {
             throw new Error('Book not found');
         }
 
         book.set(updatedBookInfo);
-        const updatedBook = await book.save();
+        const updatedBook = await book.save({ session });
 
         if (!updatedBook) {
             throw new Error('An error occurred while updating the book.');
@@ -68,12 +70,13 @@ export class BookService {
     }
 
     @errorHandlerMiddleware
-    async deleteBook(bookId: string, res: Response): Promise<IBook | null> {
+    async deleteBook(bookId: string, res: Response, session: ClientSession | null = null): Promise<IBook | null> {
         if (!bookId) {
             throw new Error('Book ID required.');
         }
 
-        const book = await Book.findByIdAndDelete(bookId);
+        const book = await Book.findByIdAndDelete(bookId).session(session);
+
         if (!book) {
             throw new Error('Book not found');
         }

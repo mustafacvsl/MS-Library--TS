@@ -1,20 +1,24 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import memberEntity from './member.entity';
+import MemberEntity from './member.entity';
 import MemberRepository from './member.repository';
+import { Response } from 'express';
+import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
 
 @injectable()
-export class MemberService {
+class MemberService {
     constructor(@inject(MemberRepository) private memberRepository: MemberRepository) {}
 
-    async makeMember(authorName: string, email: string): Promise<void> {
+    @errorHandlerMiddleware
+    async addMember(name: string, email: string, res: Response): Promise<any> {
         const existingMember = await this.memberRepository.findMemberByEmail(email);
-
-        if (!existingMember) {
-            const newMember = new memberEntity({ authorName, email });
-            await newMember.save();
-        } else {
-            throw new Error('User is already a member');
+        if (existingMember) {
+            throw new Error('Member with this email already exists');
         }
+
+        const addedMember = await this.memberRepository.addMember(name, email);
+        return addedMember;
     }
 }
+
+export default MemberService;

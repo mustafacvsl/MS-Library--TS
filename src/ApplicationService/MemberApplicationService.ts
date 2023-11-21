@@ -1,12 +1,17 @@
+import MemberService from '../Domain/Member/member.service';
+import MemberEntity from '../Domain/Member/member.entity';
 import { injectable, inject } from 'inversify';
 import 'reflect-metadata';
-import { MemberService } from '../Domain/Member/member.service';
+import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
+import { Response } from 'express';
 
 @injectable()
 export class MemberApplicationService {
     constructor(@inject(MemberService) private memberService: MemberService) {}
 
-    async makeMember(authorName: string, email: string): Promise<void> {
-        await this.memberService.makeMember(authorName, email);
+    @errorHandlerMiddleware
+    async addMember(authorName: string, email: string, res: Response): Promise<void> {
+        const addedMember = await this.memberService.addMember(authorName, email, res);
+        res.status(201).json({ member: addedMember, message: 'Member added successfully' });
     }
 }

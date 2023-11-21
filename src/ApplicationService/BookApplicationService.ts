@@ -4,31 +4,38 @@ import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import { Response } from 'express';
 import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
+import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
 
 @injectable()
 export class BookApplicationService {
     private bookService: BookService;
+    private transactionHandler: TransactionHandler;
 
-    constructor(@inject(BookService) bookService: BookService) {
+    constructor(@inject(BookService) bookService: BookService, @inject(TransactionHandler) transactionHandler: TransactionHandler) {
         this.bookService = bookService;
+        this.transactionHandler = transactionHandler;
     }
 
     @errorHandlerMiddleware
-    async createBook(bookData: { title: string; author: string; stock: string; location: string }, res: Response): Promise<IBook | null> {
+    async createBook(bookData: { title: string; author: string; stock: string; location: string }, res: Response): Promise<void | null> {
         if (!bookData.title && !bookData.author && !bookData.stock && !bookData.location) {
             throw new Error('At least one of the fields (title, author, stock, location) is required.');
         }
 
         const locationObject = JSON.parse(bookData.location);
-        return this.bookService.createBook(
-            {
-                title: bookData.title,
-                author: bookData.author,
-                stock: bookData.stock,
-                location: locationObject
-            },
-            res
-        );
+
+        await this.transactionHandler.runInTransaction(async (session) => {
+            await this.bookService.createBook(
+                {
+                    title: bookData.title,
+                    author: bookData.author,
+                    stock: bookData.stock,
+                    location: locationObject
+                },
+                res,
+                session
+            );
+        });
     }
 
     @errorHandlerMiddleware
@@ -50,21 +57,26 @@ export class BookApplicationService {
         return this.bookService.showAllBooks(res);
     }
     @errorHandlerMiddleware
-    async updateBook(bookId: string, updatedBookInfo: any, res: Response): Promise<IBook | null> {
-        const updatedBook = await this.bookService.updateBook(bookId, updatedBookInfo, res);
-        if (!updatedBook) {
-            throw new Error('Book not found');
-        }
-        return updatedBook;
+    async updateBook(bookId: string, updatedBookInfo: any, res: Response): Promise<void | null> {
+        return this.transactionHandler.runInTransaction(async (session) => {
+            const updatedBook = await this.bookService.updateBook(bookId, updatedBookInfo, res, session);
+            if (!updatedBook) {
+                throw new Error('Book not found');
+            }
+
+            return;
+        });
     }
 
     @errorHandlerMiddleware
-    async deleteBook(bookId: string, res: Response): Promise<IBook | null> {
-        const deletedBook = await this.bookService.deleteBook(bookId, res);
-        if (!deletedBook) {
-            throw new Error('Book not found');
-        }
-        return deletedBook;
+    async deleteBook(bookId: string, res: Response): Promise<void | null> {
+        return this.transactionHandler.runInTransaction(async (session) => {
+            const deletedBook = await this.bookService.deleteBook(bookId, res, session);
+            if (!deletedBook) {
+                throw new Error('Book not found');
+            }
+            return;
+        });
     }
 }
 

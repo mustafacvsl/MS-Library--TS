@@ -3,10 +3,12 @@ import { BookController } from '../Controller/book.controller';
 import BookApplicationService from '../ApplicationService/BookApplicationService';
 import BookService from '../Domain/Book/Book.service';
 import BookRepository from '../Domain/Book/Book.repository';
+import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
 
 const bookRepository = new BookRepository();
 const bookService = new BookService(bookRepository);
-const bookApplicationservice = new BookApplicationService(bookService);
+const transactionhandler = new TransactionHandler();
+const bookApplicationservice = new BookApplicationService(bookService, transactionhandler);
 const bookController = new BookController(bookApplicationservice);
 
 const router = express.Router();

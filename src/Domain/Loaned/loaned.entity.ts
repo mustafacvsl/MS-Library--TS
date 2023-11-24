@@ -1,8 +1,8 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Document, Schema, Types } from 'mongoose';
 
 export interface ILoanedModel extends Document {
-    memberId: string;
-    bookId: string;
+    memberId: Types.ObjectId;
+    bookId: Types.ObjectId;
     borrowedDate: Date;
     returnedDate: Date | null;
     penalty: number;

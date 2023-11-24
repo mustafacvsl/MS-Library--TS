@@ -10,8 +10,8 @@ export class MemberApplicationService {
     constructor(@inject(MemberService) private memberService: MemberService) {}
 
     @errorHandlerMiddleware
-    async addMember(authorName: string, email: string, res: Response): Promise<void> {
-        const addedMember = await this.memberService.addMember(authorName, email, res);
+    async addMember(name: string, email: string, res: Response): Promise<void> {
+        const addedMember = await this.memberService.addMember(name, email, res);
         res.status(201).json({ member: addedMember, message: 'Member added successfully' });
     }
 }

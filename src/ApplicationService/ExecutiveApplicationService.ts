@@ -7,6 +7,7 @@ import { Response } from 'express';
 const winston = require('winston');
 import Joi from 'joi';
 import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
+import Book from '../Domain/Book/Book';
 
 @injectable()
 export class ExecutiveApplicationService {
@@ -17,6 +18,14 @@ export class ExecutiveApplicationService {
         await this.transactionHandler.runInTransaction(async (session) => {
             const users = await authEntity.find({}, 'name email').session(session);
             res.status(200).json({ users, message: 'Users listed successfully' });
+        });
+    }
+
+    @errorHandlerMiddleware
+    async listBooksUsers(res: Response) {
+        await this.transactionHandler.runInTransaction(async (session) => {
+            const books = await Book.find({}, 'Books :').session(session);
+            res.status(200).json({ books, message: 'Books listed for users' });
         });
     }
 

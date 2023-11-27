@@ -25,6 +25,9 @@ class ExecutiveRepository {
     async getAllUsers() {
         return authEntity.find({}, 'name email');
     }
+    async getAllBooks() {
+        return Book.find({}, 'Books :');
+    }
 
     async updateUserById(userId: string, updatedUserInfo: any) {
         return authEntity.findByIdAndUpdate(userId, updatedUserInfo, { new: true });

@@ -19,6 +19,11 @@ class ExecutiveService {
     }
 
     @errorHandlerMiddleware
+    async listBooksUsers(): Promise<IBookModel[]> {
+        return this.executiverepository.getAllBooks();
+    }
+
+    @errorHandlerMiddleware
     async updateUser(authorId: string, updatedAuthorInfo: any): Promise<IAuthorModel> {
         const author = await this.executiverepository.findUserById(authorId);
         if (!author) {

@@ -21,7 +21,10 @@ export class AuthApplicationService {
 
         const user = new Author({ name, email, password: hashedPassword });
         const savedUser = await user.save();
-        res.status(201).json({ user: savedUser, message: 'User registered successfully' });
+
+        const token = this.generateJWTToken(savedUser);
+
+        res.status(201).json({ user: savedUser, token, message: 'User registered successfully' });
     }
 
     private generateJWTToken(user: any) {

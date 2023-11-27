@@ -36,6 +36,8 @@ export const Schemas = {
         create: Joi.object<IBook>({
             author: Joi.string().required(),
             title: Joi.string().required()
+            // stock: Joi.string().required,
+            // location: Joi.string().required
         }),
         update: Joi.object<IBook>({
             author: Joi.string().required(),

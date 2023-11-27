@@ -8,6 +8,7 @@ import bookRoutes from './Routes/book.routes';
 import executiveRoutes from './Routes/executive.routes';
 import memberRoutes from './Routes/member.routes';
 import { errorHandlerMiddleware } from './middleware/errorhandlerMiddleware';
+import { JoiMiddleware, Schemas } from './middleware/JoiMiddleware';
 
 const router = express();
 
@@ -49,7 +50,7 @@ const StartServer = () => {
     });
 
     // router.use(errorHandlerMiddleware);
-    router.use('/authors', authorRoutes);
+    router.use('/authors', JoiMiddleware(Schemas.author.create), authorRoutes);
     router.use('/books', bookRoutes);
     router.use('/executive', executiveRoutes);
     router.use('/member', memberRoutes);

@@ -1,7 +1,7 @@
 import express from 'express';
 import http from 'http';
 import mongoose from 'mongoose';
-import { config } from './infrastructure/config';
+import { config } from '../.vscode/config';
 import Logging from './infrastructure/Logging';
 import authorRoutes from './Routes/auth.routes';
 import bookRoutes from './Routes/book.routes';

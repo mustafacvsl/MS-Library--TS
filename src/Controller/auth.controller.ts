@@ -21,6 +21,12 @@ export class AuthController {
     }
 
     @errorHandlerMiddleware
+    async listBooksUsers(req: Request, res: Response) {
+        const book = await this.authApplicationService.listBooksUsers(res);
+        handleResponse(res, 200, { book });
+    }
+
+    @errorHandlerMiddleware
     async login(req: Request, res: Response): Promise<void> {
         const { email, password } = req.body;
 

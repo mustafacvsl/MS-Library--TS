@@ -18,6 +18,5 @@ router.patch('/update/:authorId', JoiMiddleware(Schemas.author.update), executiv
 router.delete('/delete/:authorId', executivecontroller.deleteAuthor.bind(executivecontroller));
 router.post('/borrow-book', executivecontroller.borrowBook.bind(executivecontroller));
 router.post('/return-book', executivecontroller.returnBook.bind(executivecontroller));
-router.get('/getbooks', executivecontroller.listBooksUsers.bind(executivecontroller));
 
 export = router;

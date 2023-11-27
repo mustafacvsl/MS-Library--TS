@@ -22,14 +22,6 @@ export class ExecutiveApplicationService {
     }
 
     @errorHandlerMiddleware
-    async listBooksUsers(res: Response) {
-        await this.transactionHandler.runInTransaction(async (session) => {
-            const books = await Book.find({}, 'Books :').session(session);
-            res.status(200).json({ books, message: 'Books listed for users' });
-        });
-    }
-
-    @errorHandlerMiddleware
     async updateAuthor(authorId: string, updateData: any, res: Response) {
         await this.transactionHandler.runInTransaction(async (session) => {
             const schema = Joi.object({

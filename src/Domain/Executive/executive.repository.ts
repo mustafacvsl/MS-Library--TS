@@ -25,9 +25,6 @@ class ExecutiveRepository {
     async getAllUsers() {
         return authEntity.find({}, 'name email');
     }
-    async getAllBooks() {
-        return Book.find({}, 'Books :');
-    }
 
     async updateUserById(userId: string, updatedUserInfo: any) {
         return authEntity.findByIdAndUpdate(userId, updatedUserInfo, { new: true });
@@ -42,7 +39,7 @@ class ExecutiveRepository {
         const options = { session };
 
         try {
-            const book = await Book.findById(bookId, null, options);
+            const book = await Book.findById(bookId, null, options); //Projection yerine null kullandım
 
             if (!book) {
                 throw new Error('Book not found');

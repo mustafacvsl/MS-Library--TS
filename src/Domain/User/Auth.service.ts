@@ -8,6 +8,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 import * as crypto from 'crypto';
 import { promisify } from 'util';
+import Book, { IBookModel } from '../Book/Book';
 
 const compareAsync = promisify(bcrypt.compare);
 
@@ -36,6 +37,11 @@ class AuthService {
 
         const savedUser = await user.save();
         return savedUser;
+    }
+
+    @errorHandlerMiddleware
+    async listBooksUsers(): Promise<IBookModel[]> {
+        return this.authrepository.getAllBooks();
     }
 
     @errorHandlerMiddleware

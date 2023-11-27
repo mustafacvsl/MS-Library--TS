@@ -21,12 +21,6 @@ export class ExecutiveController {
     }
 
     @errorHandlerMiddleware
-    async listBooksUsers(req: Request, res: Response) {
-        const book = await this.executiveapplicationservice.listBooksUsers(res);
-        handleResponse(res, 200, { book });
-    }
-
-    @errorHandlerMiddleware
     async updateAuthor(req: Request, res: Response, next: NextFunction) {
         const authorId = req.params.authorId;
         const updateData = req.body;

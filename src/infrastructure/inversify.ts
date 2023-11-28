@@ -10,6 +10,10 @@ import { AuthApplicationService } from '../ApplicationService/AuthApplicationSer
 import ExecutiveService from '../Domain/Executive/executive.service';
 import { ExecutiveApplicationService } from '../ApplicationService/ExecutiveApplicationService';
 import { ExecutiveController } from '../Controller/executive.controller';
+import { MemberController } from '../Controller/Member.controller';
+import { MemberApplicationService } from '../ApplicationService/MemberApplicationService';
+import MemberService from '../Domain/Member/member.service';
+import MemberRepository from '../Domain/Member/member.repository';
 
 const container = new Container();
 container.bind<AuthApplicationService>(AuthApplicationService).toSelf();
@@ -23,5 +27,9 @@ container.bind<BookRepository>(BookRepository).toSelf();
 container.bind<ExecutiveService>(ExecutiveService).toSelf();
 container.bind<ExecutiveApplicationService>(ExecutiveApplicationService).toSelf();
 container.bind<ExecutiveController>(ExecutiveController).toSelf();
+container.bind<MemberApplicationService>(MemberApplicationService).toSelf();
+container.bind<MemberController>(MemberController).toSelf();
+container.bind<MemberService>(MemberService).toSelf();
+container.bind<MemberRepository>(MemberRepository).toSelf();
 
 export default container;

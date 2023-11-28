@@ -4,14 +4,16 @@ import { injectable, inject } from 'inversify';
 import 'reflect-metadata';
 import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
 import { Response } from 'express';
+import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
 
 @injectable()
 export class MemberApplicationService {
-    constructor(@inject(MemberService) private memberService: MemberService) {}
+    constructor(@inject(MemberService) private memberService: MemberService, @inject(TransactionHandler) private transactionHandler: TransactionHandler) {}
 
     @errorHandlerMiddleware
     async addMember(name: string, email: string, res: Response): Promise<void> {
-        const addedMember = await this.memberService.addMember(name, email, res);
-        res.status(201).json({ member: addedMember, message: 'Member added successfully' });
+        await this.transactionHandler.runInTransaction(async (session) => {
+            await this.memberService.addMember(name, email, res, session);
+        });
     }
 }

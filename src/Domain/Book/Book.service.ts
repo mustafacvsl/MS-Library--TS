@@ -3,7 +3,6 @@ import 'reflect-metadata';
 import { inject, injectable } from 'inversify';
 import BookRepository from './Book.repository';
 import { Response } from 'express';
-import Book, { IBook } from './Book';
 import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
 import { ClientSession } from 'mongoose';
 
@@ -16,72 +15,32 @@ export class BookService {
     }
 
     @errorHandlerMiddleware
-    async createBook(bookData: { title: string; author: string; stock: string; location: string }, res: Response, session?: ClientSession): Promise<IBook | null> {
-        const book = new Book({
-            _id: new mongoose.Types.ObjectId(),
-            author: bookData.author,
-            title: bookData.title,
-            location: bookData.location,
-            stock: bookData.stock
-        });
-
-        const savedBook = await book.save({ session });
-        if (!savedBook) {
-            throw new Error('An error occurred while creating the book.');
-        }
-
-        return savedBook;
+    async createBook(
+        bookData: { title: string; author: string; stock: string; location: { corridor: string; shelf: string; cupboard: string } },
+        res: Response,
+        session?: ClientSession
+    ): Promise<any> {
+        return this.bookRepository.createBook(bookData);
     }
 
     @errorHandlerMiddleware
-    async showBook(bookId: string, res: Response): Promise<IBook | null> {
-        if (!bookId) {
-            throw new Error('Book ID required.');
-        }
-
-        return Book.findById(bookId);
+    async showBook(bookId: string, res: Response): Promise<any> {
+        return this.bookRepository.showBook(bookId);
     }
 
     @errorHandlerMiddleware
-    async showAllBooks(res: Response): Promise<IBook[] | null> {
-        return Book.find();
+    async showAllBooks(res: Response): Promise<any> {
+        return this.bookRepository.showAllBooks();
     }
 
     @errorHandlerMiddleware
-    async updateBook(bookId: string, updatedBookInfo: any, res: Response, session: ClientSession | null = null): Promise<IBook | null> {
-        if (!bookId) {
-            throw new Error('Book ID required.');
-        }
-
-        const book = await Book.findById(bookId).session(session);
-
-        if (!book) {
-            throw new Error('Book not found');
-        }
-
-        book.set(updatedBookInfo);
-        const updatedBook = await book.save({ session });
-
-        if (!updatedBook) {
-            throw new Error('An error occurred while updating the book.');
-        }
-
-        return updatedBook;
+    async updateBook(bookId: string, updatedBookInfo: any, res: Response, session: ClientSession | null = null): Promise<any> {
+        return this.bookRepository.updateBook(bookId, updatedBookInfo);
     }
 
     @errorHandlerMiddleware
-    async deleteBook(bookId: string, res: Response, session: ClientSession | null = null): Promise<IBook | null> {
-        if (!bookId) {
-            throw new Error('Book ID required.');
-        }
-
-        const book = await Book.findByIdAndDelete(bookId).session(session);
-
-        if (!book) {
-            throw new Error('Book not found');
-        }
-
-        return book;
+    async deleteBook(bookId: string, res: Response, session: ClientSession | null = null): Promise<any> {
+        return this.bookRepository.deleteBook(bookId);
     }
 }
 

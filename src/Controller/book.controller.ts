@@ -27,7 +27,7 @@ export class BookController {
                 title,
                 author,
                 stock,
-                location: locationString
+                location
             },
             res
         );

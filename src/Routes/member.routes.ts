@@ -1,17 +1,19 @@
-import express from 'express';
+import express, { Router, Request, Response, NextFunction } from 'express';
 import { MemberController } from '../Controller/Member.controller';
 import { MemberApplicationService } from '../ApplicationService/MemberApplicationService';
+import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
 import MemberService from '../Domain/Member/member.service';
 import MemberRepository from '../Domain/Member/member.repository';
 
-const router = express.Router();
-const memberrepository = new MemberRepository();
-const memberservice = new MemberService(memberrepository);
-const memberapplicationservice = new MemberApplicationService(memberservice);
-const memberController = new MemberController(memberapplicationservice);
+const memberRouter: Router = express.Router();
+const TransactionManager = new TransactionHandler();
+const memberRepository = new MemberRepository();
+const memberService = new MemberService(memberRepository);
+const memberApplicationService = new MemberApplicationService(memberService, TransactionManager);
+const memberController = new MemberController(memberApplicationService);
 
-router.post('/registermember', async (req, res) => {
+memberRouter.post('/add', async (req: Request, res: Response, next: NextFunction) => {
     await memberController.addMember(req, res);
 });
 
-export default router;
+export default memberRouter;

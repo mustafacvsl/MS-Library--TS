@@ -7,10 +7,15 @@ import { ClientSession } from 'mongoose';
 @injectable()
 class BookRepository {
     @errorHandlerMiddleware
-    async createBook(author: string, title: string, stock: number, location: string): Promise<any> {
-        if (!author || !title) throw new Error('Author and title are required.');
+    async createBook(bookData: { title: string; author: string; stock: string; location: { corridor: string; shelf: string; cupboard: string } }): Promise<any> {
+        if (!bookData.author || !bookData.title) throw new Error('Author and title are required.');
 
-        const newBook = await Book.create({ author, title, stock, location });
+        const newBook = await Book.create({
+            author: bookData.author,
+            title: bookData.title,
+            stock: bookData.stock,
+            location: bookData.location
+        });
         return newBook;
     }
 
@@ -26,27 +31,27 @@ class BookRepository {
     }
 
     @errorHandlerMiddleware
-    async updateBook(bookId: string, updatedBookInfo: any, session: ClientSession): Promise<any> {
+    async updateBook(bookId: string, updatedBookInfo: any): Promise<any> {
         if (!bookId) {
             throw new Error('Book ID is required.');
         }
 
-        return Book.findByIdAndUpdate(bookId, updatedBookInfo, { new: true, session }).orFail(new Error('Book not found'));
+        return Book.findByIdAndUpdate(bookId, updatedBookInfo, { new: true }).orFail(new Error('Book not found'));
     }
 
     @errorHandlerMiddleware
-    async deleteBook(bookId: string, session: ClientSession): Promise<any> {
+    async deleteBook(bookId: string): Promise<any> {
         if (!bookId) {
             throw new Error('Book ID required.');
         }
 
-        const book = await Book.findById(bookId).session(session);
+        const book = await Book.findByIdAndDelete(bookId);
 
         if (!book) {
             throw new Error('Book not found');
         }
 
-        await book.deleteOne({ session });
+        return book;
     }
 }
 

@@ -1,7 +1,7 @@
 import express from 'express';
 import { ExecutiveController } from '../Controller/executive.controller';
 import { Schemas, JoiMiddleware } from '../middleware/JoiMiddleware';
-import ExecutiveApplicationService from '../ApplicationService/ExecutiveApplicationService';
+import { ExecutiveApplicationService } from '../ApplicationService/ExecutiveApplicationService';
 import ExecutiveService from '../Domain/Executive/executive.service';
 import ExecutiveRepository from '../Domain/Executive/executive.repository';
 import TransactionHandler from '../infrastructure/Transaction/TransactionManager';

@@ -4,11 +4,11 @@ import authEntity from './auth.entity';
 import AuthRepository from './Auth.repository';
 import { Response } from 'express';
 import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-import * as crypto from 'crypto';
 import { promisify } from 'util';
 import Book, { IBookModel } from '../Book/Book';
+const crypto = require('crypto');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const compareAsync = promisify(bcrypt.compare);
 
@@ -17,7 +17,7 @@ class AuthService {
     constructor(@inject(AuthRepository) private authrepository: AuthRepository) {}
 
     @errorHandlerMiddleware
-    async register(name: string, email: string, password: string, res: Response): Promise<any> {
+    async registerUser(name: string, email: string, password: string, res: Response): Promise<any> {
         if (typeof password !== 'string') {
             throw new Error('Password must be a string');
         }
@@ -28,15 +28,9 @@ class AuthService {
         }
 
         const hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
+        const user = await this.authrepository.registerUser(name, email, hashedPassword);
 
-        const user = new authEntity({
-            name,
-            email,
-            password: hashedPassword
-        });
-
-        const savedUser = await user.save();
-        return savedUser;
+        return user;
     }
 
     @errorHandlerMiddleware
@@ -46,7 +40,8 @@ class AuthService {
 
     @errorHandlerMiddleware
     async login(email: string, password: string, res: Response): Promise<any> {
-        const user = await this.authrepository.findUserByEmail(email);
+        const user = await this.authrepository.loginUser(email);
+
         if (!user) {
             throw new Error('Invalid credentials');
         }

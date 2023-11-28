@@ -1,11 +1,10 @@
 import BookService from '../Domain/Book/Book.service';
-import { IBook } from '../Domain/Book/Book';
+import Book, { IBook } from '../Domain/Book/Book';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import { Response } from 'express';
 import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
 import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
-
 @injectable()
 export class BookApplicationService {
     private bookService: BookService;
@@ -17,65 +16,33 @@ export class BookApplicationService {
     }
 
     @errorHandlerMiddleware
-    async createBook(bookData: { title: string; author: string; stock: string; location: string }, res: Response): Promise<void | null> {
-        if (!bookData.title && !bookData.author && !bookData.stock && !bookData.location) {
-            throw new Error('At least one of the fields (title, author, stock, location) is required.');
-        }
-
-        const locationObject = JSON.parse(bookData.location);
-
-        await this.transactionHandler.runInTransaction(async (session) => {
-            await this.bookService.createBook(
-                {
-                    title: bookData.title,
-                    author: bookData.author,
-                    stock: bookData.stock,
-                    location: locationObject
-                },
-                res,
-                session
-            );
+    async createBook(bookData: { title: string; author: string; stock: string; location: { corridor: string; shelf: string; cupboard: string } }, res: Response): Promise<void | null> {
+        return this.transactionHandler.runInTransaction(async (session) => {
+            return this.bookService.createBook(bookData, res, session);
         });
     }
 
     @errorHandlerMiddleware
     async showBook(bookId: string, res: Response): Promise<IBook | null> {
-        if (!bookId) {
-            throw new Error('Book ID required.');
-        }
-
-        const book = await this.bookService.showBook(bookId, res);
-        if (!book) {
-            throw new Error('Book not found');
-        }
-
-        return book;
+        return this.bookService.showBook(bookId, res);
     }
 
     @errorHandlerMiddleware
     async showAllBooks(res: Response): Promise<IBook[] | null> {
         return this.bookService.showAllBooks(res);
     }
+
     @errorHandlerMiddleware
     async updateBook(bookId: string, updatedBookInfo: any, res: Response): Promise<void | null> {
         return this.transactionHandler.runInTransaction(async (session) => {
-            const updatedBook = await this.bookService.updateBook(bookId, updatedBookInfo, res, session);
-            if (!updatedBook) {
-                throw new Error('Book not found');
-            }
-
-            return;
+            return this.bookService.updateBook(bookId, updatedBookInfo, res, session);
         });
     }
 
     @errorHandlerMiddleware
     async deleteBook(bookId: string, res: Response): Promise<void | null> {
         return this.transactionHandler.runInTransaction(async (session) => {
-            const deletedBook = await this.bookService.deleteBook(bookId, res, session);
-            if (!deletedBook) {
-                throw new Error('Book not found');
-            }
-            return;
+            return this.bookService.deleteBook(bookId, res, session);
         });
     }
 }

@@ -10,6 +10,7 @@ const bookService = new BookService(bookRepository);
 const transactionhandler = new TransactionHandler();
 const bookApplicationservice = new BookApplicationService(bookService, transactionhandler);
 const bookController = new BookController(bookApplicationservice);
+//inversify
 
 const router = express.Router();
 

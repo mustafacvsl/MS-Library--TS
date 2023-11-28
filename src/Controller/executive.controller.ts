@@ -1,14 +1,10 @@
-import { NextFunction, Request, Response, Router } from 'express';
-import authEntity from '../Domain/User/auth.entity';
+import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import Joi from 'joi';
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
-import ExecutiveApplicationService from '../ApplicationService/ExecutiveApplicationService';
-import ExecutiveRepository from '../Domain/Executive/executive.repository';
 import { handleResponse } from '../infrastructure/response';
 import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
+import { ExecutiveApplicationService } from '../ApplicationService/ExecutiveApplicationService';
 
 @injectable()
 export class ExecutiveController {

@@ -19,13 +19,11 @@ export class AuthApplicationService {
 
     @errorHandlerMiddleware
     async registerUser(name: string, email: string, password: string, res: Response): Promise<void> {
-        const hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
+        const hashedPassword = await hashAsync(password, 10);
 
         const user = new Author({ name, email, password: hashedPassword });
         const savedUser = await user.save();
-
         const token = this.generateJWTToken(savedUser);
-
         res.status(201).json({ user: savedUser, token, message: 'User registered successfully' });
     }
 

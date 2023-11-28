@@ -39,7 +39,7 @@ class ExecutiveRepository {
         const options = { session };
 
         try {
-            const book = await Book.findById(bookId, null, options); //Projection yerine null kullandım
+            const book = await Book.findById(bookId, null, options);
 
             if (!book) {
                 throw new Error('Book not found');

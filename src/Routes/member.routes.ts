@@ -4,14 +4,16 @@ import { MemberApplicationService } from '../ApplicationService/MemberApplicatio
 import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
 import MemberService from '../Domain/Member/member.service';
 import MemberRepository from '../Domain/Member/member.repository';
+import AuthRepository from '../Domain/User/Auth.repository';
+import container from '../infrastructure/inversify';
 
 const memberRouter: Router = express.Router();
-const TransactionManager = new TransactionHandler();
-const memberRepository = new MemberRepository();
-const memberService = new MemberService(memberRepository);
-const memberApplicationService = new MemberApplicationService(memberService, TransactionManager);
-const memberController = new MemberController(memberApplicationService);
-
+const memberapplicationservice = container.get<MemberApplicationService>(MemberApplicationService);
+const memberController = container.get<MemberController>(MemberController);
+const memberrepo = container.get<MemberRepository>(MemberRepository);
+const memberservice = container.get<MemberService>(MemberService);
+const authrepo = container.get<AuthRepository>(AuthRepository);
+const transactionHandler = container.get<TransactionHandler>(TransactionHandler);
 memberRouter.post('/add', async (req: Request, res: Response, next: NextFunction) => {
     await memberController.addMember(req, res);
 });

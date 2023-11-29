@@ -25,10 +25,6 @@ export const Schemas = {
             name: Joi.string().required(),
             email: Joi.string().email().required(),
             password: Joi.string().required()
-        }),
-        update: Joi.object<IAuthor>({
-            name: Joi.string().required(),
-            email: Joi.string().email().required()
         })
     },
     book: {

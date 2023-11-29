@@ -23,11 +23,6 @@ export class BookApplicationService {
     }
 
     @errorHandlerMiddleware
-    async showBook(bookId: string, res: Response): Promise<IBook | null> {
-        return this.bookService.showBook(bookId, res);
-    }
-
-    @errorHandlerMiddleware
     async showAllBooks(res: Response): Promise<IBook[] | null> {
         return this.bookService.showAllBooks(res);
     }

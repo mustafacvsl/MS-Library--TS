@@ -24,11 +24,6 @@ export class BookService {
     }
 
     @errorHandlerMiddleware
-    async showBook(bookId: string, res: Response): Promise<any> {
-        return this.bookRepository.showBook(bookId);
-    }
-
-    @errorHandlerMiddleware
     async showAllBooks(res: Response): Promise<any> {
         return this.bookRepository.showAllBooks();
     }

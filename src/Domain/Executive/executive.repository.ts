@@ -1,8 +1,8 @@
-import authEntity from '../User/auth.entity';
 import mongoose, { ClientSession } from 'mongoose';
 import Book, { IBook } from '../Book/Book';
 import loanedEntity, { ILoanedModel } from '../Loaned/loaned.entity';
 import StockEntity, { IStock } from '../BookStock/Stock.entity';
+import authEntity, { IAuthorModel } from '../User/auth.entity';
 
 class ExecutiveRepository {
     private client: mongoose.Mongoose;
@@ -21,16 +21,19 @@ class ExecutiveRepository {
         return authEntity.findById(userId);
     }
 
-    async getAllUsers() {
-        return authEntity.find({}, 'name email');
+    async listUsers(): Promise<IAuthorModel[]> {
+        const users = await authEntity.find({}, '-password').exec();
+        return users;
     }
 
-    async updateUserById(userId: string, updatedUserInfo: any) {
-        return authEntity.findByIdAndUpdate(userId, updatedUserInfo, { new: true });
+    async updateUsers(userId: string, data: any): Promise<IAuthorModel | null> {
+        const updatedUser = await authEntity.findByIdAndUpdate(userId, data, { new: true }).exec();
+        return updatedUser;
     }
 
-    async deleteUserById(userId: string) {
-        return authEntity.findByIdAndDelete(userId);
+    async deleteUsers(userId: string): Promise<IAuthorModel | null> {
+        const deletedUser = await authEntity.findByIdAndDelete(userId).exec();
+        return deletedUser;
     }
 
     async borrowBook(memberId: string, bookId: string, session: ClientSession): Promise<ILoanedModel | null> {

@@ -11,38 +11,24 @@ export class ExecutiveController {
     constructor(@inject('ExecutiveApplicationService') private executiveapplicationservice: ExecutiveApplicationService) {}
 
     @errorHandlerMiddleware
-    async listUsers(req: Request, res: Response) {
+    async listUsers(req: Request, res: Response, next: NextFunction) {
         const users = await this.executiveapplicationservice.listUsers(res);
-        handleResponse(res, 200, { users });
+        handleResponse(res, 200, { users }, 'Users listed successfully');
     }
 
     @errorHandlerMiddleware
-    async updateAuthor(req: Request, res: Response, next: NextFunction) {
-        const authorId = req.params.authorId;
-        const updateData = req.body;
-
-        const schema = Joi.object({
-            name: Joi.string(),
-            email: Joi.string().email()
-        });
-
-        const { error } = schema.validate(updateData);
-
-        if (error) {
-            handleResponse(res, 400, { message: 'Validation error', details: error.details });
-            return;
-        }
-
-        const author = await this.executiveapplicationservice.updateAuthor(authorId, updateData, res);
-        handleResponse(res, 201, { author });
+    async updateUsers(req: Request, res: Response, next: NextFunction) {
+        const userId = req.params.userId;
+        const data = req.body;
+        const updatedUser = await this.executiveapplicationservice.updateUsers(userId, data, res);
+        handleResponse(res, 200, { updatedUser }, 'User updated successfully');
     }
 
     @errorHandlerMiddleware
-    async deleteAuthor(req: Request, res: Response, next: NextFunction) {
-        const authorId = req.params.authorId;
-
-        const author = await this.executiveapplicationservice.deleteAuthor(authorId, res);
-        handleResponse(res, 201, { author, message: 'Deleted' });
+    async deleteUsers(req: Request, res: Response, next: NextFunction) {
+        const userId = req.params.userId;
+        const deletedUser = await this.executiveapplicationservice.deleteUsers(userId, res);
+        handleResponse(res, 200, { deletedUser }, 'User deleted successfully');
     }
 
     @errorHandlerMiddleware

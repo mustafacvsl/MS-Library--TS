@@ -14,8 +14,10 @@ import { MemberController } from '../Controller/Member.controller';
 import { MemberApplicationService } from '../ApplicationService/MemberApplicationService';
 import MemberService from '../Domain/Member/member.service';
 import MemberRepository from '../Domain/Member/member.repository';
+import TransactionHandler from './Transaction/TransactionManager';
 
 const container = new Container();
+container.bind<TransactionHandler>(TransactionHandler).toSelf();
 container.bind<AuthApplicationService>(AuthApplicationService).toSelf();
 container.bind<AuthController>(AuthController).toSelf();
 container.bind<BookController>(BookController).toSelf();

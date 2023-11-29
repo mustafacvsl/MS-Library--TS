@@ -13,21 +13,24 @@ export class ExecutiveApplicationService {
     @errorHandlerMiddleware
     async listUsers(res: Response) {
         return this.transactionHandler.runInTransaction(async (session) => {
-            return this.executiveservice.listUsers();
+            const users = await this.executiveservice.listUsers();
+            res.status(200).json({ users, message: 'Users listed successfully' });
         });
     }
 
     @errorHandlerMiddleware
-    async updateAuthor(authorId: string, updateData: any, res: Response) {
+    async updateUsers(userId: string, data: any, res: Response) {
         return this.transactionHandler.runInTransaction(async (session) => {
-            return this.executiveservice.updateAuthor(authorId, updateData);
+            const updatedUser = await this.executiveservice.updateUsers(userId, data);
+            res.status(200).json({ updatedUser, message: 'User updated successfully' });
         });
     }
 
     @errorHandlerMiddleware
-    async deleteAuthor(authorId: string, res: Response) {
+    async deleteUsers(userId: string, res: Response) {
         return this.transactionHandler.runInTransaction(async (session) => {
-            return this.executiveservice.deleteAuthor(authorId);
+            const deletedUser = await this.executiveservice.deleteUsers(userId);
+            res.status(200).json({ deletedUser, message: 'User deleted successfully' });
         });
     }
 

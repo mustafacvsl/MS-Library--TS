@@ -11,17 +11,17 @@ class ExecutiveService {
 
     @errorHandlerMiddleware
     async listUsers(): Promise<any> {
-        return this.executiverepository.getAllUsers();
+        return this.executiverepository.listUsers();
     }
 
     @errorHandlerMiddleware
-    async updateAuthor(authorId: string, updatedAuthorInfo: any): Promise<any> {
-        return this.executiverepository.updateUserById(authorId, updatedAuthorInfo);
+    async updateUsers(userId: string, data: any): Promise<any> {
+        return this.executiverepository.updateUsers(userId, data);
     }
 
     @errorHandlerMiddleware
-    async deleteAuthor(authorId: string): Promise<any> {
-        return this.executiverepository.deleteUserById(authorId);
+    async deleteUsers(userId: string): Promise<any> {
+        return this.executiverepository.deleteUsers(userId);
     }
 
     @errorHandlerMiddleware

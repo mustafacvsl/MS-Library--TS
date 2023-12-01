@@ -14,7 +14,7 @@ export class ExecutiveApplicationService {
     async listUsers(res: Response) {
         return this.transactionHandler.runInTransaction(async (session) => {
             const users = await this.executiveservice.listUsers();
-            res.status(200).json({ users, message: 'Users listed successfully' });
+            res.status(200).json({ users });
         });
     }
 
@@ -22,7 +22,7 @@ export class ExecutiveApplicationService {
     async updateUsers(userId: string, data: any, res: Response) {
         return this.transactionHandler.runInTransaction(async (session) => {
             const updatedUser = await this.executiveservice.updateUsers(userId, data);
-            res.status(200).json({ updatedUser, message: 'User updated successfully' });
+            res.status(200).json({ updatedUser });
         });
     }
 
@@ -30,7 +30,7 @@ export class ExecutiveApplicationService {
     async deleteUsers(userId: string, res: Response) {
         return this.transactionHandler.runInTransaction(async (session) => {
             const deletedUser = await this.executiveservice.deleteUsers(userId);
-            res.status(200).json({ deletedUser, message: 'User deleted successfully' });
+            res.status(200).json({ deletedUser });
         });
     }
 

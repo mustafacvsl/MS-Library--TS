@@ -8,10 +8,6 @@ import AuthService from '../Domain/User/Auth.service';
 import AuthRepository from '../Domain/User/Auth.repository';
 const router = express.Router();
 
-const authRepository = container.get<AuthRepository>(AuthRepository);
-const authService = container.get<AuthService>(AuthService);
-const transactionHandler = container.get<TransactionHandler>(TransactionHandler);
-const applicationService = container.get<AuthApplicationService>(AuthApplicationService);
 const authController = container.get<AuthController>(AuthController);
 
 router.post('/register', authController.register.bind(authController));

@@ -26,7 +26,7 @@ class ExecutiveService {
 
     @errorHandlerMiddleware
     async borrowBook(memberId: string, bookId: string, borrowedDate: Date, returnedDate: Date, session: ClientSession): Promise<any> {
-        return this.executiverepository.borrowBook(memberId, bookId, borrowedDate, returnedDate, session);
+        return this.executiverepository.borrowBookWithPenalty(memberId, bookId, borrowedDate, returnedDate, session);
     }
 
     @errorHandlerMiddleware

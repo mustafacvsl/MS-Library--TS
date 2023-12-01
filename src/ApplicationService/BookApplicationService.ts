@@ -21,7 +21,7 @@ export class BookApplicationService {
             const newBook = await this.bookService.createBook(bookData, res, session);
 
             if (newBook) {
-                res.status(201).json({ book: newBook, message: 'Book created successfully' });
+                res.status(201).json({ book: newBook });
             } else {
                 res.status(500).json({ message: 'Failed to create the book' });
             }

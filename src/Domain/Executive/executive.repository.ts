@@ -3,6 +3,7 @@ import Book, { IBook } from '../Book/Book';
 import loanedEntity, { ILoanedModel } from '../Loaned/loaned.entity';
 import StockEntity, { IStock } from '../BookStock/Stock.entity';
 import authEntity, { IAuthorModel } from '../User/auth.entity';
+import { addDays } from 'date-fns';
 
 class ExecutiveRepository {
     private client: mongoose.Mongoose;
@@ -36,10 +37,23 @@ class ExecutiveRepository {
         return deletedUser;
     }
 
-    async borrowBook(memberId: string, bookId: string, borrowedDate: Date, returnedDate: Date, session: ClientSession): Promise<ILoanedModel | null> {
+    async borrowBookWithPenalty(memberId: string, bookId: string, borrowedDate: Date, returnedDate: Date, session: ClientSession): Promise<ILoanedModel | null> {
         const options = { session };
 
         try {
+            const overdueLoan = await loanedEntity.findOne(
+                {
+                    memberId,
+                    returnedDate: null,
+                    borrowedDate: { $lt: addDays(new Date(), -90) }
+                },
+                options
+            );
+
+            if (overdueLoan) {
+                throw new Error('User has overdue books. Cannot borrow until overdue books are returned.');
+            }
+
             const book = await Book.findById(bookId, null, options);
 
             if (!book) {

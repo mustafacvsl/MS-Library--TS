@@ -13,10 +13,7 @@ export class AuthApplicationService {
     async registerUser(name: string, email: string, password: string, res: Response): Promise<void> {
         const user = await this.authService.registerUser(name, email, password, res);
 
-        res.status(201).json({
-            user,
-            message: 'User registered successfully'
-        });
+        res.status(201).json({ user });
     }
 
     @errorHandlerMiddleware
@@ -25,8 +22,7 @@ export class AuthApplicationService {
             const books = await this.authService.listBooksUsers();
 
             res.status(200).json({
-                books,
-                message: 'Books listed for users'
+                books
             });
         });
     }
@@ -36,8 +32,7 @@ export class AuthApplicationService {
         const user = await this.authService.login(email, password, res);
 
         res.status(200).json({
-            user,
-            message: 'Login successful'
+            user
         });
     }
 }

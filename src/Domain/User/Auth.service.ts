@@ -57,7 +57,7 @@ class AuthService {
 
         res.status(200).json({
             token,
-            message: token
+            message: 'Login successful'
         });
     }
     private generateToken(user: IAuthorModel): string {

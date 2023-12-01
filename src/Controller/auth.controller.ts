@@ -1,13 +1,11 @@
 import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
 import { NextFunction, Request, Response, Router } from 'express';
 import container from '../infrastructure/inversify';
-import Author from '../Domain/User/auth.entity';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 import { AuthApplicationService } from '../ApplicationService/AuthApplicationService';
 import { handleResponse } from '../infrastructure/response';
+import Book, { IBook } from '../Domain/Book/Book';
 
 @injectable()
 export class AuthController {
@@ -16,21 +14,23 @@ export class AuthController {
     @errorHandlerMiddleware
     async register(req: Request, res: Response): Promise<void> {
         const { name, email, password } = req.body;
-        const user = await this.authApplicationService.registerUser(name, email, password, res);
-        handleResponse(res, 201, { user }, 'User registered successfully');
+        const result = await this.authApplicationService.registerUser(name, email, password, res);
+
+        handleResponse(res, 201, { user: result }, 'User registered successfully');
     }
 
     @errorHandlerMiddleware
-    async listBooksUsers(req: Request, res: Response) {
-        const book = await this.authApplicationService.listBooksUsers(res);
-        handleResponse(res, 200, { book });
+    async listBooksUsers(req: Request, res: Response): Promise<void> {
+        const books = await this.authApplicationService.listBooksUsers(res);
+
+        handleResponse(res, 200, { books }, 'Books listed for users');
     }
 
     @errorHandlerMiddleware
     async login(req: Request, res: Response): Promise<void> {
         const { email, password } = req.body;
+        const result = await this.authApplicationService.loginUser(email, password, res);
 
-        const token = await this.authApplicationService.loginUser(email, password, res);
-        handleResponse(res, 200, { token }, 'Login successful');
+        handleResponse(res, 200, { user: result }, 'Login successful');
     }
 }

@@ -36,7 +36,7 @@ class ExecutiveRepository {
         return deletedUser;
     }
 
-    async borrowBook(memberId: string, bookId: string, session: ClientSession): Promise<ILoanedModel | null> {
+    async borrowBook(memberId: string, bookId: string, borrowedDate: Date, returnedDate: Date, session: ClientSession): Promise<ILoanedModel | null> {
         const options = { session };
 
         try {

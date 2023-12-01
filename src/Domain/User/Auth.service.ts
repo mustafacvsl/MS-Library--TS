@@ -1,19 +1,21 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import authEntity from './auth.entity';
-import AuthRepository from './Auth.repository';
 import { Response } from 'express';
 import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
 import { promisify } from 'util';
-import Book, { IBookModel } from '../Book/Book';
-const crypto = require('crypto');
-const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+import AuthRepository from './Auth.repository';
+import { IAuthorModel } from './auth.entity';
+import { handleResponse } from '../../infrastructure/response';
+import { getConfig } from '../../infrastructure/config';
 
-const compareAsync = promisify(bcrypt.compare);
+const compareAsync = promisify(require('bcrypt').compare);
+const hashAsync = promisify(require('bcrypt').hash);
 
 @injectable()
 class AuthService {
+    private readonly config = getConfig();
+
     constructor(@inject(AuthRepository) private authrepository: AuthRepository) {}
 
     @errorHandlerMiddleware
@@ -27,14 +29,14 @@ class AuthService {
             throw new Error('User with this email already exists');
         }
 
-        const hashedPassword = crypto.createHash('sha256').update(password).digest('hex');
+        const hashedPassword = await hashAsync(password + 'sadasdda' + name, 10);
         const user = await this.authrepository.registerUser(name, email, hashedPassword);
 
         return user;
     }
 
     @errorHandlerMiddleware
-    async listBooksUsers(): Promise<IBookModel[]> {
+    async listBooksUsers(): Promise<unknown[]> {
         return this.authrepository.getAllBooks();
     }
 
@@ -51,7 +53,22 @@ class AuthService {
             throw new Error('Authentication failed');
         }
 
-        const token = jwt.sign({ email: user.email, userId: user._id }, 'your-secret-key', { expiresIn: '1h' });
+        const token = this.generateToken(user);
+
+        res.status(200).json({
+            token,
+            message: token
+        });
+    }
+    private generateToken(user: IAuthorModel): string {
+        const expiresIn = '1h';
+
+        const payload = {
+            userId: user._id,
+            email: user.email
+        };
+
+        const token = jwt.sign(payload, this.config.secretKey, { expiresIn });
         return token;
     }
 }

@@ -16,7 +16,7 @@ class BookRepository {
             stock: bookData.stock,
             location: bookData.location
         });
-        return newBook;
+        return newBook.save();
     }
 
     @errorHandlerMiddleware
@@ -26,19 +26,11 @@ class BookRepository {
 
     @errorHandlerMiddleware
     async updateBook(bookId: string, updatedBookInfo: any): Promise<any> {
-        if (!bookId) {
-            throw new Error('Book ID is required.');
-        }
-
         return Book.findByIdAndUpdate(bookId, updatedBookInfo, { new: true }).orFail(new Error('Book not found'));
     }
 
     @errorHandlerMiddleware
     async deleteBook(bookId: string): Promise<any> {
-        if (!bookId) {
-            throw new Error('Book ID required.');
-        }
-
         const book = await Book.findByIdAndDelete(bookId);
 
         if (!book) {

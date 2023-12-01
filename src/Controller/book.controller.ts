@@ -16,10 +16,6 @@ export class BookController {
     createBook = async (req: Request, res: Response, next: NextFunction) => {
         const { title, author, stock, location } = req.body;
 
-        if (!title || !author || !stock || !location) {
-            return next(new Error('Title, author, stock, and location are required.'));
-        }
-
         const newBook = await this.bookApplicationservice.createBook(
             {
                 title,
@@ -29,12 +25,13 @@ export class BookController {
             },
             res
         );
+
         handleResponse(res, 201, { book: newBook }, 'Book created successfully');
     };
 
     showAllBooks = async (req: Request, res: Response, next: NextFunction) => {
-        const books = await this.bookApplicationservice.showAllBooks(res);
-        handleResponse(res, 200, { books }, 'Books retrieved successfully');
+        const allBooks = await this.bookApplicationservice.showAllBooks(res);
+        handleResponse(res, 200, { books: allBooks }, 'List of all books');
     };
 
     updateBook = async (req: Request, res: Response, next: NextFunction) => {

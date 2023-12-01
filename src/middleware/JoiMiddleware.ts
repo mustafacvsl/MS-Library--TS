@@ -4,6 +4,7 @@ import { IAuthor } from '../Domain/User/auth.entity';
 import { IBook } from '../Domain/Book/Book';
 import memberEntity, { IMember } from '../Domain/Member/member.entity';
 import Logging from '../infrastructure/Logging';
+import { ILoanedModel } from '../Domain/Loaned/loaned.entity';
 
 export const JoiMiddleware = (schema: ObjectSchema) => {
     return async (req: Request, res: Response, next: NextFunction) => {
@@ -37,6 +38,13 @@ export const Schemas = {
         update: Joi.object<IBook>({
             author: Joi.string().required(),
             title: Joi.string().required()
+        })
+    },
+
+    executive: {
+        borrowBook: Joi.object({
+            memberId: Joi.string().required(),
+            bookId: Joi.string().required()
         })
     }
 };

@@ -1,7 +1,7 @@
 import express from 'express';
 import http from 'http';
 import mongoose from 'mongoose';
-import { config } from '../.vscode/config';
+import { getConfig } from './infrastructure/config';
 import Logging from './infrastructure/Logging';
 import authorRoutes from './Routes/auth.routes';
 import bookRoutes from './Routes/book.routes';
@@ -9,8 +9,12 @@ import executiveRoutes from './Routes/executive.routes';
 import memberRoutes from './Routes/member.routes';
 import { errorHandlerMiddleware } from './middleware/errorhandlerMiddleware';
 import { JoiMiddleware, Schemas } from './middleware/JoiMiddleware';
+const morgan = require('morgan');
 
 const router = express();
+const config = getConfig();
+
+router.use(morgan('dev'));
 
 mongoose
     .connect(config.mongo.url, { retryWrites: true, w: 'majority' })
@@ -50,7 +54,7 @@ const StartServer = () => {
     });
 
     // router.use(errorHandlerMiddleware);
-    router.use('/authors', JoiMiddleware(Schemas.author.create), authorRoutes);
+    router.use('/authors', authorRoutes);
     router.use('/books', bookRoutes);
     router.use('/executive', executiveRoutes);
     router.use('/member', memberRoutes);

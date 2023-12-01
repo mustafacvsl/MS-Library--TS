@@ -33,9 +33,9 @@ export class ExecutiveController {
 
     @errorHandlerMiddleware
     async borrowBook(req: Request, res: Response, next: NextFunction) {
-        const { memberId, bookId } = req.body;
+        const { memberId, bookId, borrowedDate, returnedDate } = req.body;
 
-        const loanedBook = await this.executiveapplicationservice.borrowBook(memberId, bookId, res);
+        const loanedBook = await this.executiveapplicationservice.borrowBook(memberId, bookId, borrowedDate, returnedDate, res);
         handleResponse(res, 201, { loanedBook });
     }
 

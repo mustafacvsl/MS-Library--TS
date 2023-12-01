@@ -35,9 +35,9 @@ export class ExecutiveApplicationService {
     }
 
     @errorHandlerMiddleware
-    async borrowBook(memberId: string, bookId: string, res: Response) {
+    async borrowBook(memberId: string, bookId: string, borrowedDate: Date, returnedDate: Date, res: Response) {
         return this.transactionHandler.runInTransaction(async (session) => {
-            return this.executiveservice.borrowBook(memberId, bookId, session);
+            return this.executiveservice.borrowBook(memberId, bookId, borrowedDate, returnedDate, session);
         });
     }
 

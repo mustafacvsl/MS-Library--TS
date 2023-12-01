@@ -15,6 +15,7 @@ import { MemberApplicationService } from '../ApplicationService/MemberApplicatio
 import MemberService from '../Domain/Member/member.service';
 import MemberRepository from '../Domain/Member/member.repository';
 import TransactionHandler from './Transaction/TransactionManager';
+import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
 
 const container = new Container();
 container.bind<TransactionHandler>(TransactionHandler).toSelf();

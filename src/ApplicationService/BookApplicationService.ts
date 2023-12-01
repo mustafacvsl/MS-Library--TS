@@ -18,13 +18,22 @@ export class BookApplicationService {
     @errorHandlerMiddleware
     async createBook(bookData: { title: string; author: string; stock: string; location: { corridor: string; shelf: string; cupboard: string } }, res: Response): Promise<void | null> {
         return this.transactionHandler.runInTransaction(async (session) => {
-            return this.bookService.createBook(bookData, res, session);
+            const newBook = await this.bookService.createBook(bookData, res, session);
+
+            if (newBook) {
+                res.status(201).json({ book: newBook, message: 'Book created successfully' });
+            } else {
+                res.status(500).json({ message: 'Failed to create the book' });
+            }
         });
     }
 
     @errorHandlerMiddleware
-    async showAllBooks(res: Response): Promise<IBook[] | null> {
-        return this.bookService.showAllBooks(res);
+    async showAllBooks(res: Response): Promise<any> {
+        return this.transactionHandler.runInTransaction(async () => {
+            const allBooks = await this.bookService.showAllBooks();
+            return allBooks;
+        });
     }
 
     @errorHandlerMiddleware

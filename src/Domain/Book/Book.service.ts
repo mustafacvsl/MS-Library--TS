@@ -24,17 +24,23 @@ export class BookService {
     }
 
     @errorHandlerMiddleware
-    async showAllBooks(res: Response): Promise<any> {
+    async showAllBooks(): Promise<any> {
         return this.bookRepository.showAllBooks();
     }
 
     @errorHandlerMiddleware
     async updateBook(bookId: string, updatedBookInfo: any, res: Response, session: ClientSession | null = null): Promise<any> {
+        if (!bookId) {
+            throw new Error('Book ID is required.');
+        }
         return this.bookRepository.updateBook(bookId, updatedBookInfo);
     }
 
     @errorHandlerMiddleware
     async deleteBook(bookId: string, res: Response, session: ClientSession | null = null): Promise<any> {
+        if (!bookId) {
+            throw new Error('Book ID required.');
+        }
         return this.bookRepository.deleteBook(bookId);
     }
 }

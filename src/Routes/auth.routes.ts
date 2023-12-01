@@ -14,7 +14,7 @@ const transactionHandler = container.get<TransactionHandler>(TransactionHandler)
 const applicationService = container.get<AuthApplicationService>(AuthApplicationService);
 const authController = container.get<AuthController>(AuthController);
 
-router.post('/register', JoiMiddleware(Schemas.author.create), authController.register.bind(authController));
+router.post('/register', authController.register.bind(authController));
 router.post('/login', authController.login.bind(authController));
 router.get('/getbooks', authController.listBooksUsers.bind(authController));
 

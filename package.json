@@ -4,9 +4,8 @@
     "description": "",
     "main": "src/app.ts",
     "scripts": {
-        "build": "rimraf ./build && tsc",
-        "dev": "nodemon",
-        "start": "npm run build && node ./build/app.js"
+        "build": "rm -rf build/ && tsc",
+        "start": "node build/app.ts'"
     },
     "author": "",
     "license": "ISC",

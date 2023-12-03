@@ -1,7 +1,7 @@
 import MemberEntity from './member.entity';
 import { ClientSession } from 'mongoose';
 
-class MemberRepository {
+export class MemberRepository {
     async findMemberByEmail(email: string, session: ClientSession) {
         return MemberEntity.findOne({ email }).session(session);
     }
@@ -13,6 +13,11 @@ class MemberRepository {
         });
 
         return await member.save({ session });
+    }
+
+    async emailExists(email: string, session: ClientSession): Promise<boolean> {
+        const member = await this.findMemberByEmail(email, session);
+        return !!member;
     }
 }
 

@@ -7,9 +7,10 @@ import { AuthApplicationService } from '../ApplicationService/AuthApplicationSer
 import { handleResponse } from '../infrastructure/response';
 import Book, { IBook } from '../Domain/Book/Book';
 
+export const Injector = Symbol.for('AuthApplicationService');
 @injectable()
 export class AuthController {
-    constructor(@inject('AuthApplicationService') private authApplicationService: AuthApplicationService) {}
+    constructor(@inject('AuthApplicationService') public authApplicationService: AuthApplicationService) {}
 
     @errorHandlerMiddleware
     async register(req: Request, res: Response): Promise<void> {

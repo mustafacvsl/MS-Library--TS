@@ -11,5 +11,5 @@
         "strict": true,
         "skipLibCheck": true
     },
-    "include": ["src/**/*", "src/app.ts", "Members", "Members", "src/infrastructure/config.ts"]
+    "include": ["src/**/*"]
 }

@@ -1,12 +1,12 @@
 import { Container } from 'inversify';
-import { AuthController } from '../Controller/auth.controller';
+import { AuthController, Injector as authcontrollerınjector } from '../Controller/auth.controller';
 import { BookController } from '../Controller/book.controller';
 import AuthService from '../Domain/User/Auth.service';
 import BookService from '../Domain/Book/Book.service';
 import BookApplicationService from '../ApplicationService/BookApplicationService';
 import AuthRepository from '../Domain/User/Auth.repository';
 import BookRepository from '../Domain/Book/Book.repository';
-import { AuthApplicationService } from '../ApplicationService/AuthApplicationService';
+import { AuthApplicationService, Injector as authApplicationInjector } from '../ApplicationService/AuthApplicationService';
 import ExecutiveService from '../Domain/Executive/executive.service';
 import { ExecutiveApplicationService } from '../ApplicationService/ExecutiveApplicationService';
 import { ExecutiveController } from '../Controller/executive.controller';
@@ -19,8 +19,8 @@ import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
 
 const container = new Container();
 container.bind<TransactionHandler>(TransactionHandler).toSelf();
-container.bind<AuthApplicationService>(AuthApplicationService).toSelf();
-container.bind<AuthController>(AuthController).toSelf();
+container.bind<AuthApplicationService>(authApplicationInjector).to(AuthApplicationService).inSingletonScope();
+container.bind<AuthController>(authApplicationInjector).to(AuthController).inSingletonScope();
 container.bind<BookController>(BookController).toSelf();
 container.bind<AuthService>(AuthService).toSelf();
 container.bind<BookService>(BookService).toSelf();

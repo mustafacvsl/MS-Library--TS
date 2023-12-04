@@ -5,6 +5,7 @@ import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
 import { Request, Response } from 'express';
 import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
 
+export const Injector = Symbol.for('AuthApplicationService');
 @injectable()
 export class AuthApplicationService {
     constructor(@inject(AuthService) private authService: AuthService, @inject(TransactionHandler) private transactionhandler: TransactionHandler) {}

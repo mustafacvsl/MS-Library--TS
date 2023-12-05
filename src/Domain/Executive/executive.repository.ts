@@ -60,9 +60,9 @@ class ExecutiveRepository {
                 throw new Error('Book not found');
             }
 
-            if (book.stock.count <= 0) {
-                throw new Error('Book out of stock');
-            }
+            // if (book.stock.count <= 0) {
+            //     throw new Error('Book out of stock');
+            // }
 
             const stockEntry = new StockEntity({
                 bookId,
@@ -73,7 +73,7 @@ class ExecutiveRepository {
 
             await stockEntry.save(options);
 
-            book.stock.count = Number(book.stock.count) - 1;
+            // book.stock.count = Number(book.stock.count) - 1;
             await book.save(options);
 
             const loanedBook = new loanedEntity({

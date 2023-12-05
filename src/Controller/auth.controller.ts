@@ -1,6 +1,6 @@
 import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
 import { NextFunction, Request, Response, Router } from 'express';
-import container from '../infrastructure/inversify';
+
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import { AuthApplicationService } from '../ApplicationService/AuthApplicationService';

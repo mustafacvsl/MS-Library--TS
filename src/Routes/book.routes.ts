@@ -4,11 +4,16 @@ import BookApplicationService from '../ApplicationService/BookApplicationService
 import BookService from '../Domain/Book/Book.service';
 import BookRepository from '../Domain/Book/Book.repository';
 import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
-import container from '../infrastructure/inversify';
+import { Container } from 'inversify';
+import StockRepository from '../Domain/BookStock/stockrepository';
 
 const router = express.Router();
-
-const bookController = container.get<BookController>(BookController);
+const transaction = new TransactionHandler();
+const bookrepository = new BookRepository();
+const stockrepository = new StockRepository();
+const bookservice = new BookService(bookrepository);
+const bookapplicationservice = new BookApplicationService(bookservice, transaction);
+const bookController = new BookController(bookapplicationservice);
 
 router.post('/create', bookController.createBook.bind(bookController));
 router.patch('/update/:bookId', bookController.updateBook.bind(bookController));

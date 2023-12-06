@@ -21,8 +21,8 @@ class AuthRepository {
         return authEntity.findById(userId).exec();
     }
 
-    async loginUser(email: string): Promise<IAuthorModel | null> {
-        return authEntity.findOne({ email }).exec();
+    async findUserByEmailAndPassword(email: string, password: string): Promise<IAuthorModel | null> {
+        return authEntity.findOne({ email, password }).exec();
     }
 }
 

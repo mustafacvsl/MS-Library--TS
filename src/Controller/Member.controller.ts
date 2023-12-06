@@ -25,7 +25,7 @@ export class MemberController {
 
             const addedMember = await this.memberApplicationService.addMember(name, email, res);
 
-            handleResponse(res, 201, { member: addedMember }, 'Member added successfully');
+            handleResponse(res, 201, { member: addedMember }, 'Member added successfully 😊');
         } catch (error) {
             console.error('Error:', error);
             handleResponse(res, 500, null, 'Internal Server Error');

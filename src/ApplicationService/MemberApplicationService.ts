@@ -14,7 +14,7 @@ export class MemberApplicationService {
         await this.transactionHandler.runInTransaction(async (session) => {
             const addedMember = await this.memberService.addMember(name, email, res, session);
 
-            res.status(201).json({ member: addedMember, message: 'Member added successfully' });
+            res.status(201).json({ member: addedMember });
         });
     }
 }

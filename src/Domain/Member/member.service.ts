@@ -36,7 +36,7 @@ export class MemberService {
         }
 
         const addedMember = await this.memberRepository.addMember(name, email, session);
-        res.status(201).json({ member: addedMember, message: 'Member added successfully' });
+        res.status(201).json({ member: addedMember, message: 'Member added successfully 😊' });
     }
 }
 

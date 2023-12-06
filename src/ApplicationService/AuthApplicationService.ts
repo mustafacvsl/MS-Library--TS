@@ -29,12 +29,9 @@ export class AuthApplicationService {
     }
 
     @errorHandlerMiddleware
-    async loginUser(email: string, password: string, res: Response): Promise<void> {
-        const user = await this.authService.login(email, password, res);
-
-        res.status(200).json({
-            user
-        });
+    async loginUser(email: string, password: string, res: Response): Promise<string> {
+        const token = await this.authService.loginUser(email, password, res);
+        return token;
     }
 }
 

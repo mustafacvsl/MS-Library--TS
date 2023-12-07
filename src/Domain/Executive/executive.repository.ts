@@ -1,7 +1,7 @@
 import mongoose, { ClientSession, Types } from 'mongoose';
 import loanedEntity from '../Loaned/loaned.entity';
 import AuthRepository from '../User/Auth.repository';
-
+import Book from '../Book/Book';
 export class ExecutiveRepository {
     private client: mongoose.Mongoose;
     private databaseName: string;
@@ -19,6 +19,15 @@ export class ExecutiveRepository {
             bookId
         });
 
-        return await loaned.save({ session });
+        try {
+            await loaned.save({ session });
+
+            await Book.findByIdAndUpdate(bookId, { status: 'Borrowed' }, { session });
+
+            return loaned;
+        } catch (error) {
+            console.error('Error borrowing book:', error);
+            return null;
+        }
     }
 }

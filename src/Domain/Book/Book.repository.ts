@@ -1,4 +1,4 @@
-import Book from './Book';
+import Book, { IBookModel } from './Book';
 import mongoose from 'mongoose';
 import { injectable } from 'inversify';
 import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
@@ -72,8 +72,15 @@ class BookRepository {
         handleResponse(res, responseData.status, responseData.data, responseData.message);
     }
 
-    async updateBookStatus(bookId: string, status: string, session: ClientSession): Promise<void> {
-        await Book.findByIdAndUpdate(bookId, { status }, { session });
+    async updateBookStatus(bookId: string, status: string): Promise<IBookModel | null> {
+        try {
+            const book = await Book.findByIdAndUpdate(bookId, { status }, { new: true });
+
+            return book;
+        } catch (error) {
+            console.error('Error updating book status:', error);
+            return null;
+        }
     }
 }
 

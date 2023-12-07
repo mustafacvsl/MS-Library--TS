@@ -1,5 +1,3 @@
-// AuthService.ts
-
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import { Response } from 'express';

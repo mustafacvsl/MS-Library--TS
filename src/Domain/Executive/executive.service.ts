@@ -1,37 +1,25 @@
 import { inject, injectable } from 'inversify';
-import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
-import { handleResponse } from '../../infrastructure/response';
-import { addDays } from 'date-fns';
 import { ClientSession } from 'mongoose';
+import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
 import ExecutiveRepository from './executive.repository';
+import Book, { IBookModel } from '../Book/Book';
 
 @injectable()
-class ExecutiveService {
-    constructor(@inject(ExecutiveRepository) private executiverepository: ExecutiveRepository) {}
+export class ExecutiveService {
+    private executiveRepository: ExecutiveRepository;
 
-    @errorHandlerMiddleware
-    async listUsers(): Promise<any> {
-        return this.executiverepository.listUsers();
+    constructor(@inject(ExecutiveRepository) executiveRepository: ExecutiveRepository) {
+        this.executiveRepository = executiveRepository;
     }
 
     @errorHandlerMiddleware
-    async updateUsers(userId: string, data: any): Promise<any> {
-        return this.executiverepository.updateUsers(userId, data);
-    }
-
-    @errorHandlerMiddleware
-    async deleteUsers(userId: string): Promise<any> {
-        return this.executiverepository.deleteUsers(userId);
-    }
-
-    @errorHandlerMiddleware
-    async borrowBook(memberId: string, bookId: string, borrowedDate: Date, returnedDate: Date, session: ClientSession): Promise<any> {
-        return this.executiverepository.borrowBookWithPenalty(memberId, bookId, borrowedDate, returnedDate, session);
+    async borrowBook(memberId: string, bookId: string, session: ClientSession): Promise<IBookModel | null> {
+        return this.executiveRepository.borrowBook(memberId, bookId, session);
     }
 
     @errorHandlerMiddleware
     async returnBook(loanId: string, session: ClientSession): Promise<any> {
-        return this.executiverepository.returnBook(loanId, session);
+        return this.executiveRepository.returnBook(loanId, session);
     }
 }
 

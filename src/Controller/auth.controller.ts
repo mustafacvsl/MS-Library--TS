@@ -27,7 +27,7 @@ export class AuthController {
 
         const result = await this.authApplicationService.registerUser(name, email, password, res);
 
-        handleResponse(res, 201, { user: result }, 'User registered successfully');
+        handleResponse(res, 201, { result }, 'User registered successfully');
     }
 
     @errorHandlerMiddleware

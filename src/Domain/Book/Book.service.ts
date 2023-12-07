@@ -2,9 +2,9 @@ import mongoose from 'mongoose';
 import 'reflect-metadata';
 import { inject, injectable } from 'inversify';
 import BookRepository from './Book.repository';
-import { Response } from 'express';
 import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
 import { ClientSession } from 'mongoose';
+import { Response } from 'express';
 
 @injectable()
 export class BookService {
@@ -15,33 +15,23 @@ export class BookService {
     }
 
     @errorHandlerMiddleware
-    async createBook(
-        bookData: { title: string; author: string; stock: string; location: { corridor: string; shelf: string; cupboard: string } },
-        res: Response,
-        session?: ClientSession
-    ): Promise<any> {
-        return this.bookRepository.createBook(bookData);
+    async createBook(bookData: any, res: Response): Promise<any> {
+        return this.bookRepository.createBook(bookData, res);
     }
 
     @errorHandlerMiddleware
-    async showAllBooks(): Promise<any> {
-        return this.bookRepository.showAllBooks();
+    async updateBook(bookId: string, updatedData: any, res: Response): Promise<any> {
+        return this.bookRepository.updateBook(bookId, updatedData, res);
     }
 
     @errorHandlerMiddleware
-    async updateBook(bookId: string, updatedBookInfo: any, res: Response, session: ClientSession | null = null): Promise<any> {
-        if (!bookId) {
-            throw new Error('Book ID is required.');
-        }
-        return this.bookRepository.updateBook(bookId, updatedBookInfo);
+    async deleteBook(bookId: string, res: Response): Promise<void> {
+        return this.bookRepository.deleteBook(bookId, res);
     }
 
     @errorHandlerMiddleware
-    async deleteBook(bookId: string, res: Response, session: ClientSession | null = null): Promise<any> {
-        if (!bookId) {
-            throw new Error('Book ID required.');
-        }
-        return this.bookRepository.deleteBook(bookId);
+    async getAllBooks(res: Response): Promise<any> {
+        return this.bookRepository.getAllBooks(res);
     }
 }
 

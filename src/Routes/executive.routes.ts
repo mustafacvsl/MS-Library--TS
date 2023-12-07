@@ -17,9 +17,6 @@ const executivecontroller = new ExecutiveController(executiveapplicationservice)
 
 const router = express.Router();
 
-router.get('/list', executivecontroller.listUsers.bind(executivecontroller));
-router.patch('/update/:authorId', executivecontroller.updateUsers.bind(executivecontroller));
-router.delete('/delete/:authorId', executivecontroller.deleteUsers.bind(executivecontroller));
-router.post('/return-book', executivecontroller.returnBook.bind(executivecontroller));
+// router.post('/return-book', executivecontroller.returnBook.bind(executivecontroller));
 router.post('/borrow-book', JoiMiddleware(Schemas.executive.borrowBook), executivecontroller.borrowBook.bind(executivecontroller));
 export = router;

@@ -14,35 +14,28 @@ export class BookController {
     }
 
     createBook = async (req: Request, res: Response, next: NextFunction) => {
-        const { title, author, stock, location } = req.body;
+        const bookData = req.body;
 
-        const newBook = await this.bookApplicationservice.createBook(
-            {
-                title,
-                author,
-                stock,
-                location
-            },
-            res
-        );
-
-        handleResponse(res, 201, { book: newBook }, 'Book created successfully');
+        const createdBook = await this.bookApplicationservice.createBook(bookData, res);
+        handleResponse(res, 201, { book: createdBook }, 'Book created successfully');
     };
 
     showAllBooks = async (req: Request, res: Response, next: NextFunction) => {
-        const allBooks = await this.bookApplicationservice.showAllBooks(res);
-        handleResponse(res, 200, { books: allBooks }, 'List of all books');
+        const books = await this.bookApplicationservice.getAllBooks(res);
+        handleResponse(res, 200, { books }, 'All books retrieved successfully');
     };
 
     updateBook = async (req: Request, res: Response, next: NextFunction) => {
-        const { bookId } = req.params;
+        const bookId = req.params.id;
         const updatedData = req.body;
-        await this.bookApplicationservice.updateBook(bookId, updatedData, res);
-        handleResponse(res, 200, null, 'Book updated successfully');
+
+        const updatedBook = await this.bookApplicationservice.updateBook(bookId, updatedData, res);
+        handleResponse(res, 200, { book: updatedBook }, 'Book updated successfully');
     };
 
     deleteBook = async (req: Request, res: Response, next: NextFunction) => {
-        const { bookId } = req.params;
+        const bookId = req.params.id;
+
         await this.bookApplicationservice.deleteBook(bookId, res);
         handleResponse(res, 204, null, 'Book deleted successfully');
     };

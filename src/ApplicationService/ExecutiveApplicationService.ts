@@ -5,39 +5,27 @@ import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
 import Joi from 'joi';
 import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
 import ExecutiveService from '../Domain/Executive/executive.service';
+import { handleResponse } from '../infrastructure/response';
 
 @injectable()
 export class ExecutiveApplicationService {
     constructor(@inject(ExecutiveService) private executiveservice: ExecutiveService, @inject(TransactionHandler) private transactionHandler: TransactionHandler) {}
 
-    @errorHandlerMiddleware
-    async listUsers(res: Response) {
+    async borrowBook(memberId: string, bookId: string, res: Response): Promise<void> {
         return this.transactionHandler.runInTransaction(async (session) => {
-            const users = await this.executiveservice.listUsers();
-            res.status(200).json({ users });
-        });
-    }
+            const borrowedBook = await this.executiveservice.borrowBook(memberId, bookId, session);
 
-    @errorHandlerMiddleware
-    async updateUsers(userId: string, data: any, res: Response) {
-        return this.transactionHandler.runInTransaction(async (session) => {
-            const updatedUser = await this.executiveservice.updateUsers(userId, data);
-            res.status(200).json({ updatedUser });
-        });
-    }
+            if (borrowedBook) {
+                const responseData = {
+                    status: 200,
+                    data: borrowedBook,
+                    message: 'Book borrowed successfully'
+                };
 
-    @errorHandlerMiddleware
-    async deleteUsers(userId: string, res: Response) {
-        return this.transactionHandler.runInTransaction(async (session) => {
-            const deletedUser = await this.executiveservice.deleteUsers(userId);
-            res.status(200).json({ deletedUser });
-        });
-    }
-
-    @errorHandlerMiddleware
-    async borrowBook(memberId: string, bookId: string, borrowedDate: Date, returnedDate: Date, res: Response) {
-        return this.transactionHandler.runInTransaction(async (session) => {
-            return this.executiveservice.borrowBook(memberId, bookId, borrowedDate, returnedDate, session);
+                handleResponse(res, responseData.status, responseData.data, responseData.message);
+            } else {
+                handleResponse(res, 400, null, 'Unable to borrow the book');
+            }
         });
     }
 

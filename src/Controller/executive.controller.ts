@@ -1,49 +1,34 @@
 import { NextFunction, Request, Response } from 'express';
-import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import Joi from 'joi';
-import { handleResponse } from '../infrastructure/response';
-import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
+import { inject, injectable } from 'inversify';
 import { ExecutiveApplicationService } from '../ApplicationService/ExecutiveApplicationService';
+import { handleResponse } from '../infrastructure/response';
 
 @injectable()
 export class ExecutiveController {
-    constructor(@inject('ExecutiveApplicationService') private executiveapplicationservice: ExecutiveApplicationService) {}
+    private executiveApplicationService: ExecutiveApplicationService;
 
-    @errorHandlerMiddleware
-    async listUsers(req: Request, res: Response, next: NextFunction) {
-        const users = await this.executiveapplicationservice.listUsers(res);
-        handleResponse(res, 200, { users }, 'Users listed successfully');
+    constructor(@inject(ExecutiveApplicationService) executiveApplicationService: ExecutiveApplicationService) {
+        this.executiveApplicationService = executiveApplicationService;
     }
 
-    @errorHandlerMiddleware
-    async updateUsers(req: Request, res: Response, next: NextFunction) {
-        const userId = req.params.userId;
-        const data = req.body;
-        const updatedUser = await this.executiveapplicationservice.updateUsers(userId, data, res);
-        handleResponse(res, 200, { updatedUser }, 'User updated successfully');
-    }
+    borrowBook = async (req: Request, res: Response, next: NextFunction) => {
+        const { memberId, bookId } = req.body;
 
-    @errorHandlerMiddleware
-    async deleteUsers(req: Request, res: Response, next: NextFunction) {
-        const userId = req.params.userId;
-        const deletedUser = await this.executiveapplicationservice.deleteUsers(userId, res);
-        handleResponse(res, 200, { deletedUser }, 'User deleted successfully');
-    }
+        try {
+            if (!memberId || !bookId) {
+                handleResponse(res, 400, null, 'MemberId and BookId are required.');
+                return;
+            }
 
-    @errorHandlerMiddleware
-    async borrowBook(req: Request, res: Response, next: NextFunction) {
-        const { memberId, bookId, borrowedDate, returnedDate } = req.body;
+            await this.executiveApplicationService.borrowBook(memberId, bookId, res);
 
-        const loanedBook = await this.executiveapplicationservice.borrowBook(memberId, bookId, borrowedDate, returnedDate, res);
-        handleResponse(res, 201, { loanedBook });
-    }
-
-    @errorHandlerMiddleware
-    async returnBook(req: Request, res: Response, next: NextFunction) {
-        const loanId = req.params.loanId;
-
-        const returnedBook = await this.executiveapplicationservice.returnBook(loanId, res);
-        handleResponse(res, 201, { returnedBook });
-    }
+            handleResponse(res, 200, null, 'Book borrowed successfully');
+        } catch (error) {
+            console.error('Error:', error);
+            handleResponse(res, 500, null, 'Internal Server Error');
+        }
+    };
 }
+
+export default ExecutiveController;

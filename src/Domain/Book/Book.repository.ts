@@ -3,41 +3,77 @@ import mongoose from 'mongoose';
 import { injectable } from 'inversify';
 import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
 import { ClientSession } from 'mongoose';
+import { handleResponse } from '../../infrastructure/response';
+import { Response } from 'express';
 
 @injectable()
 class BookRepository {
     @errorHandlerMiddleware
-    async createBook(bookData: { title: string; author: string; stock: string; location: { corridor: string; shelf: string; cupboard: string } }): Promise<any> {
-        if (!bookData.author || !bookData.title) throw new Error('Author and title are required.');
+    async createBook(bookData: any, res: Response): Promise<any> {
+        const responseData = {
+            status: 201,
+            data: { ...bookData },
+            message: 'Book created successfully'
+        };
 
-        const newBook = await Book.create({
-            author: bookData.author,
-            title: bookData.title,
-            stock: bookData.stock,
-            location: bookData.location
-        });
+        handleResponse(res, responseData.status, responseData.data, responseData.message);
+
+        if (typeof bookData.stock === 'object' && bookData.stock !== null) {
+            bookData.stock = bookData.stock.count;
+        }
+
+        const newBook = new Book(bookData);
+
         return newBook.save();
     }
 
-    @errorHandlerMiddleware
-    async showAllBooks(): Promise<any> {
-        return Book.find();
+    async findById(bookId: string, session: ClientSession): Promise<any> {
+        return Book.findById(bookId).session(session);
     }
 
     @errorHandlerMiddleware
-    async updateBook(bookId: string, updatedBookInfo: any): Promise<any> {
-        return Book.findByIdAndUpdate(bookId, updatedBookInfo, { new: true }).orFail(new Error('Book not found'));
+    async getAllBooks(res: Response): Promise<any> {
+        const books = await Book.find();
+
+        const responseData = {
+            status: 201,
+            data: { ...books },
+            message: 'Book listening successfully'
+        };
+
+        handleResponse(res, responseData.status, responseData.data, responseData.message);
+        return books;
     }
 
     @errorHandlerMiddleware
-    async deleteBook(bookId: string): Promise<any> {
-        const book = await Book.findByIdAndDelete(bookId);
+    async updateBook(bookId: string, updatedData: any, res: Response): Promise<any> {
+        const updatedBook = await Book.findByIdAndUpdate(bookId, updatedData, { new: true });
 
-        if (!book) {
-            throw new Error('Book not found');
-        }
+        const responseData = {
+            status: 200,
+            data: { ...updatedData },
+            message: 'Book updated successfully'
+        };
 
-        return book;
+        handleResponse(res, responseData.status, responseData.data, responseData.message);
+        return updatedBook;
+    }
+
+    @errorHandlerMiddleware
+    async deleteBook(bookId: string, res: Response): Promise<void> {
+        await Book.findByIdAndDelete(bookId);
+
+        const responseData = {
+            status: 204,
+            data: null,
+            message: 'Book deleted successfully'
+        };
+
+        handleResponse(res, responseData.status, responseData.data, responseData.message);
+    }
+
+    async updateBookStatus(bookId: string, status: string, session: ClientSession): Promise<void> {
+        await Book.findByIdAndUpdate(bookId, { status }, { session });
     }
 }
 

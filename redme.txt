@@ -216,7 +216,8 @@ _____________________________________________________________________________
 
 BookController.ts
 
-import { NextFunction, Request, Response } from 'express';
+ 
+ import { NextFunction, Request, Response } from 'express';
 import 'reflect-metadata';
 import { inject, injectable } from 'inversify';
 import BookApplicationService from '../ApplicationService/BookApplicationService';
@@ -232,46 +233,31 @@ export class BookController {
     }
 
     createBook = async (req: Request, res: Response, next: NextFunction) => {
-        const { title, author, stock, location } = req.body;
+        const bookData = req.body;
 
-        const newBook = await this.bookApplicationservice.createBook(
-            {
-                title,
-                author,
-                stock,
-                location
-            },
-            res
-        );
-
-        handleResponse(res, 201, { book: newBook }, 'Book created successfully');
+        const createdBook = await this.bookApplicationservice.createBook(bookData, res);
+        handleResponse(res, 201, { book: createdBook }, 'Book created successfully');
     };
 
     showAllBooks = async (req: Request, res: Response, next: NextFunction) => {
-        const allBooks = await this.bookApplicationservice.showAllBooks(res);
-        handleResponse(res, 200, { books: allBooks }, 'List of all books');
+        const books = await this.bookApplicationservice.getAllBooks(res);
+        handleResponse(res, 200, { books }, 'All books retrieved successfully');
     };
 
-    updateBook = async (req: Request, res: Response, next: NextFunction) => {
-        const { bookId } = req.params;
-        const updatedData = req.body;
-        await this.bookApplicationservice.updateBook(bookId, updatedData, res);
-        handleResponse(res, 200, null, 'Book updated successfully');
-    };
-
-    deleteBook = async (req: Request, res: Response, next: NextFunction) => {
-        const { bookId } = req.params;
-        await this.bookApplicationservice.deleteBook(bookId, res);
-        handleResponse(res, 204, null, 'Book deleted successfully');
-    };
+  
 }
 
 export default BookController;
+
+ 
+
+
 
 
 _____________________________________________________________________________
 
 BookApplicationService.ts
+ 
 
 
 import BookService from '../Domain/Book/Book.service';
@@ -281,6 +267,7 @@ import 'reflect-metadata';
 import { Response } from 'express';
 import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
 import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
+
 @injectable()
 export class BookApplicationService {
     private bookService: BookService;
@@ -292,56 +279,39 @@ export class BookApplicationService {
     }
 
     @errorHandlerMiddleware
-    async createBook(bookData: { title: string; author: string; stock: string; location: { corridor: string; shelf: string; cupboard: string } }, res: Response): Promise<void | null> {
-        return this.transactionHandler.runInTransaction(async (session) => {
-            const newBook = await this.bookService.createBook(bookData, res, session);
-
-            if (newBook) {
-                res.status(201).json({ book: newBook });
-            } else {
-                res.status(500).json({ message: 'Failed to create the book' });
-            }
-        });
-    }
-
-    @errorHandlerMiddleware
-    async showAllBooks(res: Response): Promise<any> {
+    async createBook(bookData: any, res: Response): Promise<any> {
         return this.transactionHandler.runInTransaction(async () => {
-            const allBooks = await this.bookService.showAllBooks();
-            return allBooks;
+            const createdBook = await this.bookService.createBook(bookData, res);
+            console.log(bookData);
+            return createdBook;
         });
     }
 
     @errorHandlerMiddleware
-    async updateBook(bookId: string, updatedBookInfo: any, res: Response): Promise<void | null> {
-        return this.transactionHandler.runInTransaction(async (session) => {
-            return this.bookService.updateBook(bookId, updatedBookInfo, res, session);
+    async getAllBooks(res: Response): Promise<any> {
+        return this.transactionHandler.runInTransaction(async () => {
+            const books = await this.bookService.getAllBooks(res);
+            return books;
         });
     }
 
-    @errorHandlerMiddleware
-    async deleteBook(bookId: string, res: Response): Promise<void | null> {
-        return this.transactionHandler.runInTransaction(async (session) => {
-            return this.bookService.deleteBook(bookId, res, session);
-        });
-    }
+ 
 }
 
 export default BookApplicationService;
 
-
 _____________________________________________________________________________
 
-BookService.ts
+Bookservice.ts 
 
-
+ 
 import mongoose from 'mongoose';
 import 'reflect-metadata';
 import { inject, injectable } from 'inversify';
 import BookRepository from './Book.repository';
-import { Response } from 'express';
 import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
 import { ClientSession } from 'mongoose';
+import { Response } from 'express';
 
 @injectable()
 export class BookService {
@@ -352,41 +322,25 @@ export class BookService {
     }
 
     @errorHandlerMiddleware
-    async createBook(
-        bookData: { title: string; author: string; stock: string; location: { corridor: string; shelf: string; cupboard: string } },
-        res: Response,
-        session?: ClientSession
-    ): Promise<any> {
-        return this.bookRepository.createBook(bookData);
+    async createBook(bookData: any, res: Response): Promise<any> {
+        return this.bookRepository.createBook(bookData, res);
+    }
+
+ 
     }
 
     @errorHandlerMiddleware
-    async showAllBooks(): Promise<any> {
-        return this.bookRepository.showAllBooks();
-    }
-
-    @errorHandlerMiddleware
-    async updateBook(bookId: string, updatedBookInfo: any, res: Response, session: ClientSession | null = null): Promise<any> {
-        if (!bookId) {
-            throw new Error('Book ID is required.');
-        }
-        return this.bookRepository.updateBook(bookId, updatedBookInfo);
-    }
-
-    @errorHandlerMiddleware
-    async deleteBook(bookId: string, res: Response, session: ClientSession | null = null): Promise<any> {
-        if (!bookId) {
-            throw new Error('Book ID required.');
-        }
-        return this.bookRepository.deleteBook(bookId);
+    async getAllBooks(res: Response): Promise<any> {
+        return this.bookRepository.getAllBooks(res);
     }
 }
 
 export default BookService;
 
+
+
+
 _____________________________________________________________________________
-
-
 BookRepository.ts
 
 
@@ -395,45 +349,67 @@ import mongoose from 'mongoose';
 import { injectable } from 'inversify';
 import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
 import { ClientSession } from 'mongoose';
+import { handleResponse } from '../../infrastructure/response';
+import { Response } from 'express';
 
 @injectable()
 class BookRepository {
     @errorHandlerMiddleware
-    async createBook(bookData: { title: string; author: string; stock: string; location: { corridor: string; shelf: string; cupboard: string } }): Promise<any> {
-        if (!bookData.author || !bookData.title) throw new Error('Author and title are required.');
+    async createBook(bookData: any, res: Response): Promise<any> {
+        const responseData = {
+            status: 201,
+            data: { ...bookData },
+            message: 'Book created successfully'
+        };
 
-        const newBook = await Book.create({
-            author: bookData.author,
-            title: bookData.title,
-            stock: bookData.stock,
-            location: bookData.location
-        });
+        handleResponse(res, responseData.status, responseData.data, responseData.message);
+
+        if (typeof bookData.stock === 'object' && bookData.stock !== null) {
+            bookData.stock = bookData.stock.count;
+        }
+
+        const newBook = new Book(bookData);
+
         return newBook.save();
     }
 
     @errorHandlerMiddleware
-    async showAllBooks(): Promise<any> {
-        return Book.find();
+    async getAllBooks(res: Response): Promise<any> {
+        const books = await Book.find();
+
+        const responseData = {
+            status: 201,
+            data: { ...books },
+            message: 'Book listening successfully'
+        };
+
+        handleResponse(res, responseData.status, responseData.data, responseData.message);
+        return books;
     }
 
-    @errorHandlerMiddleware
-    async updateBook(bookId: string, updatedBookInfo: any): Promise<any> {
-        return Book.findByIdAndUpdate(bookId, updatedBookInfo, { new: true }).orFail(new Error('Book not found'));
-    }
-
-    @errorHandlerMiddleware
-    async deleteBook(bookId: string): Promise<any> {
-        const book = await Book.findByIdAndDelete(bookId);
-
-        if (!book) {
-            throw new Error('Book not found');
-        }
-
-        return book;
+  
     }
 }
 
 export default BookRepository;
+
+
+_____________________________________________________________________________
+
+Response.ts 
+
+
+import { Response } from 'express';
+
+export const handleResponse = (res: Response, statusCode: number, data: any, message: string = '') => {
+    res.status(statusCode).json({
+        status: statusCode,
+        data: data,
+        message: message
+    });
+};
+
+
 
 _____________________________________________________________________________
 Book.ts

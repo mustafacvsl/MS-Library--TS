@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import authEntity, { IAuthorModel } from './auth.entity';
-import Book, { IBookModel } from '../Book/Book';
+import { Types } from 'mongoose';
 
 @injectable()
 class AuthRepository {
@@ -13,8 +13,8 @@ class AuthRepository {
         return user.save();
     }
 
-    async getAllBooks(): Promise<IBookModel[]> {
-        return Book.find({}).exec();
+    async getAllBooks(): Promise<IAuthorModel[]> {
+        return authEntity.find({}).exec();
     }
 
     async findUserById(userId: string): Promise<IAuthorModel | null> {

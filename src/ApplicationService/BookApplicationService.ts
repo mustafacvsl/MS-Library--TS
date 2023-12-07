@@ -5,6 +5,7 @@ import 'reflect-metadata';
 import { Response } from 'express';
 import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
 import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
+
 @injectable()
 export class BookApplicationService {
     private bookService: BookService;
@@ -16,37 +17,34 @@ export class BookApplicationService {
     }
 
     @errorHandlerMiddleware
-    async createBook(bookData: { title: string; author: string; stock: string; location: { corridor: string; shelf: string; cupboard: string } }, res: Response): Promise<void | null> {
-        return this.transactionHandler.runInTransaction(async (session) => {
-            const newBook = await this.bookService.createBook(bookData, res, session);
-
-            if (newBook) {
-                res.status(201).json({ book: newBook });
-            } else {
-                res.status(500).json({ message: 'Failed to create the book' });
-            }
-        });
-    }
-
-    @errorHandlerMiddleware
-    async showAllBooks(res: Response): Promise<any> {
+    async createBook(bookData: any, res: Response): Promise<any> {
         return this.transactionHandler.runInTransaction(async () => {
-            const allBooks = await this.bookService.showAllBooks();
-            return allBooks;
+            const createdBook = await this.bookService.createBook(bookData, res);
+            console.log(bookData);
+            return createdBook;
         });
     }
 
     @errorHandlerMiddleware
-    async updateBook(bookId: string, updatedBookInfo: any, res: Response): Promise<void | null> {
-        return this.transactionHandler.runInTransaction(async (session) => {
-            return this.bookService.updateBook(bookId, updatedBookInfo, res, session);
+    async getAllBooks(res: Response): Promise<any> {
+        return this.transactionHandler.runInTransaction(async () => {
+            const books = await this.bookService.getAllBooks(res);
+            return books;
         });
     }
 
     @errorHandlerMiddleware
-    async deleteBook(bookId: string, res: Response): Promise<void | null> {
-        return this.transactionHandler.runInTransaction(async (session) => {
-            return this.bookService.deleteBook(bookId, res, session);
+    async updateBook(bookId: string, updatedData: any, res: Response): Promise<any> {
+        return this.transactionHandler.runInTransaction(async () => {
+            const updatedBook = await this.bookService.updateBook(bookId, updatedData, res);
+            return updatedBook;
+        });
+    }
+
+    @errorHandlerMiddleware
+    async deleteBook(bookId: string, res: Response): Promise<void> {
+        return this.transactionHandler.runInTransaction(async () => {
+            await this.bookService.deleteBook(bookId, res);
         });
     }
 }

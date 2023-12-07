@@ -1,25 +1,28 @@
 import { inject, injectable } from 'inversify';
-import { ClientSession } from 'mongoose';
+import { Response } from 'express'; // Import Response from 'express'
 import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
-import ExecutiveRepository from './executive.repository';
-import Book, { IBookModel } from '../Book/Book';
+import { handleResponse } from '../../infrastructure/response';
+import { addDays } from 'date-fns';
+import { ClientSession } from 'mongoose';
+import { ExecutiveRepository } from './executive.repository';
+import authEntity, { IAuthorModel } from '../User/auth.entity';
+import Book from '../Book/Book';
+import memberEntity from '../Member/member.entity';
 
 @injectable()
-export class ExecutiveService {
-    private executiveRepository: ExecutiveRepository;
+class ExecutiveService {
+    constructor(@inject(ExecutiveRepository) private executiverepository: ExecutiveRepository) {}
+    async borrowBook(memberId: string, bookId: string, res: Response, session: ClientSession): Promise<any> {
+        const borrowedBook = await this.executiverepository.borrowBook(memberId, bookId, session);
+        const member = await memberEntity.findById(memberId);
+        const book = await Book.findById(bookId);
 
-    constructor(@inject(ExecutiveRepository) executiveRepository: ExecutiveRepository) {
-        this.executiveRepository = executiveRepository;
-    }
+        if (!member || !book) {
+            handleResponse(res, 404, null, 'Member or book not found');
+            return;
+        }
 
-    @errorHandlerMiddleware
-    async borrowBook(memberId: string, bookId: string, session: ClientSession): Promise<IBookModel | null> {
-        return this.executiveRepository.borrowBook(memberId, bookId, session);
-    }
-
-    @errorHandlerMiddleware
-    async returnBook(loanId: string, session: ClientSession): Promise<any> {
-        return this.executiveRepository.returnBook(loanId, session);
+        handleResponse(res, 201, { loaned: borrowedBook, member, book }, 'Book borrowed successfully');
     }
 }
 

@@ -1,497 +1,150 @@
-AuthController.ts
+ExecutiveController.ts 
 
-import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
-import { NextFunction, Request, Response, Router } from 'express';
 
+import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import { AuthApplicationService } from '../ApplicationService/AuthApplicationService';
-import { handleResponse } from '../infrastructure/response';
-import Book, { IBook } from '../Domain/Book/Book';
-
-export const Injector = Symbol.for('AuthApplicationService');
-@injectable()
-export class AuthController {
-    constructor(@inject('AuthApplicationService') public authApplicationService: AuthApplicationService) {}
-
-    @errorHandlerMiddleware
-    async register(req: Request, res: Response): Promise<void> {
-        const { name, email, password } = req.body;
-        const result = await this.authApplicationService.registerUser(name, email, password, res);
-
-        handleResponse(res, 201, { user: result }, 'User registered successfully');
-    }
-
-    @errorHandlerMiddleware
-    async listBooksUsers(req: Request, res: Response): Promise<void> {
-        const books = await this.authApplicationService.listBooksUsers(res);
-
-        handleResponse(res, 200, { books }, 'Books listed for users');
-    }
-
-    @errorHandlerMiddleware
-    async login(req: Request, res: Response): Promise<void> {
-        const { email, password } = req.body;
-        const result = await this.authApplicationService.loginUser(email, password, res);
-
-        handleResponse(res, 200, { token: result }, 'Login successful');
-    }
-}
-
-_____________________________________________________________________________
-AuthApplicationService.ts
- 
-
-
-import AuthService from '../Domain/User/Auth.service';
-import { inject, injectable } from 'inversify';
-import 'reflect-metadata';
-import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
-import { Request, Response } from 'express';
-import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
-
-export const Injector = Symbol.for('AuthApplicationService');
-@injectable()
-export class AuthApplicationService {
-    constructor(@inject(AuthService) private authService: AuthService, @inject(TransactionHandler) private transactionhandler: TransactionHandler) {}
-
-    @errorHandlerMiddleware
-    async registerUser(name: string, email: string, password: string, res: Response): Promise<void> {
-        const user = await this.authService.registerUser(name, email, password, res);
-
-        res.status(201).json({ user });
-    }
-
-    @errorHandlerMiddleware
-    async listBooksUsers(res: Response): Promise<void> {
-        await this.transactionhandler.runInTransaction(async (session) => {
-            const books = await this.authService.listBooksUsers();
-
-            res.status(200).json({
-                books
-            });
-        });
-    }
-
-    @errorHandlerMiddleware
-    async loginUser(email: string, password: string, res: Response): Promise<string> {
-        const token = await this.authService.loginUser(email, password, res);
-        return token;
-    }
-}
-
-export default AuthApplicationService;
-
-
-_____________________________________________________________________________
-AUthService.ts
-
- 
-// AuthService.ts
-
-import { inject, injectable } from 'inversify';
-import 'reflect-metadata';
-import { Response } from 'express';
-import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
-import { promisify } from 'util';
-const jwt = require('jsonwebtoken');
-import AuthRepository from './Auth.repository';
-import { IAuthorModel } from './auth.entity';
-import { handleResponse } from '../../infrastructure/response';
-import { getConfig } from '../../infrastructure/config';
-
-const compareAsync = promisify(require('bcrypt').compare);
-const hashAsync = promisify(require('bcrypt').hash);
-
-@injectable()
-class AuthService {
-    private readonly config = getConfig();
-
-    constructor(@inject(AuthRepository) private authrepository: AuthRepository) {}
-
-    @errorHandlerMiddleware
-    async registerUser(name: string, email: string, password: string, res: Response): Promise<any> {
-        if (typeof password !== 'string') {
-            throw new Error('Password must be a string');
-        }
-
-        const existingUser = await this.authrepository.findUserByEmail(email);
-        if (existingUser) {
-            throw new Error('User with this email already exists');
-        }
-
-        const hashedPassword = await hashAsync(password + 'password:password' + name, 10);
-        const user = await this.authrepository.registerUser(name, email, hashedPassword);
-
-        return user;
-    }
-
-    @errorHandlerMiddleware
-    async listBooksUsers(): Promise<unknown[]> {
-        return this.authrepository.getAllBooks();
-    }
-
-    @errorHandlerMiddleware
-    async loginUser(email: string, password: string, res: Response): Promise<string> {
-        if (!email || !password) {
-            res.status(400).json({ error: 'Email and password are required' });
-            return '';
-        }
-
-        const user = await this.authrepository.findUserByEmailAndPassword(email, password);
-        if (!user) {
-            throw new Error('User not found');
-        }
-
-        const isPasswordValid = await compareAsync(password + 'sadasdda' + user.name, user.password);
-        if (!isPasswordValid) {
-            throw new Error('Invalid password');
-        }
-
-        const token = jwt.sign({ userId: user._id, email: user.email }, getConfig().secretKey, {
-            expiresIn: '1h'
-        });
-
-        return token;
-    }
-}
-
-export default AuthService;
-
-
-_____________________________________________________________________________
-
-AuthRepository.ts
- 
-
-import { injectable } from 'inversify';
-import authEntity, { IAuthorModel } from './auth.entity';
-import Book, { IBookModel } from '../Book/Book';
-
-@injectable()
-class AuthRepository {
-    async findUserByEmail(email: string): Promise<IAuthorModel | null> {
-        return authEntity.findOne({ email }).exec();
-    }
-
-    async registerUser(name: string, email: string, hashedPassword: string): Promise<IAuthorModel> {
-        const user = new authEntity({ name, email, password: hashedPassword });
-        return user.save();
-    }
-
-    async getAllBooks(): Promise<IBookModel[]> {
-        return Book.find({}).exec();
-    }
-
-    async findUserById(userId: string): Promise<IAuthorModel | null> {
-        return authEntity.findById(userId).exec();
-    }
-
-    async findUserByEmailAndPassword(email: string, password: string): Promise<IAuthorModel | null> {
-        return authEntity.findOne({ email, password }).exec();
-    }
-}
-
-export default AuthRepository;
-
-
-
-_____________________________________________________________________________
-Response.ts
-
-
-import { Response } from 'express';
-
-export const handleResponse = (res: Response, statusCode: number, data: any, message: string = '') => {
-    res.status(statusCode).json({
-        status: statusCode,
-        data: data,
-        message: message
-    });
-};
-
-
- 
-_____________________________________________________________________________
-
-BookController.ts
-
- 
- import { NextFunction, Request, Response } from 'express';
-import 'reflect-metadata';
-import { inject, injectable } from 'inversify';
-import BookApplicationService from '../ApplicationService/BookApplicationService';
+import Joi from 'joi';
 import { handleResponse } from '../infrastructure/response';
 import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
+import { ExecutiveApplicationService } from '../ApplicationService/ExecutiveApplicationService';
 
 @injectable()
-export class BookController {
-    private bookApplicationservice: BookApplicationService;
+export class ExecutiveController {
+    constructor(@inject('ExecutiveApplicationService') private executiveapplicationservice: ExecutiveApplicationService) {}
 
-    constructor(@inject(BookApplicationService) bookApplicationservice: BookApplicationService) {
-        this.bookApplicationservice = bookApplicationservice;
-    }
+    borrowBook = async (req: Request, res: Response, next: NextFunction) => {
+        const { memberId, bookId } = req.body;
 
-    createBook = async (req: Request, res: Response, next: NextFunction) => {
-        const bookData = req.body;
+        if (!memberId || !bookId) {
+            handleResponse(res, 400, null, 'MemberId, bookId, borrowedDate, and dueDate are required.');
+            return;
+        }
 
-        const createdBook = await this.bookApplicationservice.createBook(bookData, res);
-        handleResponse(res, 201, { book: createdBook }, 'Book created successfully');
+        await this.executiveapplicationservice.borrowBook(memberId, bookId, res);
     };
-
-    showAllBooks = async (req: Request, res: Response, next: NextFunction) => {
-        const books = await this.bookApplicationservice.getAllBooks(res);
-        handleResponse(res, 200, { books }, 'All books retrieved successfully');
-    };
-
-  
 }
-
-export default BookController;
-
- 
-
-
-
 
 _____________________________________________________________________________
 
-BookApplicationService.ts
- 
+
+ExecutiveApplicationService.ts 
 
 
-import BookService from '../Domain/Book/Book.service';
-import Book, { IBook } from '../Domain/Book/Book';
+
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import { Response } from 'express';
 import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
+import Joi from 'joi';
 import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
+import ExecutiveService from '../Domain/Executive/executive.service';
 
 @injectable()
-export class BookApplicationService {
-    private bookService: BookService;
-    private transactionHandler: TransactionHandler;
-
-    constructor(@inject(BookService) bookService: BookService, @inject(TransactionHandler) transactionHandler: TransactionHandler) {
-        this.bookService = bookService;
-        this.transactionHandler = transactionHandler;
-    }
+export class ExecutiveApplicationService {
+    constructor(@inject(ExecutiveService) private executiveservice: ExecutiveService, @inject(TransactionHandler) private transactionHandler: TransactionHandler) {}
 
     @errorHandlerMiddleware
-    async createBook(bookData: any, res: Response): Promise<any> {
-        return this.transactionHandler.runInTransaction(async () => {
-            const createdBook = await this.bookService.createBook(bookData, res);
-            console.log(bookData);
-            return createdBook;
+    async borrowBook(memberId: string, bookId: string, res: Response): Promise<void> {
+        return this.transactionHandler.runInTransaction(async (session) => {
+            await this.executiveservice.borrowBook(memberId, bookId, res, session);
         });
     }
-
-    @errorHandlerMiddleware
-    async getAllBooks(res: Response): Promise<any> {
-        return this.transactionHandler.runInTransaction(async () => {
-            const books = await this.bookService.getAllBooks(res);
-            return books;
-        });
-    }
-
- 
 }
-
-export default BookApplicationService;
 
 _____________________________________________________________________________
 
-Bookservice.ts 
 
- 
-import mongoose from 'mongoose';
-import 'reflect-metadata';
+ExecutiveService.ts 
+
+
 import { inject, injectable } from 'inversify';
-import BookRepository from './Book.repository';
+import { Response } from 'express'; // Import Response from 'express'
 import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
-import { ClientSession } from 'mongoose';
-import { Response } from 'express';
-
-@injectable()
-export class BookService {
-    private bookRepository: BookRepository;
-
-    constructor(@inject(BookRepository) bookRepository: BookRepository) {
-        this.bookRepository = bookRepository;
-    }
-
-    @errorHandlerMiddleware
-    async createBook(bookData: any, res: Response): Promise<any> {
-        return this.bookRepository.createBook(bookData, res);
-    }
-
- 
-    }
-
-    @errorHandlerMiddleware
-    async getAllBooks(res: Response): Promise<any> {
-        return this.bookRepository.getAllBooks(res);
-    }
-}
-
-export default BookService;
-
-
-
-
-_____________________________________________________________________________
-BookRepository.ts
-
-
-import Book from './Book';
-import mongoose from 'mongoose';
-import { injectable } from 'inversify';
-import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
-import { ClientSession } from 'mongoose';
 import { handleResponse } from '../../infrastructure/response';
-import { Response } from 'express';
+import { addDays } from 'date-fns';
+import { ClientSession } from 'mongoose';
+import { ExecutiveRepository } from './executive.repository';
+import authEntity, { IAuthorModel } from '../User/auth.entity';
+import Book from '../Book/Book';
+import memberEntity from '../Member/member.entity';
 
 @injectable()
-class BookRepository {
-    @errorHandlerMiddleware
-    async createBook(bookData: any, res: Response): Promise<any> {
-        const responseData = {
-            status: 201,
-            data: { ...bookData },
-            message: 'Book created successfully'
-        };
+class ExecutiveService {
+    constructor(@inject(ExecutiveRepository) private executiverepository: ExecutiveRepository) {}
+    async borrowBook(memberId: string, bookId: string, res: Response, session: ClientSession): Promise<any> {
+        const borrowedBook = await this.executiverepository.borrowBook(memberId, bookId, session);
+        const member = await memberEntity.findById(memberId);
+        const book = await Book.findById(bookId);
 
-        handleResponse(res, responseData.status, responseData.data, responseData.message);
-
-        if (typeof bookData.stock === 'object' && bookData.stock !== null) {
-            bookData.stock = bookData.stock.count;
+        if (!member || !book) {
+            handleResponse(res, 404, null, 'Member or book not found');
+            return;
         }
 
-        const newBook = new Book(bookData);
-
-        return newBook.save();
-    }
-
-    @errorHandlerMiddleware
-    async getAllBooks(res: Response): Promise<any> {
-        const books = await Book.find();
-
-        const responseData = {
-            status: 201,
-            data: { ...books },
-            message: 'Book listening successfully'
-        };
-
-        handleResponse(res, responseData.status, responseData.data, responseData.message);
-        return books;
-    }
-
-  
+        handleResponse(res, 201, { loaned: borrowedBook, member, book }, 'Book borrowed successfully');
     }
 }
 
-export default BookRepository;
+export default ExecutiveService;
 
+_____________________________________________________________________________
+
+ExecutiveRepository.ts 
+
+
+import mongoose, { ClientSession, Types } from 'mongoose';
+import loanedEntity from '../Loaned/loaned.entity';
+import AuthRepository from '../User/Auth.repository';
+
+export class ExecutiveRepository {
+    private client: mongoose.Mongoose;
+    private databaseName: string;
+    private authrepository: AuthRepository;
+
+    constructor() {
+        this.client = mongoose;
+        this.databaseName = 'library';
+        this.authrepository = new AuthRepository();
+    }
+
+    async borrowBook(memberId: string, bookId: string, session: ClientSession): Promise<any> {
+        const loaned = new loanedEntity({
+            memberId,
+            bookId
+        });
+
+        return await loaned.save({ session });
+    }
+}
 
 _____________________________________________________________________________
 
-Response.ts 
+loanedEntity.ts 
 
-
-import { Response } from 'express';
-
-export const handleResponse = (res: Response, statusCode: number, data: any, message: string = '') => {
-    res.status(statusCode).json({
-        status: statusCode,
-        data: data,
-        message: message
-    });
-};
-
-
-
-_____________________________________________________________________________
-Book.ts
 
 import mongoose, { Document, Schema } from 'mongoose';
-import Stock, { IStock } from '../BookStock/Stock.entity';
-import BookLocation, { IBookLocation } from '../BookLocation/BookLocation';
-import { number, string } from 'joi';
+import memberEntity, { IMember } from '../Member/member.entity';
+import Book, { IBook } from '../Book/Book';
 
-export interface IBook {
-    title: string;
-    author: string;
-    stock: IStock;
-    location: IBookLocation;
-    status: string;
+export interface ILoaned {
+    memberId: IMember;
+    bookId: IBook;
 }
 
-export interface IBookModel extends IBook, Document {}
+export interface ILoanedModel extends ILoaned, Document {}
 
-const BookSchema: Schema = new Schema(
+const LoanedSchema: Schema = new Schema(
     {
-        title: { type: String, required: true },
-        author: { type: String, required: true },
-        stock: { type: String, ref: 'Stock', required: true },
-        location: {
-            corridor: { type: String, required: true },
-            shelf: { type: String, required: true },
-            cupboard: { type: String, required: true }
-        },
-        status: { type: String, enum: ['Available', 'Borrowed'], default: 'Available' }
+        memberId: { type: String, required: true, unique: true, ref: 'Member' },
+        bookId: { type: String, required: true, unique: true, ref: 'Book' }
     },
     {
-        timestamps: true,
         versionKey: false
     }
 );
 
-export default mongoose.model<IBookModel>('Book', BookSchema);
+export default mongoose.model<ILoanedModel>('Loaned', LoanedSchema);
 
-_____________________________________________________________________________
-
-Stock.ts
-
-
-import mongoose, { Document, Schema } from 'mongoose';
-
-export interface IStock {
-    count: number;
-}
-
-export interface IStockModel extends IStock, Document {}
-
-const StockSchema: Schema = new Schema({
-    count: { type: Number, required: true, default: 0 }
-});
-
-export default mongoose.model<IStockModel>('Stock', StockSchema);
-
-_____________________________________________________________________________
-
-location.ts
-
-
-import mongoose, { Document, Schema } from 'mongoose';
-
-export interface IBookLocation {
-    corridor: string;
-    shelf: string;
-    cupboard: string;
-}
-
-export interface IBookLocationModel extends IBookLocation, Document {}
-
-const BookLocationSchema: Schema = new Schema(
-    {
-        corridor: { type: String, required: true },
-        shelf: { type: String, required: true },
-        cupboard: { type: String, required: true }
-    },
-    {}
-);
-
-export default mongoose.model<IBookLocationModel>('BookLocation', BookLocationSchema);
 
 _____________________________________________________________________________

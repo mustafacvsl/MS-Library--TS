@@ -1,310 +1,152 @@
-LoanedEntity.ts
+İnversify.ts
 
-import mongoose, { Document, Schema } from 'mongoose';
-import mongoose, { Document, Schema } from 'mongoose';
-import memberEntity, { IMember } from '../Member/member.entity';
-import Book, { IBook } from '../Book/Book';
-import { required } from 'joi';
-
-export interface ILoaned {
-    memberId: IMember;
-    bookId: IBook;
-    borrowedDate: string;
-    returnedDate?: string;
-}
-
-export interface ILoanedModel extends ILoaned, Document {}
-
-const LoanedSchema: Schema = new Schema(
-    {
-        memberId: { type: Schema.Types.ObjectId, required: true, ref: 'Member' },
-        bookId: { type: Schema.Types.ObjectId, required: true, ref: 'Book' },
-        borrowedDate: { type: String, required: true },
-        returnedDate: { type: String }
-    },
-    {
-        versionKey: false
-    }
-);
-
-export default mongoose.model<ILoanedModel>('Loaned', LoanedSchema);
-
-
-
-
-_____________________________________________________________________________________________
-
-memberentity.ts
-
-
-import mongoose, { Document, Schema } from 'mongoose';
-import authEntity, { IAuthor } from '../User/auth.entity';
-
-export interface IMember {
-    name: IAuthor;
-    email: IAuthor;
-}
-
-export interface IMemberModel extends IMember, Document {}
-
-const MemberSchema: Schema = new Schema(
-    {
-        name: { type: String, required: true, ref: 'Author' },
-        email: { type: String, required: true, unique: true, ref: 'Author' }
-    },
-    {
-        versionKey: false
-    }
-);
-
-export default mongoose.model<IMemberModel>('Member', MemberSchema);
-
-_____________________________________________________________________________________________
-
-executivecontroller.ts
-
-
-import { NextFunction, Request, Response } from 'express';
-import { inject, injectable } from 'inversify';
-import 'reflect-metadata';
-import Joi from 'joi';
-import { handleResponse } from '../infrastructure/response';
-import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
-import { ExecutiveApplicationService } from '../ApplicationService/ExecutiveApplicationService';
-
-@injectable()
-export class ExecutiveController {
-    constructor(@inject('ExecutiveApplicationService') private executiveapplicationservice: ExecutiveApplicationService) {}
-
-    borrowBook = async (req: Request, res: Response, next: NextFunction) => {
-        const { memberId, bookId } = req.body;
-
-        if (!memberId || !bookId) {
-            handleResponse(res, 400, null, 'MemberId, bookId, and borrowedDate are required.');
-            return;
-        }
-
-        await this.executiveapplicationservice.borrowBook(memberId, bookId, res);
-    };
-
-    updateUser = async (req: Request, res: Response, next: NextFunction) => {
-        const { userId } = req.params;
-        const { name, email, password } = req.body;
-
-        if (!userId || !name || !email || !password) {
-            handleResponse(res, 400, null, 'UserId, name, email, and password are required.');
-            return;
-        }
-
-        await this.executiveapplicationservice.updateUser(userId, { name, email, password }, res);
-    };
-
-    deleteUser = async (req: Request, res: Response, next: NextFunction) => {
-        const { userId } = req.params;
-
-        if (!userId) {
-            handleResponse(res, 400, null, 'UserId is required.');
-            return;
-        }
-
-        await this.executiveapplicationservice.deleteUser(userId, res);
-    };
-
-    getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
-        await this.executiveapplicationservice.getAllUsers(res);
-    };
-
-    getUserById = async (req: Request, res: Response, next: NextFunction) => {
-        const { userId } = req.params;
-
-        if (!userId) {
-            handleResponse(res, 400, null, 'UserId is required.');
-            return;
-        }
-
-        await this.executiveapplicationservice.getUserById(userId, res);
-    };
-}
-
-
-_____________________________________________________________________________________________
-executiveApplicationService.ts
-
-import { inject, injectable } from 'inversify';
-import 'reflect-metadata';
-import { Response } from 'express';
-import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
-import Joi from 'joi';
-import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
+import { Container } from 'inversify';
+import { AuthController /*, Injector as authcontrollerınjector*/ } from '../Controller/auth.controller';
+import { BookController } from '../Controller/book.controller';
+import AuthService from '../Domain/User/Auth.service';
+import BookService from '../Domain/Book/Book.service';
+import BookApplicationService from '../ApplicationService/BookApplicationService';
+import AuthRepository from '../Domain/User/Auth.repository';
+import BookRepository from '../Domain/Book/Book.repository';
+import { AuthApplicationService /*, Injector as authApplicationInjector*/ } from '../ApplicationService/AuthApplicationService';
 import ExecutiveService from '../Domain/Executive/executive.service';
+import { ExecutiveApplicationService } from '../ApplicationService/ExecutiveApplicationService';
+import { ExecutiveController } from '../Controller/executive.controller';
+import { MemberController } from '../Controller/Member.controller';
+import { MemberApplicationService } from '../ApplicationService/MemberApplicationService';
+import MemberService from '../Domain/Member/member.service';
+import MemberRepository from '../Domain/Member/member.repository';
+import TransactionHandler from './Transaction/TransactionManager';
+import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
+import { container } from 'tsyringe';
 
-@injectable()
-export class ExecutiveApplicationService {
-    constructor(@inject(ExecutiveService) private executiveservice: ExecutiveService, @inject(TransactionHandler) private transactionHandler: TransactionHandler) {}
+const configurecontainer = (container: Container) => {
+    container.bind<TransactionHandler>(TransactionHandler).to(TransactionHandler);
+    container.bind<AuthApplicationService>(AuthApplicationService).to(AuthApplicationService);
+    container.bind<AuthController>(AuthController).to(AuthController);
+    container.bind<BookController>(BookController).to(BookController);
+    container.bind<AuthService>(AuthService).to(AuthService);
+    container.bind<BookService>(BookService).to(BookService);
+    container.bind<BookApplicationService>(BookApplicationService).to(BookApplicationService);
+    container.bind<AuthRepository>(AuthRepository).to(AuthRepository);
+    container.bind<BookRepository>(BookRepository).to(BookRepository);
+    container.bind<ExecutiveService>(ExecutiveService).to(ExecutiveService);
+    container.bind<ExecutiveApplicationService>(ExecutiveApplicationService).to(ExecutiveApplicationService);
+    container.bind<ExecutiveController>(ExecutiveController).to(ExecutiveController);
+    container.bind<MemberApplicationService>(MemberApplicationService).to(MemberApplicationService);
+    container.bind<MemberController>(MemberController).to(MemberController);
+    container.bind<MemberService>(MemberService).to(MemberService);
+    container.bind<MemberRepository>(MemberRepository).to(MemberRepository);
+};
 
-    @errorHandlerMiddleware
-    async borrowBook(memberId: string, bookId: string, res: Response): Promise<void> {
-        return this.transactionHandler.runInTransaction(async (session) => {
-            await this.executiveservice.borrowBook(memberId, bookId, res, session);
-        });
-    }
+export default configurecontainer;
 
-    @errorHandlerMiddleware
-    async updateUser(userId: string, updates: Partial<{ name: string; email: string; password: string }>, res: Response): Promise<void> {
-        return this.transactionHandler.runInTransaction(async (session) => {
-            await this.executiveservice.updateUser(userId, updates, res);
-        });
-    }
+_____________________________________________________________________________________________
 
-    @errorHandlerMiddleware
-    async deleteUser(userId: string, res: Response): Promise<void> {
-        return this.transactionHandler.runInTransaction(async (session) => {
-            await this.executiveservice.deleteUser(userId, res);
-        });
-    }
+Auth.Routes.ts 
 
-    @errorHandlerMiddleware
-    async getAllUsers(res: Response): Promise<void> {
-        await this.executiveservice.getAllUsers(res);
-    }
 
-    @errorHandlerMiddleware
-    async getUserById(userId: string, res: Response): Promise<void> {
-        await this.executiveservice.getUserById(userId, res);
-    }
-}
+
+import express from 'express';
+import { AuthController } from '../Controller/auth.controller';
+
+import AuthRepository from '../Domain/User/Auth.repository';
+import { Container } from 'inversify';
+import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
+import AuthService from '../Domain/User/Auth.service';
+import AuthApplicationService from '../ApplicationService/AuthApplicationService';
+const router = express.Router();
+const transaction = new TransactionHandler();
+const authreposiypry = new AuthRepository();
+const authservice = new AuthService(authreposiypry);
+const authapplicationservice = new AuthApplicationService(authservice, transaction);
+const authController = new AuthController(authapplicationservice);
+
+router.post('/register', authController.register.bind(authController));
+router.post('/login', authController.login.bind(authController));
+
+export = router;
 
 
 _____________________________________________________________________________________________
 
-executiveservice.ts 
 
+app.ts 
 
-   
-import { inject, injectable } from 'inversify';
-import { Response } from 'express'; // Import Response from 'express'
-import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
-import { handleResponse } from '../../infrastructure/response';
-import { addDays } from 'date-fns';
-import { ClientSession } from 'mongoose';
-import { ExecutiveRepository } from './executive.repository';
-import authEntity, { IAuthorModel } from '../User/auth.entity';
-import Book from '../Book/Book';
-import memberEntity from '../Member/member.entity';
-import loanedEntity from '../Loaned/loaned.entity';
-import parse from 'date-fns';
+import express from 'express';
+import http from 'http';
+import mongoose from 'mongoose';
+import { getConfig } from './infrastructure/config';
+import Logging from './infrastructure/Logging';
+import authorRoutes from './Routes/auth.routes';
+import bookRoutes from './Routes/book.routes';
+import executiveRoutes from './Routes/executive.routes';
+import memberRoutes from './Routes/member.routes';
+import { errorHandlerMiddleware } from './middleware/errorhandlerMiddleware';
+import { JoiMiddleware, Schemas } from './middleware/JoiMiddleware';
+const morgan = require('morgan');
 
-@injectable()
-class ExecutiveService {
-    constructor(@inject(ExecutiveRepository) private executiverepository: ExecutiveRepository) {}
+const router = express();
+const config = getConfig();
 
-    async borrowBook(memberId: string, bookId: string, res: Response, session: ClientSession): Promise<any> {
-        const borrowedBook = await this.executiverepository.borrowBook(memberId, bookId, session);
-        const member = await memberEntity.findById(memberId);
-        const book = await Book.findById(bookId);
+router.use(morgan('dev'));
 
-        if (!member || !book) {
-            handleResponse(res, 404, null, 'Member or book not found');
-            return;
-        }
+mongoose
+    .connect(config.mongo.url, { retryWrites: true, w: 'majority' })
+    .then(() => {
+        Logging.info('connected mongo db');
+        StartServer();
+    })
+    .catch((error) => {
+        Logging.error('unable to connect');
+        Logging.error(error);
+    });
 
-        handleResponse(res, 201, { loaned: borrowedBook, member, book }, 'Book borrowed successfully');
-    }
+const StartServer = () => {
+    router.use((req, res, next) => {
+        Logging.info(`Incomming - METHOD: [${req.method}] - URL: [${req.url}] - IP: [${req.socket.remoteAddress}]`);
 
-    @errorHandlerMiddleware
-    async updateUser(userId: string, updates: Partial<IAuthorModel>, res: Response): Promise<any> {
-        const user = await this.executiverepository.updateUser(userId, updates);
-
-        if (!user) {
-            handleResponse(res, 404, null, 'User not found');
-            return;
-        }
-
-        handleResponse(res, 200, { user }, 'User updated successfully');
-    }
-
-    @errorHandlerMiddleware
-    async deleteUser(userId: string, res: Response): Promise<void> {
-        await this.executiverepository.deleteUser(userId);
-        handleResponse(res, 200, null, 'User deleted successfully');
-    }
-
-    @errorHandlerMiddleware
-    async getAllUsers(res: Response): Promise<void> {
-        const users = await this.executiverepository.getAllUsers();
-        handleResponse(res, 200, { users }, 'Users listed successfully');
-    }
-
-    @errorHandlerMiddleware
-    async getUserById(userId: string, res: Response): Promise<void> {
-        const user = await this.executiverepository.getUserById(userId);
-
-        if (!user) {
-            handleResponse(res, 404, null, 'User not found');
-            return;
-        }
-
-        handleResponse(res, 200, { user }, 'User retrieved successfully');
-    }
-}
-
-export default ExecutiveService;
-
-
-
-_____________________________________________________________________________________________
-
-executiverepository.ts 
-
-import mongoose, { ClientSession, Types } from 'mongoose';
-import loanedEntity from '../Loaned/loaned.entity';
-import AuthRepository from '../User/Auth.repository';
-import Book from '../Book/Book';
-import authEntity, { IAuthorModel, IAuthor } from '../User/auth.entity';
-import { handleResponse } from '../../infrastructure/response';
-export class ExecutiveRepository {
-    private client: mongoose.Mongoose;
-    private databaseName: string;
-    private authrepository: AuthRepository;
-
-    constructor() {
-        this.client = mongoose;
-        this.databaseName = 'library';
-        this.authrepository = new AuthRepository();
-    }
-
-    async borrowBook(memberId: string, bookId: string, session: ClientSession): Promise<any> {
-        const loaned = new loanedEntity({
-            memberId,
-            bookId
+        res.on('finish', () => {
+            Logging.info(`Result - METHOD: [${req.method}] - URL: [${req.url}] - IP: [${req.socket.remoteAddress}] - STATUS: [${res.statusCode}]`);
         });
 
-        await loaned.save({ session });
+        next();
+    });
 
-        await Book.findByIdAndUpdate(bookId, { status: 'Borrowed' }, { session });
-        console.log(loaned);
+    router.use(express.urlencoded({ extended: true }));
+    router.use(express.json());
 
-        return loaned.save();
-    }
+    router.use((req, res, next) => {
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
 
-    async updateUser(userId: string, updates: Partial<IAuthorModel>): Promise<IAuthorModel | null> {
-        return authEntity.findByIdAndUpdate(userId, updates, { new: true }).exec();
-    }
+        if (req.method == 'OPTIONS') {
+            res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE, GET');
+            return res.status(200).json({});
+        }
 
-    async deleteUser(userId: string): Promise<void> {
-        await authEntity.findByIdAndDelete(userId).exec();
-    }
+        next();
+    });
 
-    async getAllUsers(): Promise<IAuthorModel[]> {
-        return authEntity.find({}).exec();
-    }
+    // router.use(errorHandlerMiddleware);
+    router.use('/authors', authorRoutes);
+    router.use('/books', bookRoutes);
+    router.use('/executive', executiveRoutes);
+    router.use('/member', memberRoutes);
 
-    async getUserById(userId: string): Promise<IAuthorModel | null> {
-        return authEntity.findById(userId).exec();
-    }
-}
+    router.use((req, res, next) => {
+        const error = new Error('Not found');
+
+        Logging.error(error);
+
+        res.status(404).json({
+            message: error.message
+        });
+    });
+
+    http.createServer(router).listen(config.server.port, () => Logging.info(`Server is running on port ${config.server.port}`));
+};
 
 
 
 _____________________________________________________________________________________________
-

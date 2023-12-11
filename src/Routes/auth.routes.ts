@@ -1,19 +1,18 @@
+import { TYPES } from '../infrastructure/Types';
 import express from 'express';
+import { Container } from 'inversify';
 import { AuthController } from '../Controller/auth.controller';
 
-import AuthRepository from '../Domain/User/Auth.repository';
-import { Container } from 'inversify';
-import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
-import AuthService from '../Domain/User/Auth.service';
-import AuthApplicationService from '../ApplicationService/AuthApplicationService';
 const router = express.Router();
-const transaction = new TransactionHandler();
-const authreposiypry = new AuthRepository();
-const authservice = new AuthService(authreposiypry);
-const authapplicationservice = new AuthApplicationService(authservice, transaction);
-const authController = new AuthController(authapplicationservice);
+const container = new Container();
+const authController = container.get<AuthController>(TYPES.AuthController);
 
-router.post('/register', authController.register.bind(authController));
-router.post('/login', authController.login.bind(authController));
+router.post('/register', async (req, res) => {
+    await authController.register(req, res);
+});
+
+router.post('/login', async (req, res) => {
+    await authController.login(req, res);
+});
 
 export = router;

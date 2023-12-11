@@ -37,4 +37,4 @@ const configurecontainer = (container: Container) => {
     container.bind<MemberRepository>(MemberRepository).to(MemberRepository);
 };
 
-export default container;
+export default configurecontainer;

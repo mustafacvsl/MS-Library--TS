@@ -2,6 +2,8 @@ import mongoose, { ClientSession, Types } from 'mongoose';
 import loanedEntity from '../Loaned/loaned.entity';
 import AuthRepository from '../User/Auth.repository';
 import Book from '../Book/Book';
+import authEntity, { IAuthorModel, IAuthor } from '../User/auth.entity';
+import { handleResponse } from '../../infrastructure/response';
 export class ExecutiveRepository {
     private client: mongoose.Mongoose;
     private databaseName: string;
@@ -19,15 +21,27 @@ export class ExecutiveRepository {
             bookId
         });
 
-        try {
-            await loaned.save({ session });
+        await loaned.save({ session });
 
-            await Book.findByIdAndUpdate(bookId, { status: 'Borrowed' }, { session });
+        await Book.findByIdAndUpdate(bookId, { status: 'Borrowed' }, { session });
+        console.log(loaned);
 
-            return loaned;
-        } catch (error) {
-            console.error('Error borrowing book:', error);
-            return null;
-        }
+        return loaned.save();
+    }
+
+    async updateUser(userId: string, updates: Partial<IAuthorModel>): Promise<IAuthorModel | null> {
+        return authEntity.findByIdAndUpdate(userId, updates, { new: true }).exec();
+    }
+
+    async deleteUser(userId: string): Promise<void> {
+        await authEntity.findByIdAndDelete(userId).exec();
+    }
+
+    async getAllUsers(): Promise<IAuthorModel[]> {
+        return authEntity.find({}).exec();
+    }
+
+    async getUserById(userId: string): Promise<IAuthorModel | null> {
+        return authEntity.findById(userId).exec();
     }
 }

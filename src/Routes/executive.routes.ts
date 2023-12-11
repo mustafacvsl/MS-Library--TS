@@ -17,6 +17,9 @@ const executivecontroller = new ExecutiveController(executiveapplicationservice)
 
 const router = express.Router();
 
-// router.post('/return-book', executivecontroller.returnBook.bind(executivecontroller));
 router.post('/borrow-book', executivecontroller.borrowBook.bind(executivecontroller));
+router.patch('/update', executivecontroller.updateUser.bind(executivecontroller));
+router.delete('/delete', executivecontroller.updateUser.bind(executivecontroller));
+router.get('/getAll', executivecontroller.getAllUsers.bind(executivecontroller));
+router.get('/getUser', executivecontroller.getUserById.bind(executivecontroller));
 export = router;

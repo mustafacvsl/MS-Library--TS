@@ -1,10 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import Joi from 'joi';
-import { handleResponse } from '../infrastructure/response';
-import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
-import { ExecutiveApplicationService } from '../ApplicationService/ExecutiveApplicationService';
+
+import { handleResponse } from '../infrastructure/Response';
+import { ExecutiveApplicationService } from '../ApplicationService/ExecutiveApplicationLayer';
 
 @injectable()
 export class ExecutiveController {
@@ -13,23 +12,7 @@ export class ExecutiveController {
     borrowBook = async (req: Request, res: Response, next: NextFunction) => {
         const { memberId, bookId } = req.body;
 
-        if (!memberId || !bookId) {
-            handleResponse(res, 400, null, 'MemberId, bookId, and borrowedDate are required.');
-            return;
-        }
-
         await this.executiveapplicationservice.borrowBook(memberId, bookId, res);
-    };
-
-    returnBook = async (req: Request, res: Response, next: NextFunction) => {
-        const { loanedId } = req.body;
-
-        if (!loanedId) {
-            handleResponse(res, 400, null, 'LoanedId is required.');
-            return;
-        }
-
-        await this.executiveapplicationservice.returnBook(loanedId, res);
     };
 
     updateUser = async (req: Request, res: Response, next: NextFunction) => {

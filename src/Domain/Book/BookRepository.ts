@@ -1,9 +1,9 @@
-import Book, { IBookModel } from './Book';
+import Book, { IBookModel } from './BookEntity';
 import mongoose from 'mongoose';
 import { injectable } from 'inversify';
-import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
+import { errorHandlerMiddleware } from '../../middleware/ErrorHandlerMiddleware';
 import { ClientSession } from 'mongoose';
-import { handleResponse } from '../../infrastructure/response';
+import { handleResponse } from '../../infrastructure/Response';
 import { Response } from 'express';
 
 @injectable()

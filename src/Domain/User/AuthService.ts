@@ -1,12 +1,12 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import { Response } from 'express';
-import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
+import { errorHandlerMiddleware } from '../../middleware/ErrorHandlerMiddleware';
 import { promisify } from 'util';
 const jwt = require('jsonwebtoken');
-import AuthRepository from './Auth.repository';
-import { IAuthorModel } from './auth.entity';
-import { handleResponse } from '../../infrastructure/response';
+import AuthRepository from './AuthRepository';
+
+import { handleResponse } from '../../infrastructure/Response';
 import { getConfig } from '../../infrastructure/config';
 
 const compareAsync = promisify(require('bcrypt').compare);
@@ -28,11 +28,6 @@ class AuthService {
         const user = await this.authrepository.registerUser(name, email, hashedPassword);
 
         return user;
-    }
-
-    @errorHandlerMiddleware
-    async listBooksUsers(): Promise<unknown[]> {
-        return this.authrepository.getAllBooks();
     }
 
     @errorHandlerMiddleware

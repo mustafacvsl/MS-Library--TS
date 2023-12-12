@@ -1,4 +1,4 @@
-import MemberEntity from './member.entity';
+import MemberEntity from './MemberEntity';
 import { ClientSession, Schema } from 'mongoose';
 
 export class MemberRepository {

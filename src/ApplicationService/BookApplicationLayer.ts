@@ -1,10 +1,10 @@
-import BookService from '../Domain/Book/Book.service';
-import Book, { IBook } from '../Domain/Book/Book';
+import BookService from '../Domain/Book/BookService';
+import Book, { IBook } from '../Domain/Book/BookEntity';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import { Response } from 'express';
-import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
-import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
+import { errorHandlerMiddleware } from '../middleware/ErrorHandlerMiddleware';
+import TransactionHandler from '../middleware/TransactionMiddleware';
 
 @injectable()
 export class BookApplicationService {

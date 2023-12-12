@@ -1,9 +1,9 @@
 import mongoose, { ClientSession, Types } from 'mongoose';
-import loanedEntity from '../Loaned/loaned.entity';
-import AuthRepository from '../User/Auth.repository';
-import Book from '../Book/Book';
-import authEntity, { IAuthorModel, IAuthor } from '../User/auth.entity';
-import { handleResponse } from '../../infrastructure/response';
+import loanedEntity from '../Loaned/LoanedEntity';
+import AuthRepository from '../User/AuthRepository';
+import Book from '../Book/BookEntity';
+import authEntity, { IAuthorModel, IAuthor } from '../User/AuthEntity';
+
 export class ExecutiveRepository {
     private client: mongoose.Mongoose;
     private databaseName: string;
@@ -33,8 +33,8 @@ export class ExecutiveRepository {
         return authEntity.findByIdAndUpdate(userId, updates, { new: true }).exec();
     }
 
-    async deleteUser(userId: string): Promise<void> {
-        await authEntity.findByIdAndDelete(userId).exec();
+    async deleteUser(userId: string): Promise<IAuthorModel | null> {
+        return authEntity.findByIdAndDelete(userId).exec();
     }
 
     async getAllUsers(): Promise<IAuthorModel[]> {

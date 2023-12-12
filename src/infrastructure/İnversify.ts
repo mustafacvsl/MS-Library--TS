@@ -1,21 +1,21 @@
 import { Container } from 'inversify';
 import { TYPES } from './Types';
-import TransactionHandler from './Transaction/TransactionManager';
-import AuthApplicationService from '../ApplicationService/AuthApplicationService';
-import { AuthController } from '../Controller/auth.controller';
-import BookController from '../Controller/book.controller';
-import AuthService from '../Domain/User/Auth.service';
-import BookService from '../Domain/Book/Book.service';
-import BookApplicationService from '../ApplicationService/BookApplicationService';
-import AuthRepository from '../Domain/User/Auth.repository';
-import BookRepository from '../Domain/Book/Book.repository';
-import ExecutiveService from '../Domain/Executive/executive.service';
-import { ExecutiveApplicationService } from '../ApplicationService/ExecutiveApplicationService';
-import { ExecutiveController } from '../Controller/executive.controller';
-import { MemberController } from '../Controller/Member.controller';
-import { MemberApplicationService } from '../ApplicationService/MemberApplicationService';
-import MemberService from '../Domain/Member/member.service';
-import MemberRepository from '../Domain/Member/member.repository';
+import TransactionHandler from '../middleware/TransactionMiddleware';
+import AuthApplicationService from '../ApplicationService/AuthApplicationLayer';
+import { AuthController } from '../Controller/AuthController';
+import BookController from '../Controller/BookController';
+import AuthService from '../Domain/User/AuthService';
+import BookService from '../Domain/Book/BookService';
+import BookApplicationService from '../ApplicationService/BookApplicationLayer';
+import AuthRepository from '../Domain/User/AuthRepository';
+import BookRepository from '../Domain/Book/BookRepository';
+import ExecutiveService from '../Domain/Executive/ExecutiveService';
+import { ExecutiveApplicationService } from '../ApplicationService/ExecutiveApplicationLayer';
+import { ExecutiveController } from '../Controller/ExecutiveController';
+import { MemberController } from '../Controller/MemberController';
+import { MemberApplicationService } from '../ApplicationService/MemberApplicationLayer';
+import MemberService from '../Domain/Member/MemberService';
+import MemberRepository from '../Domain/Member/MemberRepository';
 
 const configureContainer = (container: Container) => {
     container.bind<TransactionHandler>(TransactionHandler).to(TransactionHandler);

@@ -1,10 +1,10 @@
 import { inject, injectable } from 'inversify';
 import { Response } from 'express';
 import { ClientSession } from 'mongoose';
-import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
-import MemberRepository from './member.repository';
-import AuthRepository from '../User/Auth.repository';
-import { isValidEmail } from '../../infrastructure/validEmail';
+import { errorHandlerMiddleware } from '../../middleware/ErrorHandlerMiddleware';
+import MemberRepository from './MemberRepository';
+import AuthRepository from '../User/AuthRepository';
+import { isValidEmail } from '../../infrastructure/ValidEmail';
 
 @injectable()
 export class MemberService {

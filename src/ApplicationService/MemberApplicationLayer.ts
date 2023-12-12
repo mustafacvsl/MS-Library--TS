@@ -1,9 +1,9 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
+import { errorHandlerMiddleware } from '../middleware/ErrorHandlerMiddleware';
 import { Response } from 'express';
-import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
-import MemberService from '../Domain/Member/member.service';
+import TransactionHandler from '../middleware/TransactionMiddleware';
+import MemberService from '../Domain/Member/MemberService';
 
 @injectable()
 export class MemberApplicationService {

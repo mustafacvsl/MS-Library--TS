@@ -1,10 +1,5 @@
-import Joi, { ObjectSchema } from 'joi';
 import { NextFunction, Request, Response } from 'express';
-import { IAuthor } from '../Domain/User/auth.entity';
-import { IBook } from '../Domain/Book/Book';
-import memberEntity, { IMember } from '../Domain/Member/member.entity';
-import Logging from '../infrastructure/Logging';
-import { ILoanedModel } from '../Domain/Loaned/loaned.entity';
+import Joi, { ObjectSchema } from 'joi';
 
 export const JoiMiddleware = (schema: ObjectSchema) => {
     return async (req: Request, res: Response, next: NextFunction) => {
@@ -13,38 +8,35 @@ export const JoiMiddleware = (schema: ObjectSchema) => {
 
             next();
         } catch (error) {
-            Logging.error(error);
+            console.log(error);
 
-            return res.status(422).json({ error });
+            res.status(422).json({ error });
         }
     };
 };
 
-export const Schemas = {
-    author: {
-        create: Joi.object<IAuthor>({
-            name: Joi.string().required(),
-            email: Joi.string().email().required(),
-            password: Joi.string().required()
-        })
-    },
-    book: {
-        create: Joi.object<IBook>({
-            author: Joi.string().required(),
-            title: Joi.string().required()
-            // stock: Joi.string().required,
-            // location: Joi.string().required
-        }),
-        update: Joi.object<IBook>({
-            author: Joi.string().required(),
-            title: Joi.string().required()
-        })
-    },
-
-    executive: {
-        borrowBook: Joi.object({
-            memberId: Joi.string().required(),
-            bookId: Joi.string().required()
-        })
-    }
+export const Schema = {
+    register: Joi.object({
+        name: Joi.string().min(5).max(15).required(),
+        password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).min(8).max(30).required(),
+        email: Joi.string().email().required()
+    }),
+    login: Joi.object({
+        email: Joi.string().email().required(),
+        password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')).required()
+    }),
+    createBook: Joi.object({
+        title: Joi.string().required(),
+        author: Joi.string().required(),
+        stock: Joi.string().required(),
+        location: Joi.object().required()
+    }),
+    memberCreate: Joi.object({
+        name: Joi.string().required(),
+        email: Joi.string().email().required()
+    }),
+    borrowBook: Joi.object({
+        memberId: Joi.string().required(),
+        bookId: Joi.string().required()
+    })
 };

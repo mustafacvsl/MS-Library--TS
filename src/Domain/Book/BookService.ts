@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 import 'reflect-metadata';
 import { inject, injectable } from 'inversify';
-import BookRepository from './Book.repository';
-import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
+import BookRepository from './BookRepository';
+import { errorHandlerMiddleware } from '../../middleware/ErrorHandlerMiddleware';
 import { ClientSession } from 'mongoose';
 import { Response } from 'express';
 

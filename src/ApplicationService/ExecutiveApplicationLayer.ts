@@ -1,10 +1,9 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import { Response } from 'express';
-import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
-import Joi from 'joi';
-import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
-import ExecutiveService from '../Domain/Executive/executive.service';
+import { errorHandlerMiddleware } from '../middleware/ErrorHandlerMiddleware';
+import TransactionHandler from '../middleware/TransactionMiddleware';
+import ExecutiveService from '../Domain/Executive/ExecutiveService';
 
 @injectable()
 export class ExecutiveApplicationService {
@@ -14,13 +13,6 @@ export class ExecutiveApplicationService {
     async borrowBook(memberId: string, bookId: string, res: Response): Promise<void> {
         return this.transactionHandler.runInTransaction(async (session) => {
             await this.executiveservice.borrowBook(memberId, bookId, res, session);
-        });
-    }
-
-    @errorHandlerMiddleware
-    async returnBook(loanedId: string, res: Response): Promise<void> {
-        return this.transactionHandler.runInTransaction(async (session) => {
-            await this.executiveservice.returnBook(loanedId, res, session);
         });
     }
 

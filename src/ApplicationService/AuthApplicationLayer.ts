@@ -1,9 +1,9 @@
-import AuthService from '../Domain/User/Auth.service';
+import AuthService from '../Domain/User/AuthService';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import { errorHandlerMiddleware } from '../middleware/errorhandlerMiddleware';
+import { errorHandlerMiddleware } from '../middleware/ErrorHandlerMiddleware';
 import { Request, Response } from 'express';
-import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
+import TransactionHandler from '../middleware/TransactionMiddleware';
 
 export const Injector = Symbol.for('AuthApplicationService');
 @injectable()
@@ -15,17 +15,6 @@ export class AuthApplicationService {
         const user = await this.authService.registerUser(name, email, password, res);
 
         res.status(201).json({ user });
-    }
-
-    @errorHandlerMiddleware
-    async listBooksUsers(res: Response): Promise<void> {
-        await this.transactionhandler.runInTransaction(async (session) => {
-            const books = await this.authService.listBooksUsers();
-
-            res.status(200).json({
-                books
-            });
-        });
     }
 
     @errorHandlerMiddleware

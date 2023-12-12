@@ -3,12 +3,11 @@ import http from 'http';
 import mongoose from 'mongoose';
 import { getConfig } from './infrastructure/config';
 import Logging from './infrastructure/Logging';
-import authorRoutes from './Routes/auth.routes';
-import bookRoutes from './Routes/book.routes';
-import executiveRoutes from './Routes/executive.routes';
-import memberRoutes from './Routes/member.routes';
-import { errorHandlerMiddleware } from './middleware/errorhandlerMiddleware';
-import { JoiMiddleware, Schemas } from './middleware/JoiMiddleware';
+import authorRoutes from './Routes/AuthRoutes';
+import bookRoutes from './Routes/BookRoutes';
+import executiveRoutes from './Routes/ExecutiveRoutes';
+import memberRoutes from './Routes/MemberRoutes';
+
 const morgan = require('morgan');
 
 const router = express();

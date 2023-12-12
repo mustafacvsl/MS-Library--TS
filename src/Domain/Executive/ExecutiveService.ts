@@ -1,14 +1,14 @@
 import { inject, injectable } from 'inversify';
 import { Response } from 'express'; // Import Response from 'express'
-import { errorHandlerMiddleware } from '../../middleware/errorhandlerMiddleware';
-import { handleResponse } from '../../infrastructure/response';
+import { errorHandlerMiddleware } from '../../middleware/ErrorHandlerMiddleware';
+import { handleResponse } from '../../infrastructure/Response';
 import { addDays } from 'date-fns';
 import { ClientSession } from 'mongoose';
-import { ExecutiveRepository } from './executive.repository';
-import authEntity, { IAuthorModel } from '../User/auth.entity';
-import Book from '../Book/Book';
-import memberEntity from '../Member/member.entity';
-import loanedEntity from '../Loaned/loaned.entity';
+import { ExecutiveRepository } from './ExecutiveRepository ';
+import authEntity, { IAuthorModel } from '../User/AuthEntity';
+import Book from '../Book/BookEntity';
+import memberEntity from '../Member/MemberEntity';
+import loanedEntity from '../Loaned/LoanedEntity';
 import parse from 'date-fns';
 
 @injectable()
@@ -26,18 +26,6 @@ class ExecutiveService {
         }
 
         handleResponse(res, 201, { loaned: borrowedBook, member, book }, 'Book borrowed successfully');
-    }
-
-    @errorHandlerMiddleware
-    async returnBook(loanedId: string, res: Response, session: ClientSession): Promise<void> {
-        const returnedBook = await this.executiverepository.returnBook(loanedId, session);
-
-        if (!returnedBook) {
-            handleResponse(res, 404, null, 'Loaned record not found');
-            return;
-        }
-
-        handleResponse(res, 200, { returnedBook }, 'Book returned successfully');
     }
 
     @errorHandlerMiddleware

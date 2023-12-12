@@ -1,12 +1,11 @@
 import express from 'express';
-import { ExecutiveController } from '../Controller/executive.controller';
-import { Schemas, JoiMiddleware } from '../middleware/JoiMiddleware';
+import { ExecutiveController } from '../Controller/ExecutiveController';
 
 import { Container } from 'inversify';
-import TransactionHandler from '../infrastructure/Transaction/TransactionManager';
-import { ExecutiveRepository } from '../Domain/Executive/executive.repository';
-import ExecutiveService from '../Domain/Executive/executive.service';
-import { ExecutiveApplicationService } from '../ApplicationService/ExecutiveApplicationService';
+import TransactionHandler from '../middleware/TransactionMiddleware';
+import { ExecutiveRepository } from '../Domain/Executive/ExecutiveRepository ';
+import ExecutiveService from '../Domain/Executive/ExecutiveService';
+import { ExecutiveApplicationService } from '../ApplicationService/ExecutiveApplicationLayer';
 
 const container = new Container();
 const transaction = new TransactionHandler();

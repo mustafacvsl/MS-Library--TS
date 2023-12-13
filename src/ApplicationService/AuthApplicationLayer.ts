@@ -3,17 +3,17 @@ import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import { errorHandlerMiddleware } from '../middleware/ErrorHandlerMiddleware';
 import { Request, Response } from 'express';
-import TransactionHandler from '../middleware/TransactionMiddleware';
+import TransactionHandler from '../middleware/TransactionManager';
+import { TransactionMiddleware } from '../middleware/TransactionMiddleware';
 
-export const Injector = Symbol.for('AuthApplicationService');
 @injectable()
-export class AuthApplicationService {
+export class AuthApplicationLayer {
     constructor(@inject(AuthService) private authService: AuthService, @inject(TransactionHandler) private transactionhandler: TransactionHandler) {}
 
     @errorHandlerMiddleware
+    @TransactionMiddleware
     async registerUser(name: string, email: string, password: string, res: Response): Promise<void> {
         const user = await this.authService.registerUser(name, email, password, res);
-
         res.status(201).json({ user });
     }
 
@@ -24,4 +24,4 @@ export class AuthApplicationService {
     }
 }
 
-export default AuthApplicationService;
+export default AuthApplicationLayer;

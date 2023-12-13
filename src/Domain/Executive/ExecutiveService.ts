@@ -15,8 +15,8 @@ import parse from 'date-fns';
 class ExecutiveService {
     constructor(@inject(ExecutiveRepository) private executiverepository: ExecutiveRepository) {}
 
-    async borrowBook(memberId: string, bookId: string, res: Response, session: ClientSession): Promise<any> {
-        const borrowedBook = await this.executiverepository.borrowBook(memberId, bookId, session);
+    async borrowBook(memberId: string, bookId: string, res: Response): Promise<any> {
+        const borrowedBook = await this.executiverepository.borrowBook(memberId, bookId);
         const member = await memberEntity.findById(memberId);
         const book = await Book.findById(bookId);
 

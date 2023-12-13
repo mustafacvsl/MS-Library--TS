@@ -3,7 +3,9 @@ import loanedEntity from '../Loaned/LoanedEntity';
 import AuthRepository from '../User/AuthRepository';
 import Book from '../Book/BookEntity';
 import authEntity, { IAuthorModel, IAuthor } from '../User/AuthEntity';
+import { injectable } from 'inversify';
 
+@injectable()
 export class ExecutiveRepository {
     private client: mongoose.Mongoose;
     private databaseName: string;
@@ -15,15 +17,15 @@ export class ExecutiveRepository {
         this.authrepository = new AuthRepository();
     }
 
-    async borrowBook(memberId: string, bookId: string, session: ClientSession): Promise<any> {
+    async borrowBook(memberId: string, bookId: string): Promise<any> {
         const loaned = new loanedEntity({
             memberId,
             bookId
         });
 
-        await loaned.save({ session });
+        await loaned.save({});
 
-        await Book.findByIdAndUpdate(bookId, { status: 'Borrowed' }, { session });
+        await Book.findByIdAndUpdate(bookId, { status: 'Borrowed' }, {});
         console.log(loaned);
 
         return loaned.save();

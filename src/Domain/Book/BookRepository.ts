@@ -27,8 +27,8 @@ class BookRepository {
         return newBook.save();
     }
 
-    async findById(bookId: string, session: ClientSession): Promise<any> {
-        return Book.findById(bookId).session(session);
+    async findById(bookId: string): Promise<any> {
+        return Book.findById(bookId);
     }
 
     @errorHandlerMiddleware

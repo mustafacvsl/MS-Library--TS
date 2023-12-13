@@ -52,7 +52,6 @@ const StartServer = () => {
         next();
     });
 
-    // router.use(errorHandlerMiddleware);
     router.use('/authors', authorRoutes);
     router.use('/books', bookRoutes);
     router.use('/executive', executiveRoutes);

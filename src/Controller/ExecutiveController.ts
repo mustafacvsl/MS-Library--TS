@@ -7,7 +7,7 @@ import { ExecutiveApplicationService } from '../ApplicationService/ExecutiveAppl
 
 @injectable()
 export class ExecutiveController {
-    constructor(@inject('ExecutiveApplicationService') private executiveapplicationservice: ExecutiveApplicationService) {}
+    constructor(@inject(ExecutiveApplicationService) private executiveapplicationservice: ExecutiveApplicationService) {}
 
     borrowBook = async (req: Request, res: Response, next: NextFunction) => {
         const { memberId, bookId } = req.body;
@@ -19,22 +19,11 @@ export class ExecutiveController {
         const { userId } = req.params;
         const { name, email, password } = req.body;
 
-        if (!userId || !name || !email || !password) {
-            handleResponse(res, 400, null, 'UserId, name, email, and password are required.');
-            return;
-        }
-
         await this.executiveapplicationservice.updateUser(userId, { name, email, password }, res);
     };
 
     deleteUser = async (req: Request, res: Response, next: NextFunction) => {
         const { userId } = req.params;
-
-        if (!userId) {
-            handleResponse(res, 400, null, 'UserId is required.');
-            return;
-        }
-
         await this.executiveapplicationservice.deleteUser(userId, res);
     };
 
@@ -44,11 +33,6 @@ export class ExecutiveController {
 
     getUserById = async (req: Request, res: Response, next: NextFunction) => {
         const { userId } = req.params;
-
-        if (!userId) {
-            handleResponse(res, 400, null, 'UserId is required.');
-            return;
-        }
 
         await this.executiveapplicationservice.getUserById(userId, res);
     };

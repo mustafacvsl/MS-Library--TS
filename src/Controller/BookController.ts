@@ -14,7 +14,6 @@ export class BookController {
 
     createBook = async (req: Request, res: Response, next: NextFunction) => {
         const bookData = req.body;
-
         const createdBook = await this.bookApplicationservice.createBook(bookData, res);
         handleResponse(res, 201, { book: createdBook }, 'Book created successfully');
     };

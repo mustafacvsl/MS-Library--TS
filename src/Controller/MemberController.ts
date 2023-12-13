@@ -6,7 +6,7 @@ import { handleResponse } from '../infrastructure/Response';
 
 @injectable()
 export class MemberController {
-    constructor(@inject('MemberApplicationService') private memberApplicationService: MemberApplicationService) {}
+    constructor(@inject(MemberApplicationService) private memberApplicationService: MemberApplicationService) {}
 
     async addMember(req: Request, res: Response, next: NextFunction): Promise<void> {
         const { name, email } = req.body;

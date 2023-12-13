@@ -1,26 +1,16 @@
-import { injectable } from 'inversify';
-import mongoose, { ClientSession } from 'mongoose';
+import TransactionHandler from './TransactionManager';
 
-@injectable()
-export default class TransactionHandler {
-    private client: mongoose.Mongoose;
+export function TransactionMiddleware(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value;
 
-    constructor() {
-        this.client = mongoose;
-    }
+    descriptor.value = async function (...args: any[]) {
+        const transactionHandler = new TransactionHandler();
+        const result = await transactionHandler.runInTransaction(async (session) => {
+            return await originalMethod.apply(this, args.concat(session));
+        });
 
-    async runInTransaction(callback: (session: ClientSession) => Promise<void>): Promise<void> {
-        const session = await this.client.startSession();
-        session.startTransaction();
+        return result;
+    };
 
-        try {
-            await callback(session);
-            await session.commitTransaction();
-        } catch (error) {
-            await session.abortTransaction();
-            throw error;
-        } finally {
-            session.endSession();
-        }
-    }
+    return descriptor;
 }

@@ -4,7 +4,8 @@ import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import { Response } from 'express';
 import { errorHandlerMiddleware } from '../middleware/ErrorHandlerMiddleware';
-import TransactionHandler from '../middleware/TransactionMiddleware';
+import TransactionHandler from '../middleware/TransactionManager';
+import { TransactionMiddleware } from '../middleware/TransactionMiddleware';
 
 @injectable()
 export class BookApplicationService {
@@ -17,35 +18,30 @@ export class BookApplicationService {
     }
 
     @errorHandlerMiddleware
+    @TransactionMiddleware
     async createBook(bookData: any, res: Response): Promise<any> {
-        return this.transactionHandler.runInTransaction(async () => {
-            const createdBook = await this.bookService.createBook(bookData, res);
-            console.log(bookData);
-            return createdBook;
-        });
+        const createdBook = await this.bookService.createBook(bookData, res);
+        console.log(bookData);
+        return createdBook;
     }
 
     @errorHandlerMiddleware
     async getAllBooks(res: Response): Promise<any> {
-        return this.transactionHandler.runInTransaction(async () => {
-            const books = await this.bookService.getAllBooks(res);
-            return books;
-        });
+        const books = await this.bookService.getAllBooks(res);
+        return books;
     }
 
     @errorHandlerMiddleware
+    @TransactionMiddleware
     async updateBook(bookId: string, updatedData: any, res: Response): Promise<any> {
-        return this.transactionHandler.runInTransaction(async () => {
-            const updatedBook = await this.bookService.updateBook(bookId, updatedData, res);
-            return updatedBook;
-        });
+        const updatedBook = await this.bookService.updateBook(bookId, updatedData, res);
+        return updatedBook;
     }
 
     @errorHandlerMiddleware
+    @TransactionMiddleware
     async deleteBook(bookId: string, res: Response): Promise<void> {
-        return this.transactionHandler.runInTransaction(async () => {
-            await this.bookService.deleteBook(bookId, res);
-        });
+        await this.bookService.deleteBook(bookId, res);
     }
 }
 

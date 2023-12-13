@@ -38,5 +38,14 @@ export const Schema = {
     borrowBook: Joi.object({
         memberId: Joi.string().required(),
         bookId: Joi.string().required()
+    }),
+    updateUser: Joi.object({
+        userId: Joi.string().required(),
+        name: Joi.string().required(),
+        email: Joi.string().email().required(),
+        password: Joi.string().required()
+    }),
+    userId: Joi.object({
+        userId: Joi.string().required()
     })
 };

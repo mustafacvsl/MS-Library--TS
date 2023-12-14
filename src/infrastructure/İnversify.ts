@@ -19,11 +19,11 @@ import { MemberController } from '../Controller/MemberController';
 
 const container = new Container();
 
-container.bind<AuthApplicationLayer>(AuthApplicationLayer).to(AuthApplicationLayer).inRequestScope();
-container.bind<AuthService>(AuthService).to(AuthService).inRequestScope();
-container.bind<AuthRepository>(AuthRepository).to(AuthRepository).inRequestScope();
-container.bind<TransactionHandler>(TransactionHandler).to(TransactionHandler).inRequestScope();
-container.bind<AuthController>(AuthController).to(AuthController).inRequestScope();
+container.bind<AuthApplicationLayer>(AuthApplicationLayer).to(AuthApplicationLayer).inSingletonScope();
+container.bind<AuthService>(AuthService).to(AuthService).inSingletonScope();
+container.bind<AuthRepository>(AuthRepository).to(AuthRepository).inSingletonScope();
+container.bind<TransactionHandler>(TransactionHandler).to(TransactionHandler).inSingletonScope();
+container.bind<AuthController>(AuthController).to(AuthController).inSingletonScope();
 //!Book container
 
 container.bind<BookApplicationService>(BookApplicationService).to(BookApplicationService).inSingletonScope();

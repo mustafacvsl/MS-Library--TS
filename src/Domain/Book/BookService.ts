@@ -1,10 +1,6 @@
-import mongoose from 'mongoose';
-import 'reflect-metadata';
-import { inject, injectable } from 'inversify';
 import BookRepository from './BookRepository';
-import { errorHandlerMiddleware } from '../../middleware/ErrorHandlerMiddleware';
-import { ClientSession } from 'mongoose';
-import { Response } from 'express';
+import { inject, injectable } from 'inversify';
+import { IBookModel } from './BookEntity';
 
 @injectable()
 export class BookService {
@@ -14,24 +10,20 @@ export class BookService {
         this.bookRepository = bookRepository;
     }
 
-    @errorHandlerMiddleware
-    async createBook(bookData: any, res: Response): Promise<any> {
-        return this.bookRepository.createBook(bookData, res);
+    async createBook(bookData: string): Promise<IBookModel> {
+        return this.bookRepository.createBook(bookData);
     }
 
-    @errorHandlerMiddleware
-    async updateBook(bookId: string, updatedData: any, res: Response): Promise<any> {
-        return this.bookRepository.updateBook(bookId, updatedData, res);
+    async updateBook(bookId: string, updates: any): Promise<IBookModel | null> {
+        return this.bookRepository.updateBook(bookId, updates);
     }
 
-    @errorHandlerMiddleware
-    async deleteBook(bookId: string, res: Response): Promise<void> {
-        return this.bookRepository.deleteBook(bookId, res);
+    async deleteBook(bookId: string): Promise<IBookModel | null> {
+        return this.bookRepository.deleteBook(bookId);
     }
 
-    @errorHandlerMiddleware
-    async getAllBooks(res: Response): Promise<any> {
-        return this.bookRepository.getAllBooks(res);
+    async getAllBooks(): Promise<IBookModel[]> {
+        return this.bookRepository.getAllBooks();
     }
 }
 

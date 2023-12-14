@@ -11,16 +11,14 @@ export const Injector = Symbol.for('AuthApplicationService');
 export class AuthController {
     constructor(@inject(AuthApplicationLayer) public authapplicationlayer: AuthApplicationLayer) {}
 
-    @errorHandlerMiddleware
     async register(req: Request, res: Response): Promise<void> {
         const { name, email, password } = req.body;
 
-        const result = await this.authapplicationlayer.registerUser(name, email, password, res);
+        const result = await this.authapplicationlayer.registerUser(name, email, password);
 
         handleResponse(res, 201, { result }, 'User registered successfully');
     }
 
-    @errorHandlerMiddleware
     async login(req: Request, res: Response): Promise<void> {
         const { email, password } = req.body;
 

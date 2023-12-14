@@ -4,7 +4,6 @@ import { errorHandlerMiddleware } from '../../middleware/ErrorHandlerMiddleware'
 
 @injectable()
 class StockRepository {
-    @errorHandlerMiddleware
     async createStock(stockData: { stockProperty: string }): Promise<IStockModel> {
         const newStock = await Stock.create({
             stockProperty: stockData.stockProperty

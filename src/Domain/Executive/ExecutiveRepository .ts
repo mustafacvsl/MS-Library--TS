@@ -2,7 +2,7 @@ import mongoose, { ClientSession, Types } from 'mongoose';
 import loanedEntity from '../Loaned/LoanedEntity';
 import AuthRepository from '../User/AuthRepository';
 import Book from '../Book/BookEntity';
-import authEntity, { IAuthorModel, IAuthor } from '../User/AuthEntity';
+import AuthEntity, { IAuthorModel, IAuthor } from '../User/AuthEntity';
 import { injectable } from 'inversify';
 
 @injectable()
@@ -16,34 +16,32 @@ export class ExecutiveRepository {
         this.databaseName = 'library';
         this.authrepository = new AuthRepository();
     }
-
-    async borrowBook(memberId: string, bookId: string): Promise<any> {
+    async borrowBook(memberId: string, bookId: string, dueDate: Date): Promise<void> {
         const loaned = new loanedEntity({
             memberId,
-            bookId
+            bookId,
+            dueDate
         });
-
-        await loaned.save({});
-
-        await Book.findByIdAndUpdate(bookId, { status: 'Borrowed' }, {});
         console.log(loaned);
 
-        return loaned.save();
+        await loaned.save();
+
+        await Book.findByIdAndUpdate(bookId, { status: 'Borrowed' }, {});
     }
 
-    async updateUser(userId: string, updates: Partial<IAuthorModel>): Promise<IAuthorModel | null> {
-        return authEntity.findByIdAndUpdate(userId, updates, { new: true }).exec();
+    async listUsers(): Promise<IAuthorModel[]> {
+        const users = await AuthEntity.find();
+
+        return users;
     }
 
-    async deleteUser(userId: string): Promise<IAuthorModel | null> {
-        return authEntity.findByIdAndDelete(userId).exec();
+    async updateUser(userId: string, updateData: Partial<IAuthor>): Promise<IAuthorModel | null> {
+        const user = await AuthEntity.findByIdAndUpdate(userId, updateData, { new: true });
+
+        return user;
     }
 
-    async getAllUsers(): Promise<IAuthorModel[]> {
-        return authEntity.find({}).exec();
-    }
-
-    async getUserById(userId: string): Promise<IAuthorModel | null> {
-        return authEntity.findById(userId).exec();
+    async deleteUser(userId: string): Promise<void> {
+        await AuthEntity.findByIdAndDelete(userId);
     }
 }

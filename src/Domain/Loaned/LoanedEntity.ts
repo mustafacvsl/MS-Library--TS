@@ -5,9 +5,7 @@ import Book, { IBook } from '../Book/BookEntity';
 export interface ILoaned {
     memberId: IMember;
     bookId: IBook;
-    borrowedDate: string;
-    returnedDate?: string;
-    penaltyApplied?: boolean;
+    dueDate: Date;
 }
 
 export interface ILoanedModel extends ILoaned, Document {}
@@ -15,10 +13,8 @@ export interface ILoanedModel extends ILoaned, Document {}
 const LoanedSchema: Schema = new Schema(
     {
         memberId: { type: Schema.Types.ObjectId, required: true, ref: 'Member' },
-        bookId: { type: Schema.Types.ObjectId, required: true, ref: 'Book' }
-        // borrowedDate: { type: String, required: true },
-        // returnedDate: { type: String },
-        // penaltyApplied: { type: Boolean }
+        bookId: { type: Schema.Types.ObjectId, required: true, ref: 'Book' },
+        dueDate: { type: Date, required: true }
     },
     {
         versionKey: false

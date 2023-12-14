@@ -1,86 +1,42 @@
 import Book, { IBookModel } from './BookEntity';
-import mongoose from 'mongoose';
 import { injectable } from 'inversify';
-import { errorHandlerMiddleware } from '../../middleware/ErrorHandlerMiddleware';
-import { ClientSession } from 'mongoose';
-import { handleResponse } from '../../infrastructure/Response';
-import { Response } from 'express';
 
 @injectable()
 class BookRepository {
-    @errorHandlerMiddleware
-    async createBook(bookData: any, res: Response): Promise<any> {
-        const responseData = {
-            status: 201,
-            data: { ...bookData },
-            message: 'Book created successfully'
-        };
-
-        handleResponse(res, responseData.status, responseData.data, responseData.message);
-
-        if (typeof bookData.stock === 'object' && bookData.stock !== null) {
-            bookData.stock = bookData.stock.count;
-        }
-
-        const newBook = new Book(bookData);
-
+    async createBook(bookData: string): Promise<IBookModel> {
+        const newBook: IBookModel = new Book(bookData);
         return newBook.save();
     }
 
-    async findById(bookId: string): Promise<any> {
+    async findById(bookId: string): Promise<IBookModel | null> {
         return Book.findById(bookId);
     }
 
-    @errorHandlerMiddleware
-    async getAllBooks(res: Response): Promise<any> {
-        const books = await Book.find();
-
-        const responseData = {
-            status: 201,
-            data: { ...books },
-            message: 'Book listening successfully'
-        };
-
-        handleResponse(res, responseData.status, responseData.data, responseData.message);
-        return books;
-    }
-
-    @errorHandlerMiddleware
-    async updateBook(bookId: string, updatedData: any, res: Response): Promise<any> {
-        const updatedBook = await Book.findByIdAndUpdate(bookId, updatedData, { new: true });
-
-        const responseData = {
-            status: 200,
-            data: { ...updatedData },
-            message: 'Book updated successfully'
-        };
-
-        handleResponse(res, responseData.status, responseData.data, responseData.message);
+    async updateBook(bookId: string, updates: any): Promise<IBookModel | null> {
+        const updatedBook: IBookModel | null = await Book.findByIdAndUpdate(bookId, updates, { new: true });
+        if (!updatedBook) {
+            throw new Error('Book not found');
+        }
         return updatedBook;
     }
 
-    @errorHandlerMiddleware
-    async deleteBook(bookId: string, res: Response): Promise<void> {
-        await Book.findByIdAndDelete(bookId);
-
-        const responseData = {
-            status: 204,
-            data: null,
-            message: 'Book deleted successfully'
-        };
-
-        handleResponse(res, responseData.status, responseData.data, responseData.message);
+    async deleteBook(bookId: string): Promise<IBookModel | null> {
+        const deletedBook: IBookModel | null = await Book.findByIdAndDelete(bookId);
+        if (!deletedBook) {
+            throw new Error('Book not found');
+        }
+        return deletedBook;
     }
 
     async updateBookStatus(bookId: string, status: string): Promise<IBookModel | null> {
-        try {
-            const book = await Book.findByIdAndUpdate(bookId, { status }, { new: true });
+        const book: IBookModel | null = await Book.findByIdAndUpdate(bookId, { status }, { new: true });
+        return book;
+    }
 
-            return book;
-        } catch (error) {
-            console.error('Error updating book status:', error);
-            return null;
-        }
+    async getAllBooks(): Promise<IBookModel[]> {
+        const books: IBookModel[] = await Book.find();
+
+        return books;
     }
 }
 

@@ -18,8 +18,7 @@ class AuthService {
 
     constructor(@inject(AuthRepository) private authrepository: AuthRepository) {}
 
-    @errorHandlerMiddleware
-    async registerUser(name: string, email: string, password: string, res: Response): Promise<any> {
+    async registerUser(name: string, email: string, password: string): Promise<any> {
         const existingUser = await this.authrepository.findUserByEmail(email);
         if (existingUser) {
             throw new Error('User with this email already exists');
@@ -30,7 +29,6 @@ class AuthService {
         return user;
     }
 
-    @errorHandlerMiddleware
     async loginUser(email: string, password: string, res: Response): Promise<string> {
         const user = await this.authrepository.findUserByEmail(email);
 

@@ -11,7 +11,7 @@ export class MemberController {
     async addMember(req: Request, res: Response, next: NextFunction): Promise<void> {
         const { name, email } = req.body;
 
-        const addedMember = await this.memberApplicationService.addMember(name, email, res);
+        const addedMember = await this.memberApplicationService.addMember(name, email);
 
         handleResponse(res, 201, { member: addedMember }, 'Member added successfully 😊');
     }

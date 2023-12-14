@@ -37,8 +37,15 @@ export const Schema = {
     }),
     borrowBook: Joi.object({
         memberId: Joi.string().required(),
-        bookId: Joi.string().required()
+        bookId: Joi.string().required(),
+        dueDate: Joi.string()
+            .pattern(new RegExp(/^\d{2}\/\d{2}\/\d{4}$/))
+            .required()
+            .messages({
+                'string.pattern.base': 'Invalid date format. Please use Gün/Ay/Yıl format (e.g., 01/12/2023)'
+            })
     }),
+
     updateUser: Joi.object({
         userId: Joi.string().required(),
         name: Joi.string().required(),

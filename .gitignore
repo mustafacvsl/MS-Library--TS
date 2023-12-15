@@ -2,5 +2,5 @@
 *.js
 node_modules/
 config.ts
-readme.txt
+redme.txt
 

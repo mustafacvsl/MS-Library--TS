@@ -1,14 +1,10 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
 import { Response } from 'express';
-import { errorHandlerMiddleware } from '../../middleware/ErrorHandlerMiddleware';
 import { promisify } from 'util';
 const jwt = require('jsonwebtoken');
 import AuthRepository from './AuthRepository';
-
-import { handleResponse } from '../../infrastructure/Response';
 import { getConfig } from '../../infrastructure/config';
-
 const compareAsync = promisify(require('bcrypt').compare);
 const hashAsync = promisify(require('bcrypt').hash);
 
@@ -45,7 +41,7 @@ class AuthService {
             expiresIn: '1h'
         });
 
-        handleResponse(res, 200, { user, token }, 'Login successful');
+        return token;
 
         return token;
     }

@@ -1,13 +1,12 @@
 import AuthService from '../Domain/User/AuthService';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import { errorHandlerMiddleware } from '../middleware/ErrorHandlerMiddleware';
-import { Request, Response } from 'express';
-import TransactionHandler from '../middleware/TransactionManager';
+
+import { Response } from 'express';
 
 @injectable()
-export class AuthApplicationLayer {
-    constructor(@inject(AuthService) private authService: AuthService, @inject(TransactionHandler) private transactionhandler: TransactionHandler) {}
+export class AuthApplicationService {
+    constructor(@inject(AuthService) private authService: AuthService) {}
 
     async registerUser(name: string, email: string, password: string): Promise<void> {
         const user = await this.authService.registerUser(name, email, password);
@@ -20,4 +19,4 @@ export class AuthApplicationLayer {
     }
 }
 
-export default AuthApplicationLayer;
+export default AuthApplicationService;

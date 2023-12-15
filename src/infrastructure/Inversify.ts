@@ -1,25 +1,25 @@
 import { Container } from 'inversify';
-import AuthApplicationLayer from '../ApplicationService/AuthApplicationLayer';
 import { AuthController } from '../Controller/AuthController';
 import AuthService from '../Domain/User/AuthService';
 import AuthRepository from '../Domain/User/AuthRepository';
 import TransactionHandler from '../middleware/TransactionManager';
-import BookApplicationService from '../ApplicationService/BookApplicationLayer';
+import BookApplicationService from '../ApplicationService/BookApplicationService';
 import BookService from '../Domain/Book/BookService';
 import BookRepository from '../Domain/Book/BookRepository';
 import BookController from '../Controller/BookController';
-import { ExecutiveApplicationService } from '../ApplicationService/ExecutiveApplicationLayer';
+import { ExecutiveApplicationService } from '../ApplicationService/ExecutiveApplicationService';
 import ExecutiveService from '../Domain/Executive/ExecutiveService';
 import { ExecutiveRepository } from '../Domain/Executive/ExecutiveRepository ';
 import { ExecutiveController } from '../Controller/ExecutiveController';
-import { MemberApplicationService } from '../ApplicationService/MemberApplicationLayer';
+import { MemberApplicationService } from '../ApplicationService/MemberApplicationService';
 import MemberService from '../Domain/Member/MemberService';
 import MemberRepository from '../Domain/Member/MemberRepository';
 import { MemberController } from '../Controller/MemberController';
+import AuthApplicationService from '../ApplicationService/AuthApplicationService';
 
 const container = new Container();
 
-container.bind<AuthApplicationLayer>(AuthApplicationLayer).to(AuthApplicationLayer).inSingletonScope();
+container.bind<AuthApplicationService>(AuthApplicationService).to(AuthApplicationService).inSingletonScope();
 container.bind<AuthService>(AuthService).to(AuthService).inSingletonScope();
 container.bind<AuthRepository>(AuthRepository).to(AuthRepository).inSingletonScope();
 container.bind<TransactionHandler>(TransactionHandler).to(TransactionHandler).inSingletonScope();

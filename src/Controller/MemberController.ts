@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import { MemberApplicationService } from '../ApplicationService/MemberApplicationLayer';
-import { handleResponse } from '../infrastructure/Response';
+import { MemberApplicationService } from '../ApplicationService/MemberApplicationService';
+import { HandleResponse } from '../infrastructure/Response';
 
 @injectable()
 export class MemberController {
@@ -13,6 +13,6 @@ export class MemberController {
 
         const addedMember = await this.memberApplicationService.addMember(name, email);
 
-        handleResponse(res, 201, { member: addedMember }, 'Member added successfully 😊');
+        HandleResponse(res, 201, { member: addedMember }, 'Member added successfully 😊');
     }
 }

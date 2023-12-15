@@ -1,5 +1,4 @@
 import { inject, injectable } from 'inversify';
-
 import MemberRepository from './MemberRepository';
 import AuthRepository from '../User/AuthRepository';
 

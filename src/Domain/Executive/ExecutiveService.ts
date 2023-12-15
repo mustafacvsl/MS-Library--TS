@@ -1,7 +1,6 @@
 import { inject, injectable } from 'inversify';
-import AuthEntity, { IAuthorModel, IAuthor } from '../User/AuthEntity';
+import { IAuthorModel, IAuthor } from '../User/AuthEntity';
 import { ExecutiveRepository } from './ExecutiveRepository ';
-import { errorHandlerMiddleware } from '../../middleware/ErrorHandlerMiddleware';
 import MemberEntity from '../Member/MemberEntity';
 import BookEntity from '../Book/BookEntity';
 
@@ -19,6 +18,9 @@ class ExecutiveService {
         }
 
         return { borrowedBook, member, book };
+    }
+    async returnBook(loanedId: string): Promise<void> {
+        return this.executiverepository.returnBook(loanedId);
     }
 
     async listUsers(): Promise<IAuthorModel[]> {

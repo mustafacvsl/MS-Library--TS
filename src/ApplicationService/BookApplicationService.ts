@@ -1,17 +1,15 @@
 import BookService from '../Domain/Book/BookService';
 import TransactionHandler from '../middleware/TransactionManager';
 import { inject, injectable } from 'inversify';
-import { errorHandlerMiddleware } from '../middleware/ErrorHandlerMiddleware';
+
 import { IBookModel } from '../Domain/Book/BookEntity';
 
 @injectable()
 export class BookApplicationService {
     private bookService: BookService;
-    private transactionHandler: TransactionHandler;
 
-    constructor(@inject(BookService) bookService: BookService, @inject(TransactionHandler) transactionHandler: TransactionHandler) {
+    constructor(@inject(BookService) bookService: BookService) {
         this.bookService = bookService;
-        this.transactionHandler = transactionHandler;
     }
 
     async createBook(bookData: string): Promise<IBookModel> {

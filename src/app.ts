@@ -3,16 +3,14 @@ import http from 'http';
 import mongoose from 'mongoose';
 import { getConfig } from './infrastructure/config';
 import Logging from './infrastructure/Logging';
-import authorRoutes from './Routes/AuthRoutes';
+import authorRoutes, { route } from './Routes/AuthRoutes';
 import bookRoutes from './Routes/BookRoutes';
 import executiveRoutes from './Routes/ExecutiveRoutes';
 import memberRoutes from './Routes/MemberRoutes';
-const morgan = require('morgan');
+import { ErrorHandlerMiddleware } from './middleware/ErrorHandlerMiddleware';
 
 const router = express();
 const config = getConfig();
-
-router.use(morgan('dev'));
 
 mongoose
     .connect(config.mongo.url, { retryWrites: true, w: 'majority' })
@@ -51,6 +49,7 @@ const StartServer = () => {
         next();
     });
 
+    router.use(ErrorHandlerMiddleware);
     router.use('/authors', authorRoutes);
     router.use('/books', bookRoutes);
     router.use('/executive', executiveRoutes);

@@ -1,32 +1,35 @@
-import mongoose, { ClientSession, Types } from 'mongoose';
 import loanedEntity from '../Loaned/LoanedEntity';
-import AuthRepository from '../User/AuthRepository';
 import Book from '../Book/BookEntity';
 import AuthEntity, { IAuthorModel, IAuthor } from '../User/AuthEntity';
 import { injectable } from 'inversify';
+import ReturnedEntity from '../Returned/ReturnedEntity';
 
 @injectable()
 export class ExecutiveRepository {
-    private client: mongoose.Mongoose;
-    private databaseName: string;
-    private authrepository: AuthRepository;
-
-    constructor() {
-        this.client = mongoose;
-        this.databaseName = 'library';
-        this.authrepository = new AuthRepository();
-    }
+    constructor() {}
     async borrowBook(memberId: string, bookId: string, dueDate: Date): Promise<void> {
         const loaned = new loanedEntity({
             memberId,
             bookId,
-            dueDate
+            dueDate,
+            returnedDate: null
         });
         console.log(loaned);
 
         await loaned.save();
 
         await Book.findByIdAndUpdate(bookId, { status: 'Borrowed' }, {});
+    }
+
+    async returnBook(loanedId: string): Promise<void> {
+        const returned = new ReturnedEntity({
+            loanedId,
+            returnedDate: new Date()
+        });
+
+        await returned.save();
+
+        await Book.findByIdAndUpdate(Book, { status: 'Returned' }, {});
     }
 
     async listUsers(): Promise<IAuthorModel[]> {

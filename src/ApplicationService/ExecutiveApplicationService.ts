@@ -1,6 +1,5 @@
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
-import TransactionHandler from '../middleware/TransactionManager';
 import ExecutiveService from '../Domain/Executive/ExecutiveService';
 import AuthEntity, { IAuthorModel, IAuthor } from '../Domain/User/AuthEntity';
 

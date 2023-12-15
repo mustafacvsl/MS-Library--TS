@@ -1,5 +1,5 @@
 import BookService from '../Domain/Book/BookService';
-import TransactionHandler from '../middleware/TransactionManager';
+
 import { inject, injectable } from 'inversify';
 
 import { IBookModel } from '../Domain/Book/BookEntity';
@@ -14,7 +14,7 @@ export class BookApplicationService {
 
     async createBook(bookData: string): Promise<IBookModel> {
         const createdBook: IBookModel = await this.bookService.createBook(bookData);
-        console.log(bookData);
+
         return createdBook;
     }
 

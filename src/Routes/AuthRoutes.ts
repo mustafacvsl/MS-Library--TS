@@ -1,9 +1,13 @@
 import express from 'express';
 import { AuthController } from '../Controller/AuthController';
 import { JoiMiddleware, Schema } from '../middleware/JoiMiddleware';
-import { container } from '../infrastructure/Inversify';
+import configureContainer from '../infrastructure/Inversify';
 import { TransactionMiddleware } from '../middleware/TransactionMiddleware';
+import { Container } from 'inversify';
 const router = express.Router();
+
+const container = new Container();
+configureContainer(container);
 
 const authController = container.resolve<AuthController>(AuthController);
 

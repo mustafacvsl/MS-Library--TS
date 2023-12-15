@@ -8,9 +8,30 @@ import bookRoutes from './Routes/BookRoutes';
 import executiveRoutes from './Routes/ExecutiveRoutes';
 import memberRoutes from './Routes/MemberRoutes';
 import { ErrorHandlerMiddleware } from './middleware/ErrorHandlerMiddleware';
+import configureContainer from './infrastructure/Inversify';
+import { AuthController } from './Controller/AuthController';
+import BookController from './Controller/BookController';
+import ExecutiveController from './Controller/ExecutiveController';
+import { MemberController } from './Controller/MemberController';
+import { Container } from 'inversify';
+import bodyParser from 'body-parser';
 
 const router = express();
 const config = getConfig();
+const container = new Container();
+configureContainer(container);
+router.use(bodyParser.json());
+
+container.get<AuthController>(AuthController);
+container.get<BookController>(BookController);
+container.get<ExecutiveController>(ExecutiveController);
+container.get<MemberController>(MemberController);
+
+router.use(ErrorHandlerMiddleware);
+router.use('/authors', authorRoutes);
+router.use('/books', bookRoutes);
+router.use('/executive', executiveRoutes);
+router.use('/member', memberRoutes);
 
 mongoose
     .connect(config.mongo.url, { retryWrites: true, w: 'majority' })
@@ -48,12 +69,6 @@ const StartServer = () => {
 
         next();
     });
-
-    router.use(ErrorHandlerMiddleware);
-    router.use('/authors', authorRoutes);
-    router.use('/books', bookRoutes);
-    router.use('/executive', executiveRoutes);
-    router.use('/member', memberRoutes);
 
     router.use((req, res, next) => {
         const error = new Error('Not found');

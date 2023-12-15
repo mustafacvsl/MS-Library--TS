@@ -1,10 +1,14 @@
 import express from 'express';
 import { BookController } from '../Controller/BookController';
-import { container } from '../infrastructure/Inversify';
+import configureContainer from '../infrastructure/Inversify';
 import { TransactionMiddleware } from '../middleware/TransactionMiddleware';
 import { JoiMiddleware, Schema } from '../middleware/JoiMiddleware';
+import { Container } from 'inversify';
 
 const router = express.Router();
+
+const container = new Container();
+configureContainer(container);
 
 const bookController = container.resolve<BookController>(BookController);
 

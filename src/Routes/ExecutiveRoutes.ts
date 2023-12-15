@@ -1,9 +1,13 @@
 import express from 'express';
 import { JoiMiddleware, Schema } from '../middleware/JoiMiddleware';
-import { container } from '../infrastructure/Inversify';
+import configureContainer from '../infrastructure/Inversify';
 import { ExecutiveController } from '../Controller/ExecutiveController';
 import { TransactionMiddleware } from '../middleware/TransactionMiddleware';
+import { Container } from 'inversify';
 const router = express.Router();
+
+const container = new Container();
+configureContainer(container);
 const executivecontroller = container.resolve<ExecutiveController>(ExecutiveController);
 
 router.post('/borrow-book', TransactionMiddleware, JoiMiddleware(Schema.borrowBook), executivecontroller.borrowBook.bind(executivecontroller));

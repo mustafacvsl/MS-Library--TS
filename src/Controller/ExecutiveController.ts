@@ -10,20 +10,22 @@ export class ExecutiveController {
     borrowBook = async (req: Request, res: Response, next: NextFunction) => {
         const { memberId, bookId, dueDate } = req.body;
 
-        await this.executiveapplicationservice.borrowBook(memberId, bookId, dueDate);
-        HandleResponse(res, 201, null, 'Book borrowed successfully');
+        const loanedBook = await this.executiveapplicationservice.borrowBook(memberId, bookId, dueDate);
+
+        HandleResponse(res, 200, loanedBook, 'Book borrowed successfully');
+    };
+
+    returnBook = async (req: Request, res: Response, next: NextFunction) => {
+        const { loanedId, returnedDate } = req.body;
+
+        const returnedBook = await this.executiveapplicationservice.returnBook(loanedId, returnedDate);
+
+        HandleResponse(res, 200, returnedBook, 'Book returned successfully');
     };
 
     listUsers = async (req: Request, res: Response, next: NextFunction) => {
         const users = await this.executiveapplicationservice.listUsers();
         HandleResponse(res, 200, { users }, 'Users listed successfully');
-    };
-
-    returnBook = async (req: Request, res: Response, next: NextFunction) => {
-        const { loanedId } = req.body;
-
-        await this.executiveapplicationservice.returnBook(loanedId);
-        HandleResponse(res, 200, null, 'Book returned successfully');
     };
 
     updateUser = async (req: Request, res: Response, next: NextFunction) => {

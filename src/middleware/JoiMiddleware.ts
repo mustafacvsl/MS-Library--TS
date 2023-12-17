@@ -42,7 +42,7 @@ export const Schema = {
             .pattern(new RegExp(/^\d{2}\/\d{2}\/\d{4}$/))
             .required()
             .messages({
-                'string.pattern.base': 'Invalid date format. Please use Gün/Ay/Yıl format (e.g., 01/12/2023)'
+                'string.pattern.base': 'Invalid date format. Please use Day/Month/Year format (e.g., 01/12/2023)'
             })
     }),
 

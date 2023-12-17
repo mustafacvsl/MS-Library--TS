@@ -1,20 +1,19 @@
 import mongoose, { Document, Schema } from 'mongoose';
-
+import MemberEntity, { IMember } from '../Member/MemberEntity';
+import BookEntity, { IBook } from '../Book/BookEntity';
 export interface ILoaned {
-    memberId: string;
-    bookId: string;
+    memberId: IMember;
+    bookId: IBook;
     dueDate: Date;
-    returnedDate?: Date;
 }
 
 export interface ILoanedModel extends ILoaned, Document {}
 
 const LoanedSchema: Schema = new Schema(
     {
-        memberId: { type: Schema.Types.ObjectId, required: true, ref: 'Member' },
-        bookId: { type: Schema.Types.ObjectId, required: true, ref: 'Book' },
-        dueDate: { type: Date, required: true },
-        returnedDate: { type: Date }
+        memberId: { type: String, required: true, ref: 'Member' },
+        bookId: { type: String, required: true, ref: 'Book' },
+        dueDate: { type: Date, required: true }
     },
     {
         versionKey: false

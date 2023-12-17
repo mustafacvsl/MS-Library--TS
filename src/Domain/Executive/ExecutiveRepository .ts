@@ -1,35 +1,23 @@
-import loanedEntity from '../Loaned/LoanedEntity';
-import Book from '../Book/BookEntity';
+import LoanedEntity, { ILoaned, ILoanedModel } from '../Loaned/LoanedEntity';
 import AuthEntity, { IAuthorModel, IAuthor } from '../User/AuthEntity';
 import { injectable } from 'inversify';
-import ReturnedEntity from '../Returned/ReturnedEntity';
+import BookEntity from '../Book/BookEntity';
+import ReturnedEntity, { IReturnedModel } from '../Returned/ReturnedEntity';
+import MemberEntity from '../Member/MemberEntity';
 
 @injectable()
 export class ExecutiveRepository {
     constructor() {}
-    async borrowBook(memberId: string, bookId: string, dueDate: Date): Promise<void> {
-        const loaned = new loanedEntity({
-            memberId,
-            bookId,
-            dueDate,
-            returnedDate: null
-        });
-        console.log(loaned);
-
-        await loaned.save();
-
-        await Book.findByIdAndUpdate(bookId, { status: 'Borrowed' }, {});
-    }
-
-    async returnBook(loanedId: string): Promise<void> {
-        const returned = new ReturnedEntity({
-            loanedId,
-            returnedDate: new Date()
+    async borrowBook(memberId: string, bookId: string, dueDate: string): Promise<ILoanedModel | null> {
+        const newLoan = new LoanedEntity({
+            memberId: memberId,
+            bookId: bookId,
+            dueDate: new Date(dueDate)
         });
 
-        await returned.save();
+        const savedLoan = await newLoan.save();
 
-        await Book.findByIdAndUpdate(Book, { status: 'Returned' }, {});
+        return savedLoan;
     }
 
     async listUsers(): Promise<IAuthorModel[]> {
@@ -46,5 +34,15 @@ export class ExecutiveRepository {
 
     async deleteUser(userId: string): Promise<void> {
         await AuthEntity.findByIdAndDelete(userId);
+    }
+
+    async returnBook(loanedId: string, returnedDate: string): Promise<IReturnedModel | null> {
+        const returnedEntity = new ReturnedEntity({
+            loanedId: loanedId,
+            returnedDate: new Date(returnedDate)
+        });
+
+        const savedReturned = await returnedEntity.save();
+        return savedReturned;
     }
 }

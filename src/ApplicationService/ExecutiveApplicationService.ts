@@ -22,8 +22,9 @@ export class ExecutiveApplicationService {
         return this.executiveservice.listUsers();
     }
 
-    async updateUser(userId: string, updateData: Partial<IAuthor>): Promise<IAuthorModel | null> {
-        return this.executiveservice.updateUser(userId, updateData);
+    async updateUser(userId: string, updates: any): Promise<IAuthorModel | null> {
+        const updatedBook: IAuthorModel | null = await this.executiveservice.updateUser(userId, updates);
+        return updatedBook;
     }
 
     async deleteUser(userId: string): Promise<void> {

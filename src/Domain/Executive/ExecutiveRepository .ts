@@ -26,10 +26,12 @@ export class ExecutiveRepository {
         return users;
     }
 
-    async updateUser(userId: string, updateData: Partial<IAuthor>): Promise<IAuthorModel | null> {
-        const user = await AuthEntity.findByIdAndUpdate(userId, updateData, { new: true });
-
-        return user;
+    async updateUser(userId: string, updates: any): Promise<IAuthorModel | null> {
+        const updatedUser: IAuthorModel | null = await AuthEntity.findByIdAndUpdate(userId, updates, { new: true });
+        if (!updatedUser) {
+            throw new Error('user not found');
+        }
+        return updatedUser;
     }
 
     async deleteUser(userId: string): Promise<void> {
@@ -44,16 +46,5 @@ export class ExecutiveRepository {
 
         const savedReturned = await returnedEntity.save();
         return savedReturned;
-    }
-
-    async updateStock(bookId: string, countChange: number): Promise<void> {
-        const book = await BookEntity.findById(bookId);
-        if (!book) {
-            throw new Error('Book not found');
-        }
-
-        const newStockCount = book.stock.count + countChange;
-
-        await BookEntity.findByIdAndUpdate(bookId, { 'stock.count': newStockCount });
     }
 }

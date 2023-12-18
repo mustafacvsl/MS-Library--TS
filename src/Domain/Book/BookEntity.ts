@@ -17,7 +17,7 @@ const BookSchema: Schema = new Schema(
     {
         title: { type: String, required: true },
         author: { type: String, required: true },
-        stock: { type: String, ref: 'Stock', required: true },
+        stock: { type: Number, ref: 'Stock', required: true },
         location: {
             corridor: { type: String, required: true },
             shelf: { type: String, required: true },

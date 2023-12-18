@@ -28,10 +28,11 @@ export class ExecutiveController {
         HandleResponse(res, 200, { users }, 'Users listed successfully');
     };
 
-    updateUser = async (req: Request, res: Response, next: NextFunction) => {
-        const { userId, updateData } = req.body;
-        const updatedUser = await this.executiveapplicationservice.updateUser(userId, updateData);
-        HandleResponse(res, 200, updatedUser, 'User updated successfully');
+    updateUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+        const { userId } = req.params;
+        const updates: any = req.body;
+        const updatedUser: any = await this.executiveapplicationservice.updateUser(userId, updates);
+        HandleResponse(res, 200, { user: updatedUser }, 'user updated successfully');
     };
 
     deleteUser = async (req: Request, res: Response, next: NextFunction) => {

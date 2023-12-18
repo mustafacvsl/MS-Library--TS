@@ -5,16 +5,15 @@ import MemberEntity from '../Member/MemberEntity';
 import ReturnedEntity, { IReturnedModel } from '../Returned/ReturnedEntity';
 import BookEntity from '../Book/BookEntity';
 import LoanedEntity from '../Loaned/LoanedEntity';
-import StockService from '../BookStock/StockService';
 
-const FINE_RATE_PER_DAY = 5;
+const Penalties = 5;
 
 @injectable()
 class ExecutiveService {
-    constructor(@inject(ExecutiveRepository) private executiverepository: ExecutiveRepository, @inject(StockService) private stockservice: StockService) {}
+    constructor(@inject(ExecutiveRepository) private executiverepository: ExecutiveRepository) {}
     async borrowBook(memberId: string, bookId: string, dueDate: string): Promise<any> {
         const borrowedBook = await this.executiverepository.borrowBook(memberId, bookId, dueDate);
-        await this.stockservice.decreaseStock(bookId);
+
         const member = await MemberEntity.findById(memberId);
         const book = await BookEntity.findById(bookId);
 
@@ -39,7 +38,7 @@ class ExecutiveService {
                 return returnedBook;
             } else {
                 const memberId = loanedInfo?.memberId;
-                const fineAmount = daysDifference * FINE_RATE_PER_DAY;
+                const fineAmount = daysDifference * Penalties;
 
                 await MemberEntity.findByIdAndUpdate(memberId, { $inc: { fineAmount: fineAmount } });
 
@@ -54,8 +53,8 @@ class ExecutiveService {
         return this.executiverepository.listUsers();
     }
 
-    async updateUser(userId: string, updateData: Partial<IAuthor>): Promise<IAuthorModel | null> {
-        return this.executiverepository.updateUser(userId, updateData);
+    async updateUser(userId: string, updates: any): Promise<IAuthorModel | null> {
+        return this.executiverepository.updateUser(userId, updates);
     }
 
     async deleteUser(userId: string): Promise<void> {

@@ -31,7 +31,6 @@ export class ExecutiveController {
     updateUser = async (req: Request, res: Response, next: NextFunction) => {
         const { userId, updateData } = req.body;
         const updatedUser = await this.executiveapplicationservice.updateUser(userId, updateData);
-        console.log(updatedUser);
         HandleResponse(res, 200, updatedUser, 'User updated successfully');
     };
 

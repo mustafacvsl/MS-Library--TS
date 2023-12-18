@@ -15,6 +15,7 @@ import MemberService from '../Domain/Member/MemberService';
 import MemberRepository from '../Domain/Member/MemberRepository';
 import { MemberController } from '../Controller/MemberController';
 import AuthApplicationService from '../ApplicationService/AuthApplicationService';
+import StockService from '../Domain/BookStock/StockService';
 
 const configureContainer = (container: Container) => {
     container.bind<AuthApplicationService>(AuthApplicationService).to(AuthApplicationService).inSingletonScope();
@@ -34,6 +35,7 @@ const configureContainer = (container: Container) => {
     container.bind<ExecutiveService>(ExecutiveService).to(ExecutiveService).inSingletonScope();
     container.bind<ExecutiveRepository>(ExecutiveRepository).to(ExecutiveRepository).inSingletonScope();
     container.bind<ExecutiveController>(ExecutiveController).to(ExecutiveController).inSingletonScope();
+    container.bind<StockService>(StockService).to(StockService).inSingletonScope();
 
     //? Member container
 

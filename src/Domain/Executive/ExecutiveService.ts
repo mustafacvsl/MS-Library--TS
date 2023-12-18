@@ -5,14 +5,16 @@ import MemberEntity from '../Member/MemberEntity';
 import ReturnedEntity, { IReturnedModel } from '../Returned/ReturnedEntity';
 import BookEntity from '../Book/BookEntity';
 import LoanedEntity from '../Loaned/LoanedEntity';
+import StockService from '../BookStock/StockService';
 
-const FINE_RATE_PER_DAY = 0.5;
+const FINE_RATE_PER_DAY = 5;
 
 @injectable()
 class ExecutiveService {
-    constructor(@inject(ExecutiveRepository) private executiverepository: ExecutiveRepository) {}
+    constructor(@inject(ExecutiveRepository) private executiverepository: ExecutiveRepository, @inject(StockService) private stockservice: StockService) {}
     async borrowBook(memberId: string, bookId: string, dueDate: string): Promise<any> {
         const borrowedBook = await this.executiverepository.borrowBook(memberId, bookId, dueDate);
+        await this.stockservice.decreaseStock(bookId);
         const member = await MemberEntity.findById(memberId);
         const book = await BookEntity.findById(bookId);
 
@@ -21,18 +23,6 @@ class ExecutiveService {
         }
 
         return { borrowedBook, member, book };
-    }
-
-    async listUsers(): Promise<IAuthorModel[]> {
-        return this.executiverepository.listUsers();
-    }
-
-    async updateUser(userId: string, updateData: Partial<IAuthor>): Promise<IAuthorModel | null> {
-        return this.executiverepository.updateUser(userId, updateData);
-    }
-
-    async deleteUser(userId: string): Promise<void> {
-        return this.executiverepository.deleteUser(userId);
     }
 
     async returnBook(loanedId: string, returnedDate: string): Promise<IReturnedModel | null> {
@@ -58,6 +48,18 @@ class ExecutiveService {
         } else {
             throw new Error(`Loan information not found.`);
         }
+    }
+
+    async listUsers(): Promise<IAuthorModel[]> {
+        return this.executiverepository.listUsers();
+    }
+
+    async updateUser(userId: string, updateData: Partial<IAuthor>): Promise<IAuthorModel | null> {
+        return this.executiverepository.updateUser(userId, updateData);
+    }
+
+    async deleteUser(userId: string): Promise<void> {
+        return this.executiverepository.deleteUser(userId);
     }
 }
 

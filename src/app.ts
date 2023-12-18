@@ -3,7 +3,7 @@ import http from 'http';
 import mongoose from 'mongoose';
 import { getConfig } from './infrastructure/config';
 import Logging from './infrastructure/Logging';
-import authorRoutes, { route } from './Routes/AuthRoutes';
+import authorRoutes from './Routes/AuthRoutes';
 import bookRoutes from './Routes/BookRoutes';
 import executiveRoutes from './Routes/ExecutiveRoutes';
 import memberRoutes from './Routes/MemberRoutes';

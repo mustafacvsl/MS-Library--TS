@@ -45,4 +45,15 @@ export class ExecutiveRepository {
         const savedReturned = await returnedEntity.save();
         return savedReturned;
     }
+
+    async updateStock(bookId: string, countChange: number): Promise<void> {
+        const book = await BookEntity.findById(bookId);
+        if (!book) {
+            throw new Error('Book not found');
+        }
+
+        const newStockCount = book.stock.count + countChange;
+
+        await BookEntity.findByIdAndUpdate(bookId, { 'stock.count': newStockCount });
+    }
 }

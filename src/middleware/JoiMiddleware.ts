@@ -28,7 +28,7 @@ export const Schema = {
     createBook: Joi.object({
         title: Joi.string().required(),
         author: Joi.string().required(),
-        stock: Joi.string().required(),
+        stock: Joi.number().required(),
         location: Joi.object().required()
     }),
     memberCreate: Joi.object({

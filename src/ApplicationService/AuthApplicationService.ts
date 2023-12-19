@@ -9,13 +9,11 @@ export class AuthApplicationService {
     constructor(@inject(AuthService) private authService: AuthService) {}
 
     async registerUser(name: string, email: string, password: string): Promise<void> {
-        const user = await this.authService.registerUser(name, email, password);
-        return user;
+        return this.authService.registerUser(name, email, password);
     }
 
     async loginUser(email: string, password: string, res: Response): Promise<string> {
-        const token = await this.authService.loginUser(email, password, res);
-        return token;
+        return this.authService.loginUser(email, password, res);
     }
 }
 

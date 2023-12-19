@@ -1,12 +1,10 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import Stock, { IStock } from '../BookStock/Stock.entity';
-import BookLocation, { IBookLocation } from '../BookLocation/BookLocation';
-import { number, string } from 'joi';
+import { IBookLocation } from '../BookLocation/BookLocation';
 
 export interface IBook {
     title: string;
     author: string;
-    stock: IStock;
+    stock: number;
     location: IBookLocation;
     status: string;
 }

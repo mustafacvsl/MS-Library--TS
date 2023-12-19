@@ -28,15 +28,15 @@ class BookRepository {
         return deletedBook;
     }
 
-    async updateBookStatus(bookId: string, status: string): Promise<IBookModel | null> {
-        const book: IBookModel | null = await Book.findByIdAndUpdate(bookId, { status }, { new: true });
-        return book;
-    }
-
     async getAllBooks(): Promise<IBookModel[]> {
         const books: IBookModel[] = await Book.find();
 
         return books;
+    }
+
+    async updateBookStatus(bookId: string, status: string): Promise<IBookModel | null> {
+        const book: IBookModel | null = await Book.findByIdAndUpdate(bookId, { status }, { new: true });
+        return book;
     }
 }
 

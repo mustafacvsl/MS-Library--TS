@@ -13,19 +13,15 @@ export class BookApplicationService {
     }
 
     async createBook(bookData: string): Promise<IBookModel> {
-        const createdBook: IBookModel = await this.bookService.createBook(bookData);
-
-        return createdBook;
+        return this.bookService.createBook(bookData);
     }
 
     async updateBook(bookId: string, updates: any): Promise<IBookModel | null> {
-        const updatedBook: IBookModel | null = await this.bookService.updateBook(bookId, updates);
-        return updatedBook;
+        return this.bookService.updateBook(bookId, updates);
     }
 
     async deleteBook(bookId: string): Promise<IBookModel | null> {
-        const deletedBook: IBookModel | null = await this.bookService.deleteBook(bookId);
-        return deletedBook;
+        return this.bookService.deleteBook(bookId);
     }
 
     async getAllBooks(): Promise<IBookModel[]> {

@@ -1,9 +1,8 @@
 import LoanedEntity, { ILoaned, ILoanedModel } from '../Loaned/LoanedEntity';
 import AuthEntity, { IAuthorModel, IAuthor } from '../User/AuthEntity';
-import { injectable } from 'inversify';
-import BookEntity from '../Book/BookEntity';
+import { injectable, inject } from 'inversify';
 import ReturnedEntity, { IReturnedModel } from '../Returned/ReturnedEntity';
-import MemberEntity from '../Member/MemberEntity';
+import BookRepository from '../Book/BookRepository';
 
 @injectable()
 export class ExecutiveRepository {

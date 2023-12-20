@@ -3,9 +3,9 @@ import { injectable } from 'inversify';
 
 @injectable()
 class BookLocationRepository {
-    async getBookLocations(): Promise<IBookLocationModel[]> {
-        const bookLocations: IBookLocationModel[] = await BookLocation.find();
-        return bookLocations;
+    async createBookLocation(locationDetails: { corridor: string; shelf: string; cupboard: string }): Promise<IBookLocationModel> {
+        const newBookLocation: IBookLocationModel = new BookLocation(locationDetails);
+        return newBookLocation.save();
     }
 }
 

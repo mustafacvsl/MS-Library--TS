@@ -1,7 +1,8 @@
 import BookRepository from './BookRepository';
 import { inject, injectable } from 'inversify';
 import { IBookModel } from './BookEntity';
-
+import StockEntity, { IStockModel } from '../BookStock/Stock.entity';
+import BookLocation, { IBookLocationModel } from '../BookLocation/BookLocation';
 @injectable()
 export class BookService {
     private bookRepository: BookRepository;

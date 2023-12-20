@@ -15,7 +15,8 @@ import MemberService from '../Domain/Member/MemberService';
 import MemberRepository from '../Domain/Member/MemberRepository';
 import { MemberController } from '../Controller/MemberController';
 import AuthApplicationService from '../ApplicationService/AuthApplicationService';
-
+import StockController from '../Controller/StockController';
+import BookLocationController from '../Controller/LocationController';
 const configureContainer = (container: Container) => {
     container.bind<AuthApplicationService>(AuthApplicationService).to(AuthApplicationService).inSingletonScope();
     container.bind<AuthService>(AuthService).to(AuthService).inSingletonScope();
@@ -23,6 +24,8 @@ const configureContainer = (container: Container) => {
     container.bind<AuthController>(AuthController).to(AuthController).inSingletonScope();
     //!Book container
 
+    container.bind<StockController>(StockController).to(StockController).inSingletonScope();
+    container.bind<BookLocationController>(BookLocationController).to(BookLocationController).inSingletonScope();
     container.bind<BookApplicationService>(BookApplicationService).to(BookApplicationService).inSingletonScope();
     container.bind<BookService>(BookService).to(BookService).inSingletonScope();
     container.bind<BookRepository>(BookRepository).to(BookRepository).inSingletonScope();

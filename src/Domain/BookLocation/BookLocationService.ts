@@ -10,8 +10,8 @@ export class BookLocationService {
         this.bookLocationRepository = bookLocationRepository;
     }
 
-    async getBookLocations(): Promise<IBookLocationModel[]> {
-        return this.bookLocationRepository.getBookLocations();
+    async createBookLocation(locationDetails: { corridor: string; shelf: string; cupboard: string }): Promise<IBookLocationModel | null> {
+        return this.bookLocationRepository.createBookLocation(locationDetails);
     }
 }
 

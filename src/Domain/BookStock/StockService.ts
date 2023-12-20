@@ -10,8 +10,8 @@ export class StockService {
         this.stockRepository = stockRepository;
     }
 
-    async getStock(): Promise<IStockModel[]> {
-        return this.stockRepository.getStock();
+    async createStock(count: number): Promise<IStockModel | null> {
+        return this.stockRepository.createStock({ count });
     }
 }
 

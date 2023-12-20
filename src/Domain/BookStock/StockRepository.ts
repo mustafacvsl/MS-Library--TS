@@ -3,9 +3,9 @@ import { injectable } from 'inversify';
 
 @injectable()
 class StockRepository {
-    async getStock(): Promise<IStockModel[]> {
-        const stock: IStockModel[] = await StockEntity.find();
-        return stock;
+    async createStock(stockData: { count: number }): Promise<IStockModel> {
+        const newStock: IStockModel = new StockEntity(stockData);
+        return newStock.save();
     }
 }
 

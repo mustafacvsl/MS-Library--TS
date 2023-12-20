@@ -15,17 +15,13 @@ class AuthService {
     constructor(@inject(AuthRepository) private authrepository: AuthRepository) {}
 
     async registerUser(name: string, email: string, password: string): Promise<any> {
-        const existingUser = await this.authrepository.findUserByEmail(email);
-        if (existingUser) {
-            throw new Error('User with this email already exists');
-        }
         const hashedPassword = await hashAsync(password + 'password:password' + name, 10);
         const user = await this.authrepository.registerUser(name, email, hashedPassword);
 
         return user;
     }
 
-    async loginUser(email: string, password: string, res: Response): Promise<string> {
+    async loginUser(email: string, password: string): Promise<string> {
         const user = await this.authrepository.findUserByEmail(email);
 
         if (!user) {
@@ -40,8 +36,6 @@ class AuthService {
         const token = jwt.sign({ userId: user._id, email: user.email }, this.config.auth.secretKey, {
             expiresIn: '1h'
         });
-
-        return token;
 
         return token;
     }

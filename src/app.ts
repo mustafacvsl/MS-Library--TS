@@ -27,11 +27,11 @@ container.get<BookController>(BookController);
 container.get<ExecutiveController>(ExecutiveController);
 container.get<MemberController>(MemberController);
 
-router.use(ErrorHandlerMiddleware);
 router.use('/authors', authorRoutes);
 router.use('/books', bookRoutes);
 router.use('/executive', executiveRoutes);
 router.use('/member', memberRoutes);
+router.use(ErrorHandlerMiddleware);
 
 mongoose
     .connect(config.mongo.url, { retryWrites: true, w: 'majority' })

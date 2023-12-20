@@ -3,7 +3,7 @@ import { injectable } from 'inversify';
 
 @injectable()
 class BookRepository {
-    async createBook(bookData: string): Promise<IBookModel> {
+    async createBook(bookData: any): Promise<IBookModel> {
         const newBook: IBookModel = new Book(bookData);
         return newBook.save();
     }

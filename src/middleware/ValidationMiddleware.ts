@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import Joi, { ObjectSchema } from 'joi';
 
-export const JoiMiddleware = (schema: ObjectSchema) => {
+export const ValidationMiddleware = (schema: ObjectSchema) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         try {
             await schema.validateAsync(req.body);

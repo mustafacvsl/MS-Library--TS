@@ -7,9 +7,7 @@ import { IReturnedModel } from '../Returned/ReturnedEntity';
 class ExecutiveService {
     constructor(@inject(ExecutiveRepository) private executiverepository: ExecutiveRepository) {}
     async borrowBook(memberId: string, bookId: string, dueDate: string): Promise<any> {
-        const borrowedBook = await this.executiverepository.borrowBook(memberId, bookId, dueDate);
-
-        return { borrowedBook };
+        return this.executiverepository.borrowBook(memberId, bookId, dueDate);
     }
 
     async returnBook(loanedId: string, returnedDate: string): Promise<IReturnedModel | null> {

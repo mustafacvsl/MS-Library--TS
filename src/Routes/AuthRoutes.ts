@@ -1,6 +1,6 @@
 import express from 'express';
 import { AuthController } from '../Controller/AuthController';
-import { JoiMiddleware, Schema } from '../middleware/JoiMiddleware';
+import { ValidationMiddleware, Schema } from '../middleware/ValidationMiddleware';
 import configureContainer from '../infrastructure/Inversify';
 import { TransactionMiddleware } from '../middleware/TransactionMiddleware';
 import { Container } from 'inversify';
@@ -11,7 +11,7 @@ configureContainer(container);
 
 const authController = container.resolve<AuthController>(AuthController);
 
-router.post('/register', TransactionMiddleware, JoiMiddleware(Schema.register), authController.register.bind(authController));
-router.post('/login', JoiMiddleware(Schema.login), authController.login.bind(authController));
+router.post('/register', TransactionMiddleware, ValidationMiddleware(Schema.register), authController.register.bind(authController));
+router.post('/login', ValidationMiddleware(Schema.login), authController.login.bind(authController));
 
 export = router;

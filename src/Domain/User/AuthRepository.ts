@@ -12,10 +12,6 @@ class AuthRepository {
         return user.save();
     }
 
-    async getAllBooks(): Promise<IAuthorModel[]> {
-        return AuthEntity.find({}).exec();
-    }
-
     async findUserById(userId: string): Promise<IAuthorModel | null> {
         return AuthEntity.findById(userId).exec();
     }

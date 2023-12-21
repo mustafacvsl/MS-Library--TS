@@ -1,10 +1,11 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import { IBookLocation } from '../BookLocation/BookLocation';
+import { IBookLocation } from '../BookLocation/LocationEntity';
+import { IStock } from '../BookStock/Stock.entity';
 
 export interface IBook {
     title: string;
     author: string;
-    stock: number;
+    stock: IStock;
     location: IBookLocation;
     status: string;
 }
@@ -15,7 +16,9 @@ const BookSchema: Schema = new Schema(
     {
         title: { type: String, required: true },
         author: { type: String, required: true },
-        stock: { type: Number, ref: 'Stock', required: true },
+        stock: {
+            count: { type: Number, required: true }
+        },
         location: {
             corridor: { type: String, required: true },
             shelf: { type: String, required: true },

@@ -12,11 +12,12 @@ export class BookController {
     }
 
     createBook = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-        const bookData: string = req.body;
+        const bookData: any = req.body;
+
         const createdBook: any = await this.bookApplicationservice.createBook(bookData);
+
         HandleResponse(res, 201, { book: createdBook }, 'Book created successfully');
     };
-
     updateBook = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         const { bookId } = req.params;
         const updates: any = req.body;

@@ -28,8 +28,14 @@ export const Schema = {
     createBook: Joi.object({
         title: Joi.string().required(),
         author: Joi.string().required(),
-        stock: Joi.number().required(),
-        location: Joi.object().required()
+        stock: Joi.object({
+            count: Joi.number().required()
+        }).required(),
+        location: Joi.object({
+            corridor: Joi.string().required(),
+            shelf: Joi.string().required(),
+            cupboard: Joi.string().required()
+        }).required()
     }),
     memberCreate: Joi.object({
         name: Joi.string().required(),

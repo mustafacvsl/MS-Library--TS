@@ -8,13 +8,20 @@ import MemberEntity from '../Domain/Member/MemberEntity';
 import BookEntity from '../Domain/Book/BookEntity';
 import BookRepository from '../Domain/Book/BookRepository';
 import LoanedEntity from '../Domain/Loaned/LoanedEntity';
+import LoanedService from '../Domain/Loaned/LoanedService';
+import ReturnedService from '../Domain/Returned/ReturnedService';
 import { Result } from '../infrastructure/Result';
 
 const Penalties = 5;
 
 @injectable()
 export class ExecutiveApplicationService {
-    constructor(@inject(ExecutiveService) private executiveservice: ExecutiveService, @inject(BookRepository) private bookRepository: BookRepository) {}
+    constructor(
+        @inject(ExecutiveService) private executiveservice: ExecutiveService,
+        @inject(BookRepository) private bookRepository: BookRepository,
+        @inject(LoanedService) private loanedService: LoanedService,
+        @inject(ReturnedService) private returnedService: ReturnedService
+    ) {}
 
     async borrowBook(memberId: string, bookId: string, dueDate: string): Promise<Result<ILoanedModel | null>> {
         const member = await MemberEntity.findById(memberId);
@@ -30,7 +37,14 @@ export class ExecutiveApplicationService {
         }
 
         await this.bookRepository.updateBookStatus(bookId, 'Borrowed');
-        return this.executiveservice.borrowBook(memberId, bookId, dueDate);
+
+        const loanedData = {
+            memberId: memberId,
+            bookId: bookId,
+            dueDate: new Date(dueDate)
+        };
+
+        return this.loanedService.createLoaned(loanedData);
     }
 
     async returnBook(loanedId: string, returnedDate: string): Promise<Result<IReturnedModel | null>> {
@@ -59,12 +73,12 @@ export class ExecutiveApplicationService {
 
         await MemberEntity.findByIdAndUpdate(memberId, { $inc: { fineAmount: fineAmount } });
 
-        return {
-            success: false,
-            error: {
-                message: 'Book returned late! Fine applied. Please pay your debts.'
-            }
+        const returnedData = {
+            loanedId: loanedId,
+            returnedDate: new Date(returnedDate)
         };
+
+        return this.returnedService.createReturned(returnedData);
     }
 
     async listUsers(): Promise<IAuthorModel[]> {

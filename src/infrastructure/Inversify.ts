@@ -19,6 +19,10 @@ import StockService from '../Domain/BookStock/StockService';
 import StockRepository from '../Domain/BookStock/StockRepository';
 import LocationService from '../Domain/BookLocation/LocationService';
 import LocationRepository from '../Domain/BookLocation/LocationRepository';
+import LoanedService from '../Domain/Loaned/LoanedService';
+import ReturnedService from '../Domain/Returned/ReturnedService';
+import LoanedRepository from '../Domain/Loaned/LoanedRepository';
+import ReturnedRepository from '../Domain/Returned/ReturnedRepository';
 
 const configureContainer = (container: Container) => {
     container.bind<AuthApplicationService>(AuthApplicationService).to(AuthApplicationService).inSingletonScope();
@@ -44,7 +48,10 @@ const configureContainer = (container: Container) => {
     container.bind<ExecutiveController>(ExecutiveController).to(ExecutiveController).inSingletonScope();
 
     //? Member container
-
+    container.bind<LoanedService>(LoanedService).to(LoanedService).inSingletonScope();
+    container.bind<LoanedRepository>(LoanedRepository).to(LoanedRepository).inSingletonScope();
+    container.bind<ReturnedService>(ReturnedService).to(ReturnedService).inSingletonScope();
+    container.bind<ReturnedRepository>(ReturnedRepository).to(ReturnedRepository).inSingletonScope();
     container.bind<MemberApplicationService>(MemberApplicationService).to(MemberApplicationService).inSingletonScope();
     container.bind<MemberService>(MemberService).to(MemberService).inSingletonScope();
     container.bind<MemberRepository>(MemberRepository).to(MemberRepository).inSingletonScope();

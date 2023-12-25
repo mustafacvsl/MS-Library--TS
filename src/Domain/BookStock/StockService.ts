@@ -1,6 +1,7 @@
 import StockRepository from './StockRepository';
 import { inject, injectable } from 'inversify';
-import StockEntity, { IStockModel } from './Stock.entity';
+import { IStockModel } from './StockEntity';
+import Book, { IBookModel } from '../Book/BookEntity';
 
 @injectable()
 export class StockService {
@@ -10,8 +11,14 @@ export class StockService {
         this.stockRepository = stockRepository;
     }
 
-    async createStock(stockData: any): Promise<IStockModel> {
+    async createStock(stockData: string): Promise<IStockModel> {
         return this.stockRepository.createStock(stockData);
+    }
+
+    async updateStock(bookId: string, count: number): Promise<IBookModel | null> {
+        const updatedBook = await Book.findByIdAndUpdate(bookId, { $inc: { 'stock.count': count } }, { new: true });
+
+        return updatedBook;
     }
 }
 

@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema } from 'mongoose';
 import { IBookLocation } from '../BookLocation/LocationEntity';
-import { IStock } from '../BookStock/Stock.entity';
+import { IStock } from '../BookStock/StockEntity';
 
 export interface IBook {
     title: string;

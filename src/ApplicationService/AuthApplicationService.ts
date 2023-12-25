@@ -22,7 +22,7 @@ export class AuthApplicationService {
         }
     }
 
-    async loginUser(email: string, password: string, res: Response): Promise<string> {
+    async loginUser(email: string, password: string, res: Response): Promise<Result<string>> {
         return this.authService.loginUser(email, password);
     }
 }

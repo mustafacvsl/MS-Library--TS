@@ -11,6 +11,8 @@ import LoanedEntity from '../Domain/Loaned/LoanedEntity';
 import LoanedService from '../Domain/Loaned/LoanedService';
 import ReturnedService from '../Domain/Returned/ReturnedService';
 import { Result } from '../infrastructure/Result';
+import StockService from '../Domain/BookStock/StockService';
+import mongoose, { ObjectId } from 'mongoose';
 
 const Penalties = 5;
 
@@ -20,7 +22,8 @@ export class ExecutiveApplicationService {
         @inject(ExecutiveService) private executiveservice: ExecutiveService,
         @inject(BookRepository) private bookRepository: BookRepository,
         @inject(LoanedService) private loanedService: LoanedService,
-        @inject(ReturnedService) private returnedService: ReturnedService
+        @inject(ReturnedService) private returnedService: ReturnedService,
+        @inject(StockService) private stockservice: StockService
     ) {}
 
     async borrowBook(memberId: string, bookId: string, dueDate: string): Promise<Result<ILoanedModel | null>> {
@@ -35,6 +38,8 @@ export class ExecutiveApplicationService {
                 }
             };
         }
+
+        await this.stockservice.updateStock(bookId, -1);
 
         await this.bookRepository.updateBookStatus(bookId, 'Borrowed');
 
@@ -72,6 +77,11 @@ export class ExecutiveApplicationService {
         const fineAmount = daysDifference * Penalties;
 
         await MemberEntity.findByIdAndUpdate(memberId, { $inc: { fineAmount: fineAmount } });
+        const bookId: string | undefined = loanedInfo?.bookId?.toString();
+
+        if (bookId) {
+            await this.stockservice.updateStock(bookId, 1);
+        }
 
         const returnedData = {
             loanedId: loanedId,

@@ -7,6 +7,7 @@ import AuthRepository from './AuthRepository';
 import { getConfig } from '../../infrastructure/config';
 const compareAsync = promisify(require('bcrypt').compare);
 const hashAsync = promisify(require('bcrypt').hash);
+import { Result } from '../../infrastructure/Result';
 
 @injectable()
 class AuthService {
@@ -21,16 +22,26 @@ class AuthService {
         return user;
     }
 
-    async loginUser(email: string, password: string): Promise<string> {
+    async loginUser(email: string, password: string): Promise<Result<string>> {
         const user = await this.authrepository.findUserByEmail(email);
 
         if (!user) {
-            throw new Error('User not found');
+            return {
+                success: false,
+                error: {
+                    message: 'User not found'
+                }
+            };
         }
 
         const isPasswordValid = await compareAsync(password + 'password:password' + user.name, user.password);
         if (!isPasswordValid) {
-            throw new Error('Invalid password');
+            return {
+                success: false,
+                error: {
+                    message: 'İnvalid Password'
+                }
+            };
         }
 
         const token = jwt.sign({ userId: user._id, email: user.email }, this.config.auth.secretKey, {

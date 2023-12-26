@@ -56,6 +56,8 @@ const configureContainer = (container: Container) => {
     container.bind<MemberService>(MemberService).to(MemberService).inSingletonScope();
     container.bind<MemberRepository>(MemberRepository).to(MemberRepository).inSingletonScope();
     container.bind<MemberController>(MemberController).to(MemberController).inSingletonScope();
+
+    //! Payfine container
 };
 
 export default configureContainer;

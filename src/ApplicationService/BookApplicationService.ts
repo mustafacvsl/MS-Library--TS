@@ -23,11 +23,11 @@ export class BookApplicationService {
         const locationData = bookData.location;
 
         if (stockData) {
-            await this.stockService.createStock(stockData);
+            await this.stockService.createStock(createdBook._id, stockData.count);
         }
 
         if (locationData) {
-            await this.locationService.createLocation(locationData);
+            await this.locationService.createLocation(createdBook._id, locationData);
         }
 
         return createdBook;

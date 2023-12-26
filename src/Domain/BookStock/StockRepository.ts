@@ -3,7 +3,7 @@ import { injectable } from 'inversify';
 
 @injectable()
 class StockRepository {
-    async createStock(stockData: string): Promise<IStockModel> {
+    async createStock(stockData: any): Promise<IStockModel> {
         const newStock: IStockModel = new StockEntity(stockData);
         return newStock.save();
     }

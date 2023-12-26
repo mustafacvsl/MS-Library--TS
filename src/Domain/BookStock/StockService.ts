@@ -2,6 +2,7 @@ import StockRepository from './StockRepository';
 import { inject, injectable } from 'inversify';
 import { IStockModel } from './StockEntity';
 import Book, { IBookModel } from '../Book/BookEntity';
+import mongoose from 'mongoose';
 
 @injectable()
 export class StockService {
@@ -11,7 +12,12 @@ export class StockService {
         this.stockRepository = stockRepository;
     }
 
-    async createStock(stockData: string): Promise<IStockModel> {
+    async createStock(bookId: string, count: number): Promise<IStockModel> {
+        const stockData = {
+            bookId: new mongoose.Types.ObjectId(bookId),
+            count: count
+        };
+
         return this.stockRepository.createStock(stockData);
     }
 

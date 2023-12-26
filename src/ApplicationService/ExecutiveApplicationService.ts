@@ -12,7 +12,6 @@ import LoanedService from '../Domain/Loaned/LoanedService';
 import ReturnedService from '../Domain/Returned/ReturnedService';
 import { Result } from '../infrastructure/Result';
 import StockService from '../Domain/BookStock/StockService';
-import mongoose, { ObjectId } from 'mongoose';
 
 const Penalties = 5;
 
